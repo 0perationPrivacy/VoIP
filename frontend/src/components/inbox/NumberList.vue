@@ -10,7 +10,7 @@
         <div class="icons mt-2">
           <b-dropdown class="dropDown" variant="primary">
             <template #button-content>
-              <div v-if="activeProfile" class="d-flex flex-row align-items-center bd-highlight">
+              <div class="d-flex flex-row align-items-center bd-highlight">
                 <div v-if="activeProfile" class="d-flex flex-column bd-highlight">
                   <div>{{  getValidString(activeProfile.profile) }}</div>
                   <div style="font-size: 10px;">{{activeProfile.number}}</div>

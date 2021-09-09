@@ -2,8 +2,22 @@
   <div>
     <div v-for="profile in profiles" :key="profile._id" >
       <b-dropdown-item-button @click="changeProfile(profile)">
-        {{ getValidString(profile.profile)}}<span v-if="profile.number && profile.number !== ''">({{profile.number}})</span>
-        <span  v-if="profile.messageCount > 0" class="start-100 translate-middle badge border border-light rounded-circle bg-danger p-2"><span class="visually-hidden">unread messages</span></span>
+        <div class="d-flex flex-row">
+          <div>
+            <div class="d-flex flex-column">
+              <div>
+                <!-- {{ getValidString(profile.profile)}} -->
+                {{ profile.profile }}
+              </div>
+              <div>
+                <span v-if="profile.number && profile.number !== ''" class="profileNum">({{profile.number}})</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <span v-if="profile.messageCount > 0" class="start-100 translate-middle badge border border-light rounded-circle bg-danger p-2"><span class="visually-hidden">unread messages</span></span>
+          </div>
+        </div>
       </b-dropdown-item-button>
       <b-dropdown-divider></b-dropdown-divider>
     </div>
@@ -67,15 +81,15 @@ export default {
     this.getallProfile()
   },
   methods: {
-    getValidString (str) {
-      if (str.length > 10) {
-        var newStr2 = str.substring(0, str.length - (str.length - 10)) + '..'
-      } else {
-        // eslint-disable-next-line no-redeclare
-        var newStr2 = str
-      }
-      return newStr2
-    },
+    // getValidString (str) {
+    //   if (str.length > 10) {
+    //     var newStr2 = str.substring(0, str.length - (str.length - 10)) + '..'
+    //   } else {
+    //     // eslint-disable-next-line no-redeclare
+    //     var newStr2 = str
+    //   }
+    //   return newStr2
+    // },
     onClickButton (profile) {
       this.$emit('clicked', profile)
     },

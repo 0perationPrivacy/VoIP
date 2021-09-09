@@ -392,10 +392,21 @@ exports.receiveSms = async (req, res) => {
                 const url = req.body[tMedia]; // link to file you want to download
                 //var name = `uploads/${Date.now()}${req.body.SmsSid}.png`;
                 var name = crypto.randomBytes(24).toString('hex');
-                request(url).pipe(fs.createWriteStream(name))
+                var date = moment(new Date()).format('MMDDYYYY');
+                try {
+                    await fs.promises.access("./uploads/"+date);
+                }catch (e) {
+                    await fs.promises.mkdir('./uploads/'+date)
+                }
+
+                request(url).pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
+                .on('close', () => console.log('Image downloaded.'));
+                savedName = `${process.env.BASE_URL.trim()}uploads/${date}/${name}`
+                fackMedia.push(savedName)
+                /*request(url).pipe(fs.createWriteStream(name))
                 .on('close', () => console.log('Image downloaded.'));
                 savedName = `${process.env.BASE_URL.trim()}${name}`
-                fackMedia.push(savedName)
+                fackMedia.push(savedName)*/
             }
             media = fackMedia;
         }
@@ -411,9 +422,16 @@ exports.receiveSms = async (req, res) => {
                 const url = messageData.media[i].url; // link to file you want to download
                 // var name = `uploads/${Date.now()}${sid}.png`;
                 var name = crypto.randomBytes(24).toString('hex');
-                request(url).pipe(fs.createWriteStream(name))
+                var date = moment(new Date()).format('MMDDYYYY');
+                try {
+                    await fs.promises.access("./uploads/"+date);
+                }catch (e) {
+                    await fs.promises.mkdir('./uploads/'+date)
+                }
+
+                request(url).pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
                 .on('close', () => console.log('Image downloaded.'));
-                savedName = `${process.env.BASE_URL.trim()}${name}`
+                savedName = `${process.env.BASE_URL.trim()}uploads/${date}/${name}`
                 fackMedia.push(savedName)
                 // fackMedia.push(messageData.media[i].url)
             }

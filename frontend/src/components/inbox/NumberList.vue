@@ -12,8 +12,9 @@
             <template #button-content>
               <div class="d-flex flex-row align-items-center bd-highlight">
                 <div v-if="activeProfile" class="d-flex flex-column bd-highlight">
-                  <div>{{  getValidString(activeProfile.profile) }}</div>
-                  <div style="font-size: 10px;">{{activeProfile.number}}</div>
+                  <!-- <div>{{  getValidString(activeProfile.profile) }}</div> -->
+                   <div class="profileName">{{ activeProfile.profile }}</div>
+                  <div class="profileNum">{{activeProfile.number}}</div>
                 </div>
                 <div v-else>
                   <span v-if="userdata">{{ userdata.name }}</span>
@@ -240,7 +241,6 @@
           </div>
         </div>
         <div class="card form-group mt-4" v-if="selected == 'twilio'">
-          <span class="comingsoon"></span>
           <div class="card-body">
             <div class="row mb-2">
               <div class="col-auto col-lg-3 m-auto">
@@ -376,15 +376,15 @@ export default {
     }
   },
   methods: {
-    getValidString (str) {
-      if (str.length > 10) {
-        var newStr2 = str.substring(0, str.length - (str.length - 10)) + '..'
-      } else {
-        // eslint-disable-next-line no-redeclare
-        var newStr2 = str
-      }
-      return newStr2
-    },
+    // getValidString (str) {
+    //   if (str.length > 10) {
+    //     var newStr2 = str.substring(0, str.length - (str.length - 10)) + '..'
+    //   } else {
+    //     // eslint-disable-next-line no-redeclare
+    //     var newStr2 = str
+    //   }
+    //   return newStr2
+    // },
     getOneProfile () {
       // eslint-disable-next-line no-undef
       axios.post(`${this.baseurl}/api/profile/getdata-one`, { setting: this.activeProfile._id }, this.headers)

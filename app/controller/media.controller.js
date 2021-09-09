@@ -1,13 +1,20 @@
 var Media = require('../model/media.model');
 const multer = require("multer")
 const path = require("path")
-const crypto = require('crypto');
+const crypto = require('crypto')
+const moment = require('moment')
+const fs = require("fs")
 
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-
+    destination: async function (req, file, cb) {
+        var date = moment(new Date()).format('MMDDYYYY');
+        try {
+            await fs.promises.access("./uploads/"+date);
+        }catch (e) {
+            await fs.promises.mkdir('./uploads/'+date)
+        }
         // Uploads is the Upload_folder_name
-        cb(null, "./uploads/")
+        cb(null, `./uploads/${date}/`)
         // cb(null, path.join(__dirname, '../../../uploads/'));
     },
     filename: function (req, file, cb) {
@@ -25,7 +32,7 @@ var upload = multer({
     fileFilter: function (req, file, cb){
     
         // Set the filetypes, it is optional
-        var filetypes = /jpeg|jpg|png/;
+        var filetypes = /jpeg|jpg|gif|png/;
         var mimetype = filetypes.test(file.mimetype);
   
         var extname = filetypes.test(path.extname(
@@ -49,7 +56,8 @@ exports.fileUpload = async (req, res) => {
             res.send(err)
         }
         else {
-            var mediaData = {media:`uploads/${req.file.filename}`, user:req.user.id};
+            var date = moment(new Date()).format('MMDDYYYY');
+            var mediaData = {media:`uploads/${date}/${req.file.filename}`, user:req.user.id};
 
             var media = await Media.create(mediaData);
             if(media){
@@ -58,39 +66,30 @@ exports.fileUpload = async (req, res) => {
             }else{
                 res.status(400).json({status:'false',message:'Media not uploaded!'}); 
             }
-            // SUCCESS, image successfully uploaded
-            // res.send("Success, Image uploaded!")
         }
     })
 };
 
 var cron = require('node-cron');
-// cron job runs every hour
-/*cron.schedule('0 1 * * *', () => {
-    console.log('running a task every minute');
-    var fs = require('fs'); 
-    var directoryPath = path.join(__dirname, '../../uploads/')
-    fs.readdir(directoryPath, function (err, files) {
-        if (err) {
-            return console.log('Unable to scan directory: ' + err);
-        } 
-        files.forEach(function (file) {
-            console.log(file)
-            var fileData = `${directoryPath}${file}`
-            const { birthtime } = fs.statSync(fileData)
-            console.log(birthtime); 
-            now = new Date().getTime()
-            var deleteTime = (3600000 * 12 * 10) // deletes mms after 10 days
-            endTime = new Date(birthtime).getTime() + deleteTime;
-            console.log(deleteTime)
-            console.log(endTime)
-            if(now > endTime){
-                fs.unlinkSync(fileData);
-            }
-        });
-    });
-});*/
+// cron job runs every day at 01:00
+cron.schedule('0 1 * * *', () => {
+    console.log('running a task every day at 01:00');
+    var startdate = moment();
+    startdate = startdate.subtract(7, "days");
+    startdate = startdate.format("DDMMYYYY");
+    try {
+        fs.rmdirSync("./uploads/"+startdate, { recursive: true });
+    }catch (e) {
+        console.log('folder not found')
+    }
+});
 exports.deleteMedia = async (req, res) => {
-    
-    res.send({test:'test'});
+    var startdate = moment();
+    startdate = startdate.subtract(7, "days");
+    startdate = startdate.format("DDMMYYYY");
+    try {
+        fs.rmdirSync("./uploads/"+startdate, { recursive: true });
+    }catch (e) {
+        console.log('folder not found')
+    }
 };

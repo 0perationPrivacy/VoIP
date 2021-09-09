@@ -1,14 +1,15 @@
 {
-  "name": "appintment",
-  "version": "1.0.0",
+  "name": "voipsuite",
+  "version": "0.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "dev": "set NODE_ENV=development && nodemon app.js",
+    "start": "set NODE_ENV=production && node app.js"
   },
-  "author": "Fv Thakor",
-  "license": "MIT",
+  "author": "Operation Privacy",
+  "license": "",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",

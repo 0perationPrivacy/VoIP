@@ -714,3 +714,27 @@ body::after {
     padding: 0 0.75rem !important;
     font-size: 15px !important;
 }
+.profileNum {
+    font-size: 12px;
+    color: var(--theme-orange);
+}
+.dropdown-item {
+    line-height: 18px!important;
+}
+.dropdown-item > div > div > div > div, .profileName {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+.profileName {
+    max-width: 100px;
+}
+.dropdown-item:hover {
+    background-color: var(--contact-hover)!important;
+}
+.dropdown-menu {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    max-height: 100vh;
+    overflow-y: auto;
+}

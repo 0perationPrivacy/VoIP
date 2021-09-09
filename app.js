@@ -1,3 +1,5 @@
+const config =  require('./config.js');
+
 const express = require('express')
 const app = express()
 var bodyParser = require('body-parser')
@@ -9,6 +11,7 @@ const server = require('http').createServer(app);
 
 global.io = require('socket.io')(server,{ cors: { origin: '*' } });
 
+console.log(`NODE_ENV=${config.NODE_ENV}`);
 
 var mongoose = require('./config/db.config');
 

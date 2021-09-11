@@ -1,7 +1,14 @@
 
 # Changelog
 
+
 > Note: Every update deletes the MMS media files/folder
+
+
+
+## v0.62
+- JWT token implementaiton in Cookies instead of LocalStorage
+- Security/Vulnerability patches
 
 ## v0.61
 - Dopdown menu red dot notification
@@ -15,13 +22,10 @@
 - Fixed uploads folder path
 - Scrollable dropdown
 - Minor aesthetics
-
 ## v0.55 - Sept 7, 2021
 - Signup bug fix
-
 ## v0.50 - Sept 6, 2021
 - version number added
-
 ## v0-0.50 - Aug, 2021
 - Untracked changes
 - Twilio sms auto delete

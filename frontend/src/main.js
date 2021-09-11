@@ -8,15 +8,16 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 
 import VueChatScroll from 'vue-chat-scroll'
 import formLoading from 'vue2-form-loading'
+var VueCookie = require('vue-cookie')
 window.axios = require('axios')
 Vue.use(VueChatScroll)
 Vue.use(formLoading)
+Vue.use(VueCookie)
 
 Vue.config.productionTip = false
 Vue.use(VueSweetalert2)
 Vue.use(require('vue-moment'))
 
-/* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,

@@ -102,7 +102,7 @@ export default {
     if (baseUrl === 'http://localhost:8080') {
       this.baseurl = 'http://localhost:3000'
     }
-    if (localStorage.getItem('access_token')) {
+    if (this.$cookie.get('access_token')) {
       this.$router.push('/dashboard')
     }
     this.getsignup()
@@ -141,8 +141,8 @@ export default {
       // eslint-disable-next-line no-undef
       axios.post(`${this.baseurl}/api/auth/login`, this.user)
         .then(response => {
-          localStorage.setItem('access_token', response.data.token)
-          localStorage.setItem('userdata', JSON.stringify(response.data.data))
+          this.$cookie.set('access_token', response.data.token)
+          this.$cookie.set('userdata', JSON.stringify(response.data.data))
           this.$router.push('/dashboard')
         })
         .catch(error => {

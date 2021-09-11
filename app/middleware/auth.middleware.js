@@ -1,5 +1,6 @@
 var User = require('../model/user.model');
-
+var jwt = require('jsonwebtoken');
+// const salt = process.env.COOKIE_KEY
 module.exports = (req, res, next) => {
     try {
         if(req.headers.token){
@@ -7,8 +8,17 @@ module.exports = (req, res, next) => {
             var condition = {token:token};
             User.findOne(condition).then(data => {
                 if(data){
-                    req.user = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
-                    next();
+                    try {
+                        var decoded = jwt.verify(token, process.env.COOKIE_KEY);
+                        //console.log(decoded)
+                        req.user = decoded;
+                        next();
+                      } catch(err) {
+                        res.status(401).json({
+                            error: 'Unauthorized Access!'
+                        });
+                      }
+                    
                 }else{
                     res.status(401).json({
                         error: 'Unauthorized Access!'

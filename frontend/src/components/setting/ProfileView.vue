@@ -68,7 +68,8 @@ export default {
     }
   },
   mounted () {
-    this.access_token = localStorage.getItem('access_token')
+    this.userdata = JSON.parse(this.$cookie.get('userdata'))
+    this.access_token = this.$cookie.get('access_token')
     this.headers = {
       headers: {
         token: this.access_token
@@ -81,15 +82,7 @@ export default {
     this.getallProfile()
   },
   methods: {
-    // getValidString (str) {
-    //   if (str.length > 10) {
-    //     var newStr2 = str.substring(0, str.length - (str.length - 10)) + '..'
-    //   } else {
-    //     // eslint-disable-next-line no-redeclare
-    //     var newStr2 = str
-    //   }
-    //   return newStr2
-    // },
+
     onClickButton (profile) {
       this.$emit('clicked', profile)
     },
@@ -133,7 +126,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
-            localStorage.removeItem('access_token')
+            this.$cookie.delete('access_token')
             this.$router.push('/')
           }
         })
@@ -162,7 +155,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
-            localStorage.removeItem('access_token')
+            this.$cookie.delete('access_token')
             this.$router.push('/')
           }
           if (error.response.status === 400) {

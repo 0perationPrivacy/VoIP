@@ -367,8 +367,8 @@ export default {
     if (baseUrl === 'http://localhost:8080') {
       this.baseurl = 'http://localhost:3000'
     }
-    this.userdata = JSON.parse(localStorage.getItem('userdata'))
-    this.access_token = localStorage.getItem('access_token')
+    this.userdata = JSON.parse(this.$cookie.get('userdata'))
+    this.access_token = this.$cookie.get('access_token')
     this.headers = {
       headers: {
         token: this.access_token
@@ -398,7 +398,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
-            localStorage.removeItem('access_token')
+            this.$cookie.delete('access_token')
             this.$router.push('/')
           }
         })
@@ -427,8 +427,8 @@ export default {
       this.$emit('clicked', id)
     },
     logout () {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('userdata')
+      this.$cookie.delete('access_token')
+      this.$cookie.delete('userdata')
       this.$router.push('/')
     },
     getNumberList () {
@@ -446,6 +446,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
+            this.$cookie.delete('access_token')
             this.$router.push('/')
           }
         })
@@ -472,7 +473,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
-            localStorage.removeItem('access_token')
+            this.$cookie.delete('access_token')
             this.$router.push('/')
           }
         })
@@ -518,7 +519,7 @@ export default {
                   title: 'Oops...',
                   text: error.response.data.message
                 })
-                localStorage.removeItem('access_token')
+                this.$cookie.delete('access_token')
                 this.$router.push('/')
               }
             })
@@ -563,7 +564,7 @@ export default {
                   title: 'Oops...',
                   text: error.response.data.message
                 })
-                localStorage.removeItem('access_token')
+                this.$cookie.delete('access_token')
                 this.$router.push('/')
               }
             })
@@ -594,7 +595,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
-            localStorage.removeItem('access_token')
+            this.$cookie.delete('access_token')
             this.$router.push('/')
           }
         })
@@ -654,7 +655,7 @@ export default {
                 title: 'Oops...',
                 text: error.response.data.message
               })
-              localStorage.removeItem('access_token')
+              this.$cookie.delete('access_token')
               this.$router.push('/')
             }
             if (error.response.status === 400) {

@@ -7,6 +7,8 @@ const moment = require('moment')
 var User = require('../model/user.model');
 const nodemailer = require('nodemailer');
 
+var jwt = require('jsonwebtoken');
+
 exports.login = async (req, res) => {
     let rules = {
         email: 'required',
@@ -22,10 +24,14 @@ exports.login = async (req, res) => {
             var checkpassword = bcrypt.compareSync(req.body.password, user.password);
             if(checkpassword){
                 var obj = {id:user.id,email:user.email,name:user.name};
-                var strObj = JSON.stringify(obj);
-                let buff = Buffer.from(strObj, "utf8");
-                let base64data = buff.toString('base64');
-                user.token = base64data;
+                var token = jwt.sign(obj, process.env.COOKIE_KEY);
+                //console.log(token)
+                //res.status(401).json({status:'false',message:'Unauthorized Access!'});
+                // return
+                //var strObj = JSON.stringify(obj);
+                //let buff = Buffer.from(strObj, "utf8");
+                //let base64data = buff.toString('base64');
+                user.token = token;
                 user.save();                
                 /*var min = 100000;
                 var max = 999999;
@@ -50,7 +56,7 @@ exports.login = async (req, res) => {
                     text: "Your otp is " +otp, // plain text body
                   });
                   var data = {_id:user._id, email:user.email};*/
-                  res.send({status:true, message:'user data!', data:user, token:base64data});
+                  res.send({status:true, message:'user data!', data:user, token:token});
                   return;
             }else{
                 res.status(401).json({status:'false',message:'Unauthorized Access!'});

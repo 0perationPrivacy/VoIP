@@ -6,11 +6,9 @@ module.exports = app => {
     router.post("/login", user.login);
     //router.get("/me", user.getUser); 
     router.post("/register", user.register);
-    router.post("/otp-verify", user.otpVerify);
+    // router.post("/otp-verify", user.otpVerify);
     router.post("/get-signup", user.getSignUpOption);
     router.post("/get-version", user.getVersionOption);
-
-    router.get("/update-all-profile", user.updateAllProfile);
 
     app.use('/api/auth', router);
 };

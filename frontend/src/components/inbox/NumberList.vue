@@ -12,9 +12,9 @@
             <template #button-content>
               <div class="d-flex flex-row align-items-center bd-highlight">
                 <div v-if="activeProfile" class="d-flex flex-column bd-highlight">
-                  <!-- <div>{{  getValidString(activeProfile.profile) }}</div> -->
                    <div class="profileName">{{ activeProfile.profile }}</div>
                   <div class="profileNum">{{activeProfile.number}}</div>
+                  <span v-if="activeProfile.totalCount > 0" class="position-absolute top-0 start-100 translate-middle badge border border-light rounded-circle bg-danger p-2"><span class="visually-hidden">unread messages</span></span>
                 </div>
                 <div v-else>
                   <span v-if="userdata">{{ userdata.name }}</span>
@@ -398,6 +398,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
+            localStorage.removeItem('access_token')
             this.$router.push('/')
           }
         })
@@ -471,6 +472,8 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
+            localStorage.removeItem('access_token')
+            this.$router.push('/')
           }
         })
     },
@@ -515,6 +518,7 @@ export default {
                   title: 'Oops...',
                   text: error.response.data.message
                 })
+                localStorage.removeItem('access_token')
                 this.$router.push('/')
               }
             })
@@ -559,6 +563,7 @@ export default {
                   title: 'Oops...',
                   text: error.response.data.message
                 })
+                localStorage.removeItem('access_token')
                 this.$router.push('/')
               }
             })
@@ -589,6 +594,8 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
+            localStorage.removeItem('access_token')
+            this.$router.push('/')
           }
         })
     },
@@ -647,6 +654,7 @@ export default {
                 title: 'Oops...',
                 text: error.response.data.message
               })
+              localStorage.removeItem('access_token')
               this.$router.push('/')
             }
             if (error.response.status === 400) {

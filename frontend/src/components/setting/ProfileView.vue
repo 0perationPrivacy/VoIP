@@ -133,6 +133,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
+            localStorage.removeItem('access_token')
             this.$router.push('/')
           }
         })
@@ -161,6 +162,7 @@ export default {
               title: 'Oops...',
               text: error.response.data.message
             })
+            localStorage.removeItem('access_token')
             this.$router.push('/')
           }
           if (error.response.status === 400) {

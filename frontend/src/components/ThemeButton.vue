@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="idHide === 'false'">
     <input
       @change="toggleTheme"
       id="checkbox"
@@ -19,6 +19,7 @@
 
 <script>
 export default {
+  props: ['idHide'],
   mounted () {
     var getTheme = localStorage.getItem('user-theme')
     let initUserTheme

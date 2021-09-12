@@ -288,8 +288,9 @@ exports.sendSms = async (req, res) => {
                     const client = require('twilio')(settingCheck.twilio_sid, settingCheck.twilio_token);
                     var arrMessageData = [];
                     for(var i=0; i < req.body.numbers.length; i++ ) {
-                        var sendNumber = req.body.numbers[i].length
                         var toNumber = req.body.numbers[i];
+                        toNumber = toNumber.replace(/\s/g,'').replace(/\-/g,'').replace(/\)/g,'').replace(/\(/g,'')
+                        var sendNumber = toNumber.length
                         if(sendNumber <= 10){
                             toNumber = `+1${toNumber}`;
                         }
@@ -326,8 +327,10 @@ exports.sendSms = async (req, res) => {
                     const Telnyx = telnyx(settingCheck.api_key);
                     var arrMessageData = [];
                     for(var i=0; i < req.body.numbers.length; i++ ) {
-                        var sendNumber = req.body.numbers[i].length
+                        //var sendNumber = req.body.numbers[i].length
                         var toNumber = req.body.numbers[i];
+                        toNumber = toNumber.replace(/\s/g,'').replace(/\-/g,'').replace(/\)/g,'').replace(/\(/g,'')
+                        var sendNumber = toNumber.length
                         if(sendNumber <= 10){
                             toNumber = `+1${toNumber}`;
                         }

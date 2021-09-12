@@ -4,23 +4,28 @@
 > Note: Every update deletes the MMS media files/folder
 
 
+
+## v0.64
+- Dark mode `refresh` issue resolved
+- `To` Phone number brackets, hyphens now ignored (regex)
+
 ## v0.63
-- Multiple/concurrent logins allowed
-- Cookie expiry 30 days
+- Multiple/`concurrent logins` allowed
+- Cookie expiry `30 days`
 
 ## v0.62
-- JWT token implementaiton in Cookies instead of LocalStorage
-- Security/Vulnerability patches
+- `JWT` token implementaiton in `Cookies` instead of LocalStorage
+- Security/Vulnerability `patches`
 
 ## v0.61
-- Dopdown menu red dot notification
-- fixed login loop error for db/session
+- Dopdown menu `red dot` notification
+- fixed login `loop error` for db/session
 
 ## v0.60
-- MMS auto delete function (7 days)
-- Added gif filetype
-- Separate dev environment
-- Ignore uploads folder in commits
+- MMS `auto delete` function (7 days)
+- Added `gif` filetype
+- Separate `dev` environment
+- Ignore `uploads` folder in commits, deletes on each build
 - Fixed uploads folder path
 - Scrollable dropdown
 - Minor aesthetics

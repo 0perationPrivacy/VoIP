@@ -102,7 +102,7 @@
     </div>
      <!-- setting modal -->
     <b-modal ref="my-modal" id="modal-1" size="lg" title="Settings" hide-footer>
-      <theme-button />
+      <theme-button id-hide="false" />
       <form @submit.prevent="handleSubmit" class="ml-2 mr-2">
         <b-form-radio-group
           id="btn-radios-2"

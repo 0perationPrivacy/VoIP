@@ -1,5 +1,6 @@
 <template>
   <div id="wrapbody" class="wrap">
+    <theme-button id-hide="true"></theme-button>
     <b-sidebar v-if="vw < 576"
       class="d-sm-none"
       id="sidebar-no-header"
@@ -196,11 +197,12 @@
 import { required } from 'vuelidate/lib/validators'
 import NumberList from './inbox/NumberList.vue'
 import VueTagsInput from '@johmun/vue-tags-input'
+import ThemeButton from '@/components/ThemeButton.vue'
 const io = require('socket.io-client')
 
 export default {
   name: 'dashboard',
-  components: { NumberList, VueTagsInput },
+  components: { NumberList, VueTagsInput, ThemeButton },
   data () {
     return {
       dropArea: null,

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="login-box dark-mode p-3">
-            <theme-button />
+            <theme-button id-hide="false" />
             <h1 class="dark-mode">Login</h1>
             <form @submit.prevent="handleSubmit" class="ml-2 mr-2" v-if="!otpScreen">
               <div class="form-group mt-4">

@@ -141,8 +141,8 @@ export default {
       // eslint-disable-next-line no-undef
       axios.post(`${this.baseurl}/api/auth/login`, this.user)
         .then(response => {
-          this.$cookie.set('access_token', response.data.token)
-          this.$cookie.set('userdata', JSON.stringify(response.data.data))
+          this.$cookie.set('access_token', response.data.token, 30)
+          this.$cookie.set('userdata', JSON.stringify(response.data.data), 30)
           this.$router.push('/dashboard')
         })
         .catch(error => {

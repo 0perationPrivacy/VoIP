@@ -6,8 +6,8 @@ module.exports = (req, res, next) => {
         if(req.headers.token){
             const token = req.headers.token;
             var condition = {token:token};
-            User.findOne(condition).then(data => {
-                if(data){
+            /* User.findOne(condition).then(data => {
+                if(data){ */
                     try {
                         var decoded = jwt.verify(token, process.env.COOKIE_KEY);
                         //console.log(decoded)
@@ -19,17 +19,17 @@ module.exports = (req, res, next) => {
                         });
                       }
                     
-                }else{
+               /* }else{
                     res.status(401).json({
                         error: 'Unauthorized Access!'
                     });
                 }
-            }).catch(err => {
+             }).catch(err => {
                 res.status(500).send({
                   message:
                     err.message || "Error occurred while logging in."
                 });
-            });  
+            });  */
         }else{
             res.status(401).json({
                 error: 'Unauthorized Access!'

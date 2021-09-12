@@ -1,10 +1,12 @@
 
 # Changelog
 
-
 > Note: Every update deletes the MMS media files/folder
 
 
+## v0.63
+- Multiple/concurrent logins allowed
+- Cookie expiry 30 days
 
 ## v0.62
 - JWT token implementaiton in Cookies instead of LocalStorage

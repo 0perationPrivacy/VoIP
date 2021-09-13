@@ -6,5 +6,8 @@
 
 - [Troubleshooting](https://github.com/0perationPrivacy/VoIP/wiki/Troubleshooting) tips
 
-- Donate:
-https://www.OperationPrivacy.com/donate
+- Donate: https://www.OperationPrivacy.com/donate
+
+- Coming Soon
+- BTC:
+- XMR:

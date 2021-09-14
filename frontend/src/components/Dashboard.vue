@@ -264,7 +264,6 @@ export default {
     // this.userdata = JSON.parse(localStorage.getItem('userdata'))
     this.userdata = JSON.parse(this.$cookie.get('userdata'))
     this.access_token = this.$cookie.get('access_token')
-    // this.access_token = localStorage.getItem('access_token')
     this.socket.emit('join_profile_channel', this.userdata._id.toString())
 
     this.socket.on('user_message', function (data) {
@@ -473,7 +472,6 @@ export default {
                   text: error.response.data.message
                 })
                 this.$cookie.delete('access_token')
-                // localStorage.removeItem('access_token')
                 this.$router.push('/')
               }
             })
@@ -533,7 +531,6 @@ export default {
               text: error.response.data.message
             })
             this.$cookie.delete('access_token')
-            // localStorage.removeItem('access_token')
             this.$router.push('/')
           }
         })
@@ -572,7 +569,6 @@ export default {
               text: error.response.data.message
             })
             this.$cookie.delete('access_token')
-            // localStorage.removeItem('access_token')
             this.$router.push('/')
           }
         })

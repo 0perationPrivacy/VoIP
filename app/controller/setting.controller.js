@@ -494,12 +494,14 @@ exports.smsStatus = async (req, res) => {
     }else{
         var data = req.body.data.payload;
         var status = data.to[0].status;
-        var sid = data.to[0].status;
+        var sid = data.id;
     }
     var message = await Message.findOne({sid: sid});
-    message.status = status;
-    message.save();
-   const VoiceResponse = twilio.twiml.VoiceResponse;
+    if(message){
+        message.status = status;
+        message.save();
+    }
+    const VoiceResponse = twilio.twiml.VoiceResponse;
     const response = new VoiceResponse();
     console.log(response.toString());
     res.set('Content-Type', 'text/xml');

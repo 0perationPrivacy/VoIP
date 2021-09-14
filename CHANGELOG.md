@@ -3,7 +3,8 @@
 
 > Note: Every update deletes the MMS media files/folder
 
-
+## v0.64.1
+- NULL error issue when sending resolved
 
 ## v0.64
 - Dark mode `refresh` issue resolved

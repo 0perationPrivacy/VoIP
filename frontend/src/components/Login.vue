@@ -111,7 +111,7 @@ export default {
   methods: {
     getsignup () {
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/auth/get-signup`, {})
+      axios.post(`${this.baseurl}/auth/get-signup`, {})
         .then(response => {
           if (response.data.data === 'on') {
             this.signUpOption = true
@@ -125,7 +125,7 @@ export default {
     },
     getVersion () {
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/auth/get-version`, {})
+      axios.post(`${this.baseurl}/auth/get-version`, {})
         .then(response => {
           this.versionOption = response.data.data
         })
@@ -139,7 +139,7 @@ export default {
       }
 
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/auth/login`, this.user)
+      axios.post(`${this.baseurl}/auth/login`, this.user)
         .then(response => {
           this.$cookie.set('access_token', response.data.token, 30)
           this.$cookie.set('userdata', JSON.stringify(response.data.data), 30)
@@ -159,7 +159,7 @@ export default {
       this.submitted2 = true
       if (this.otpForm.otp.trim() !== '') {
         // eslint-disable-next-line no-undef
-        axios.post(`${this.baseurl}/api/auth/otp-verify`, {user: this.loginId, otp: this.otpForm.otp})
+        axios.post(`${this.baseurl}/auth/otp-verify`, {user: this.loginId, otp: this.otpForm.otp})
           .then(response => {
             localStorage.setItem('access_token', response.data.token)
             localStorage.setItem('userdata', JSON.stringify(response.data.data))

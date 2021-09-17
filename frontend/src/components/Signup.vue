@@ -65,7 +65,6 @@
 <script>
 
 import { required, minLength, sameAs } from 'vuelidate/lib/validators'
-import env from '../config'
 export default {
   name: 'Signup',
   data () {
@@ -104,7 +103,7 @@ export default {
       }
 
       // eslint-disable-next-line no-undef
-      axios.post(`${env.baseurl}/auth/register`, this.user)
+      axios.post(`auth/register`, this.user)
         .then(response => {
           this.$router.push('/')
         })

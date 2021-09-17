@@ -3,14 +3,26 @@
 
 > Note: Every update deletes the MMS media files/folder
 
-## v0.64.1
+## v0.65 (Sept 17, 2021)
+- Contacts
+  - `Add` Manually
+  - `Import` CSV file
+  - `Expoert` CSV file
+  - `Dropdown` in compose message
+- Bug Fix
+  - Send empty message error
+  - Double click send twice issue (delays till sent confirmation from server received)
+  - Sidebar dynamic sizing issue in mid-range (iPad or landscape) view
+
+
+## v0.64.1 (Sept 13, 2021)
 - NULL error issue when sending resolved
 
-## v0.64
+## v0.64 (Sept 12, 2021)
 - Dark mode `refresh` issue resolved
 - `To` Phone number brackets, hyphens now ignored (regex)
 
-## v0.63
+## v0.63 (Sept 11, 2021)
 - Multiple/`concurrent logins` allowed
 - Cookie expiry `30 days`
 
@@ -22,7 +34,7 @@
 - Dopdown menu `red dot` notification
 - fixed login `loop error` for db/session
 
-## v0.60
+## v0.60 (Sept 9, 2021)
 - MMS `auto delete` function (7 days)
 - Added `gif` filetype
 - Separate `dev` environment
@@ -30,11 +42,14 @@
 - Fixed uploads folder path
 - Scrollable dropdown
 - Minor aesthetics
-## v0.55 - Sept 7, 2021
+
+## v0.55 - (Sept 7, 2021)
 - Signup bug fix
-## v0.50 - Sept 6, 2021
+
+## v0.50 - (Sept 6, 2021)
 - version number added
-## v0-0.50 - Aug, 2021
+
+## v0-0.50 - (Aug, 2021)
 - Untracked changes
 - Twilio sms auto delete
 - Drag/Drop functionality

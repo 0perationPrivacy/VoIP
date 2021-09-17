@@ -738,3 +738,8 @@ body::after {
     max-height: 100vh;
     overflow-y: auto;
 }
+
+.list-group-item {
+    color: var(--text-primary-color) !important;
+    background-color: transparent !important;
+}

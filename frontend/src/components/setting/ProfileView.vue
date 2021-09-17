@@ -82,7 +82,6 @@ export default {
     this.getallProfile()
   },
   methods: {
-
     onClickButton (profile) {
       this.$emit('clicked', profile)
     },
@@ -101,7 +100,7 @@ export default {
     },
     getallProfile () {
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/profile/getdata`, {}, this.headers)
+      axios.post(`${this.baseurl}/profile/getdata`, {}, this.headers)
         .then(response => {
           this.profiles = response.data.data
           if (!this.activeProfile) {
@@ -138,7 +137,7 @@ export default {
         return
       }
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/profile/create`, this.form, this.headers)
+      axios.post(`${this.baseurl}/profile/create`, this.form, this.headers)
         .then(response => {
           this.$swal({
             icon: 'success',

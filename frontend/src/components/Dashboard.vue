@@ -1,5 +1,10 @@
 <template>
   <div id="wrapbody" class="wrap">
+  <div id="loader" v-if="isLoading">
+      <div class="d-flex loader justify-content-center align-items-center">
+        <div class="sp sp-circle"></div>
+      </div>
+  </div>
     <theme-button id-hide="true"></theme-button>
     <b-sidebar v-if="vw < 576"
       class="d-sm-none"
@@ -19,11 +24,11 @@
             </b-button>
           </div>
         </div>
-       <number-list ref="numberList" @activeChat="activeProfileView" @clicked="onClickChild" />
+       <number-list ref="numberList" @onaddContact="onaddContact" @activeChat="activeProfileView" @clicked="onClickChild" />
       </template>
     </b-sidebar>
     <section class="col-auto col-md-4 d-none d-sm-block">
-    <number-list ref="numberList" @activeChat="activeProfileView" @clicked="onClickChild" v-if="vw >= 576" />
+    <number-list ref="numberList" @onaddContact="onaddContact" @activeChat="activeProfileView" @clicked="onClickChild"  v-if="vw >= 576" />
     </section>
     <section class="col col-md-8 pb-2" id="drop-area1">
       <div class="chat-head">
@@ -153,6 +158,12 @@
       <span class="small text-secondary">Input (+) and country code followed by the 10 digit phone number. If no country code is provided (+1) is assumed. Multiple numbers will be sent as Bulk SMS (individual sms's to recipients). <span class="small text-center">[Telnyx does not support group texting]</span></span>
       <form @submit.prevent="handleSubmit2" class="ml-2 mr-2">
         <div class="form-group mt-4">
+          <select class="form-control chat-input" v-model="selectedContact" @change="contactChangeEvent($event)">
+            <option value=""> Select Contact </option>
+            <option v-for="contact in contacts" :key="contact._id" :value="contact.number">{{contact.first_name}} {{contact.last_name}} - {{contact.number}}</option>
+          </select>
+        </div>
+        <div class="form-group mt-4">
           <vue-tags-input class="form-control chat-input"
                v-model="sms.numbers"
               :tags="tags"
@@ -199,12 +210,15 @@ import NumberList from './inbox/NumberList.vue'
 import VueTagsInput from '@johmun/vue-tags-input'
 import ThemeButton from '@/components/ThemeButton.vue'
 const io = require('socket.io-client')
-
 export default {
   name: 'dashboard',
   components: { NumberList, VueTagsInput, ThemeButton },
   data () {
     return {
+      isLoading: false,
+      fullPage: true,
+      contacts: [],
+      selectedContact: '',
       dropArea: null,
       progressBar: null,
       filesDone: 0,
@@ -303,6 +317,21 @@ export default {
     }
   },
   methods: {
+    messageRefresh () {
+      this.messages = []
+    },
+    contactChangeEvent (e) {
+      console.log(this.sms.numbers)
+      var inputText = {'text': e.target.value, 'tiClasses': ['ti-valid']}
+      this.tags.push(inputText)
+      // this.sms.numbers = e.target.value
+
+      this.selectedContact = ''
+      // console.log(e.target.value)
+    },
+    onaddContact (data) {
+      this.contacts = data
+    },
     hiddenImage () {
       this.zoomImage = ''
       document.getElementById('hidden').style.display = 'none'
@@ -377,7 +406,7 @@ export default {
       }
     },
     uploadFile (file, i) {
-      var url = `${this.baseurl}/api/media/upload-files`
+      var url = `${this.baseurl}/media/upload-files`
       var xhr = new XMLHttpRequest()
       var formData = new FormData()
       xhr.open('POST', url, true)
@@ -410,6 +439,11 @@ export default {
       e.stopPropagation()
     },
     activeProfileView (profile) {
+      console.log(profile)
+      console.log(profile.refresh)
+      if (profile.refresh !== undefined && profile.refresh) {
+        this.messages = []
+      }
       this.activeProfile = profile
     },
     onClickChild (value) {
@@ -457,7 +491,7 @@ export default {
         if (result.isConfirmed) {
           var messageData = {user: this.userdata._id, number: this.activeChat}
           // eslint-disable-next-line no-undef
-          axios.post(`${this.baseurl}/api/setting/message-list-delete`, messageData, this.headers)
+          axios.post(`${this.baseurl}/setting/message-list-delete`, messageData, this.headers)
             .then(response => {
               if (this.activeChatData) {
                 this.showChat(this.activeChat)
@@ -482,12 +516,14 @@ export default {
       })
     },
     sendSms () {
+      this.isLoading = true
       if (this.messageBody.trim() === '' && this.uploadedImages.length === 0) {
         this.$swal({
           icon: 'error',
           title: 'Oops...',
           text: 'Message or file required'
         })
+        this.isLoading = false
         return
       }
       var activechat = JSON.parse(localStorage.getItem('activenumber'))
@@ -497,7 +533,7 @@ export default {
     commonSendMessage (numbers, message) {
       var messageData = {user: this.userdata._id, numbers: numbers, message: message, profile: this.activeProfile, media: this.uploadedImages}
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/setting/send-sms`, messageData, this.headers)
+      axios.post(`${this.baseurl}/setting/send-sms`, messageData, this.headers)
         .then(response => {
           this.messageBody = ''
           this.sms.numbers = ''
@@ -515,8 +551,10 @@ export default {
           if (this.vw < 576) {
             this.$refs['mySidebar2'].hide()
           }
+          this.isLoading = false
         })
         .catch(error => {
+          this.isLoading = false
           if (error.response.status === 400) {
             this.$swal({
               icon: 'error',
@@ -552,7 +590,7 @@ export default {
       this.activeChat = activechat
       this.activeChatData = true
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/setting/message-list`, {user: this.userdata._id, number: activechat, profile: this.activeProfile}, this.headers)
+      axios.post(`${this.baseurl}/setting/message-list`, {user: this.userdata._id, number: activechat, profile: this.activeProfile}, this.headers)
         .then(response => {
           this.messages = response.data
           this.chatListLoader = false
@@ -576,6 +614,7 @@ export default {
     handleSubmit2 (e) {
       this.submitted2 = true
       this.$v.$touch()
+      this.isLoading = true
       if (this.tags.length <= 0) {
         this.$swal({
           icon: 'error',
@@ -585,9 +624,11 @@ export default {
         return
       }
       var numbers = []
+      console.log(this.tags)
       for (var i = 0; i < this.tags.length; i++) {
         numbers.push(this.tags[i].text)
       }
+      // return
       if (!this.$v.sms.message.$error || this.uploadedImages.length > 0) {
         this.commonSendMessage(numbers, this.sms.message)
       } else {
@@ -596,6 +637,7 @@ export default {
           title: 'Oops...',
           text: 'Message or file required!'
         })
+        this.isLoading = false
       }
     },
     updateVw () {
@@ -669,7 +711,7 @@ p {
   border-top-left-radius: 5px !important;
   border-bottom-left-radius: 5px !important;
   padding: 0.5rem 0.75rem !important;
-  border-right: 1px solid lightgray;
+  border-right: 1px solid black;
 }
 #hidden {
     z-index:9999;
@@ -689,4 +731,50 @@ p {
 .wrap-container2{
   position: relative;
 } */
+.sp {
+  width: 32px;
+  height: 32px;
+  clear: both;
+  margin: 20px auto;
+}
+
+/* Spinner Circle Rotation */
+.sp-circle {
+  border: 4px rgba(0, 0, 0, 0.25) solid;
+  border-top: 4px black solid;
+  border-radius: 50%;
+  -webkit-animation: spCircRot 0.6s infinite linear;
+  animation: spCircRot 0.6s infinite linear;
+}
+
+@-webkit-keyframes spCircRot {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(359deg);
+  }
+}
+@keyframes spCircRot {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+#loader{
+  position: absolute;
+  background: white;
+  height: 100%;
+  width: 100%;
+  z-index: 2050;
+  top: 0;
+  left: 0;
+  opacity: .3;
+}
+.loader{
+  height: 100%;
+  width:100%;
+}
 </style>

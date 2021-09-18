@@ -12,7 +12,6 @@ const crypto = require('crypto');
 var Setting = require('../model/setting.model');
 var User = require('../model/user.model');
 var Message = require('../model/message.model');
-var Number = require('../model/number.model');
 const Numbers = require('twilio/lib/rest/Numbers');
 const { exists } = require('../model/setting.model');
 exports.deleteKey = async (req, res) => {

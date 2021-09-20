@@ -3,6 +3,10 @@
 
 > Note: Every update deletes the MMS media files/folder
 
+## v0.65.1 (Sept 19, 2021)
+- Image upload path issue fixed
+
+
 ## v0.65 (Sept 17, 2021)
 - Contacts
   - `Add` Manually

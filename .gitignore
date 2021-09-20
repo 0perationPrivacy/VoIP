@@ -1,4 +1,3 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
 /tmp
@@ -39,8 +38,7 @@ testem.log
 /typings
 
 # System Files
-.DS_Store
+*.DS_Store
 Thumbs.db
 package-lock.json
 .dccache
-

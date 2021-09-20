@@ -406,7 +406,7 @@ export default {
       }
     },
     uploadFile (file, i) {
-      var url = `${this.baseurl}/media/upload-files`
+      var url = `${this.baseurl}/api/media/upload-files`
       var xhr = new XMLHttpRequest()
       var formData = new FormData()
       xhr.open('POST', url, true)

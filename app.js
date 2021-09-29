@@ -26,11 +26,11 @@ app.use(cors({ origin: ['http://localhost:8080'], }))
 io.on('connection', socket => {
   console.log('a user connected');
   socket.on('join_channel', (channel) => {
-    console.log(`${channel} user joied chanel`);
+    console.log(`${channel} user joined channel`);
     socket.join(channel);
   });
   socket.on('join_profile_channel', (channel) => {
-    console.log(`${channel} user joied chanel`);
+    console.log(`${channel} user joined channel`);
     socket.join(channel);
   });
   

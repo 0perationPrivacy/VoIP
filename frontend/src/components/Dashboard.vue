@@ -47,8 +47,11 @@
         ></b-icon>
         <div class="chat-name">
           <h1 class="font-name" v-if="activeChat">
+            <div class="d-flex align-items-start align-self-center" v-if="activeChat.contact">
+              <div class="mt-2 ml-4" >{{activeChat.contact.first_name}} {{activeChat.contact.last_name}}</div>
+            </div>
             <div class="d-flex align-items-start align-self-center">
-              <div class="mt-2 ml-4">{{ activeChat._id }}</div>
+              <div class="mt-2 ml-4" >{{ activeChat._id }}</div>
             </div>
           </h1>
         </div>
@@ -93,7 +96,8 @@
             </div>
           </div>
         </div>
-        <div class="chat" id="chat-container" v-chat-scroll>
+        <!-- v-chat-scroll="{smooth: true, notSmoothOnInit: true}" -->
+        <div class="chat" id="chat-container" >
           <div v-if="activeChatData">
             <div v-for="message in messages" :key="message._id">
               <div
@@ -209,6 +213,7 @@ import { required } from 'vuelidate/lib/validators'
 import NumberList from './inbox/NumberList.vue'
 import VueTagsInput from '@johmun/vue-tags-input'
 import ThemeButton from '@/components/ThemeButton.vue'
+import { post } from '../core/module/common.module'
 const io = require('socket.io-client')
 export default {
   name: 'dashboard',
@@ -439,8 +444,6 @@ export default {
       e.stopPropagation()
     },
     activeProfileView (profile) {
-      console.log(profile)
-      console.log(profile.refresh)
       if (profile.refresh !== undefined && profile.refresh) {
         this.messages = []
       }
@@ -490,24 +493,20 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           var messageData = {user: this.userdata._id, number: this.activeChat}
-          // eslint-disable-next-line no-undef
-          axios.post(`${this.baseurl}/setting/message-list-delete`, messageData, this.headers)
-            .then(response => {
+          var request = {
+            data: messageData,
+            url: 'setting/message-list-delete'
+          }
+          this.$store
+            .dispatch(post, request)
+            .then((response) => {
               if (this.activeChatData) {
                 this.showChat(this.activeChat)
               }
               this.$refs.numberList.getNumberList()
             })
-            .catch(error => {
-              if (error.response.status === 401) {
-                this.$swal({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: error.response.data.message
-                })
-                this.$cookie.delete('access_token')
-                this.$router.push('/')
-              }
+            .catch((e) => {
+              console.log(e)
             })
         } else if (result.isDenied) {
           // eslint-disable-next-line no-undef
@@ -532,9 +531,13 @@ export default {
     },
     commonSendMessage (numbers, message) {
       var messageData = {user: this.userdata._id, numbers: numbers, message: message, profile: this.activeProfile, media: this.uploadedImages}
-      // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/setting/send-sms`, messageData, this.headers)
-        .then(response => {
+      var request = {
+        data: messageData,
+        url: 'setting/send-sms'
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
           this.messageBody = ''
           this.sms.numbers = ''
           this.sms.message = ''
@@ -553,24 +556,8 @@ export default {
           }
           this.isLoading = false
         })
-        .catch(error => {
-          this.isLoading = false
-          if (error.response.status === 400) {
-            this.$swal({
-              icon: 'error',
-              title: 'Oops...',
-              text: error.response.data.errors
-            })
-          }
-          if (error.response.status === 401) {
-            this.$swal({
-              icon: 'error',
-              title: 'Oops...',
-              text: error.response.data.message
-            })
-            this.$cookie.delete('access_token')
-            this.$router.push('/')
-          }
+        .catch((e) => {
+          console.log(e)
         })
     },
     firstChatShow (activechat) {
@@ -589,26 +576,27 @@ export default {
     showChat (activechat) {
       this.activeChat = activechat
       this.activeChatData = true
-      // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/setting/message-list`, {user: this.userdata._id, number: activechat, profile: this.activeProfile}, this.headers)
-        .then(response => {
-          this.messages = response.data
+      var request = {
+        data: {user: this.userdata._id, number: activechat, profile: this.activeProfile},
+        url: 'setting/message-list'
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
+          this.messages = response
           this.chatListLoader = false
-          var container = this.$el.querySelector('#chat-container')
-          container.scrollTop = container.scrollHeight
+          // var container = this.$el.querySelector('#chat-container')
+          // container.scrollTop = container.scrollHeight
+          setTimeout(function () {
+            var scroll = document.getElementById('chat-container')
+            scroll.scrollTop = scroll.scrollHeight
+            scroll.animate({scrollTop: scroll.scrollHeight})
+          }, 1000)
           this.$refs.numberList.refreshProfile()
           this.$refs.numberList.getOneProfile()
         })
-        .catch(error => {
-          if (error.response.status === 401) {
-            this.$swal({
-              icon: 'error',
-              title: 'Oops...',
-              text: error.response.data.message
-            })
-            this.$cookie.delete('access_token')
-            this.$router.push('/')
-          }
+        .catch((e) => {
+          console.log(e)
         })
     },
     handleSubmit2 (e) {
@@ -624,7 +612,6 @@ export default {
         return
       }
       var numbers = []
-      console.log(this.tags)
       for (var i = 0; i < this.tags.length; i++) {
         numbers.push(this.tags[i].text)
       }

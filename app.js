@@ -52,6 +52,7 @@ require("./app/routes/setting.route")(app);
 require("./app/routes/profile.route")(app);
 require("./app/routes/media.route")(app);
 require("./app/routes/contact.route")(app);
+require("./app/routes/email.route")(app);
 /*/api/auth/login*/
 app.get('/', function (req, res) {
   //res.send('Hello World')

@@ -46,7 +46,8 @@
                 </div>
               </div>
               <div class="d-grid d-md-flex">
-                <button class="btn btn-success mt-3" type="button" v-on:click="handleSubmit2($event)" id="login-button">Submit</button>
+                <!-- v-on:click="handleSubmit2($event)" -->
+                <button class="btn btn-success mt-3" type="button"  id="login-button">Submit</button>
               </div>
             </form>
             <div class="d-flex my-4 justify-content-center">
@@ -66,6 +67,7 @@
 </template>
 
 <script>
+import { post } from '../core/module/common.module'
 import ThemeButton from '@/components/ThemeButton.vue'
 import { required, minLength } from 'vuelidate/lib/validators'
 export default {
@@ -98,10 +100,6 @@ export default {
     }
   },
   mounted: function () {
-    var baseUrl = window.location.origin
-    if (baseUrl === 'http://localhost:8080') {
-      this.baseurl = 'http://localhost:3000'
-    }
     if (this.$cookie.get('access_token')) {
       this.$router.push('/dashboard')
     }
@@ -110,24 +108,35 @@ export default {
   },
   methods: {
     getsignup () {
-      // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/auth/get-signup`, {})
-        .then(response => {
+      var request = {
+        data: {},
+        url: 'auth/get-signup'
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
           if (response.data.data === 'on') {
             this.signUpOption = true
           } else {
             this.signUpOption = false
           }
         })
-        .catch(() => {
+        .catch((e) => {
           this.signUpOption = false
         })
     },
     getVersion () {
-      // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/auth/get-version`, {})
-        .then(response => {
+      var request = {
+        data: {},
+        url: 'auth/get-version'
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
           this.versionOption = response.data.data
+        })
+        .catch((e) => {
+          // this.signUpOption = false
         })
     },
     handleSubmit (e) {
@@ -138,27 +147,27 @@ export default {
         return
       }
 
-      // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/auth/login`, this.user)
-        .then(response => {
-          this.$cookie.set('access_token', response.data.token, 30)
-          this.$cookie.set('userdata', JSON.stringify(response.data.data), 30)
+      var request = {
+        data: this.user,
+        url: 'auth/login'
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
+          // console.log(response.data)
+          this.$cookie.set('access_token', response.token, 30)
+          this.$cookie.set('userdata', JSON.stringify(response.data), 30)
+          console.log(this.$cookie.get('access_token'))
+          console.log(this.$cookie.get('userdata'))
           this.$router.push('/dashboard')
         })
-        .catch(error => {
-          if (error.response.status === 401) {
-            this.$swal({
-              icon: 'error',
-              title: 'Oops...',
-              text: error.response.data.message
-            })
-          }
+        .catch((e) => {
+          // this.signUpOption = false
         })
-    },
-    handleSubmit2 (e) {
+    }
+    /* handleSubmit2 (e) {
       this.submitted2 = true
       if (this.otpForm.otp.trim() !== '') {
-        // eslint-disable-next-line no-undef
         axios.post(`${this.baseurl}/auth/otp-verify`, {user: this.loginId, otp: this.otpForm.otp})
           .then(response => {
             localStorage.setItem('access_token', response.data.token)
@@ -177,7 +186,7 @@ export default {
       } else {
         this.otpError = true
       }
-    }
+    } */
   }
 }
 </script>

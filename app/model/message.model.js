@@ -21,9 +21,9 @@ const Message = mongoose.model('Message', {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User' 
     },
-    number_id: { 
+    contact: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Number' 
+        ref: 'Contact' 
     },
     setting: { 
         type: mongoose.Schema.Types.ObjectId, 

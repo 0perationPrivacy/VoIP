@@ -115,7 +115,7 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          if (response.data.data === 'on') {
+          if (response.data === 'on') {
             this.signUpOption = true
           } else {
             this.signUpOption = false
@@ -133,7 +133,7 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.versionOption = response.data.data
+          this.versionOption = response.data
         })
         .catch((e) => {
           // this.signUpOption = false

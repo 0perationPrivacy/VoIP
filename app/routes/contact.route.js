@@ -8,7 +8,7 @@ module.exports = app => {
     router.post("/delete", auth, contact.delete);
     router.get("/get-all", auth, contact.getAllContact);
     router.post("/multiple-add", auth, contact.multipleUpload);
-    
+    router.post("/deleteall", auth, contact.deleteall);
     
 
     app.use('/api/contact', router);

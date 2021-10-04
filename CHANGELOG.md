@@ -3,6 +3,13 @@
 
 > Note: Every update deletes the MMS media files/folder
 
+## v0.66 (Oct 3, 2021)
+- Bug fix: number list refresh in API section
+- Pull down to refresh on mobile (on full screen, home screen shortcut)
+- Contact names integration in message list (with or without +1)
+- Contacts: delete all button
+- Contact upload limit (500)
+
 ## v0.65.2 (Sept 26, 2021)
 - Memory issues/buffer crashes fixed for heroku
 - manifest mobile shortcut icons (Progressive Web App look)

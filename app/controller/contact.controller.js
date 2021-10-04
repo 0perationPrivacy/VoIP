@@ -8,16 +8,22 @@ exports.crate = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var storeData = {user: req.user.id, number:req.body.number,note: req.body.note,  first_name: req.body.first_name, last_name: req.body.last_name};
-        var checkProfile = await Contact.findOne(storeData)
+        var checkData = {user: req.user.id, number:req.body.number};
+        var checkProfile = await Contact.findOne(checkData)
         if(checkProfile){
             res.status(400).json({status:'false',message:'Number already exists!'});
         }else{
-            var isSave = await Contact.create(storeData);
-            if(isSave){
-                res.send({status:true, message:'Contact saved!', data:isSave});
+            var countContact = await Contact.countDocuments({user: req.user.id});
+            if(countContact < 500){
+                var storeData = {user: req.user.id, number:req.body.number,note: req.body.note,  first_name: req.body.first_name, last_name: req.body.last_name};
+                var isSave = await Contact.create(storeData);
+                if(isSave){
+                    res.send({status:true, message:'Contact saved!', data:isSave});
+                }else{
+                    res.status(400).json({status:'false',message:'Contact not saved!'});
+                }
             }else{
-                res.status(400).json({status:'false',message:'Contact not saved!'});
+                res.status(400).json({status:'false',message:'Cannot have more than 500 contacts!'});
             }
         }
     }else{
@@ -37,7 +43,10 @@ exports.multipleUpload = async (req, res) => {
         };
         var checkProfile = await Contact.findOne(storeData)
         if(!checkProfile){
-            var isSave = await Contact.create(storeData);
+            var countContact = await Contact.countDocuments({user: req.user.id});
+            if(countContact < 500){
+                var isSave = await Contact.create(storeData);
+            }
         }
     }
     res.send({status:true, message:'Contact data added!', data:[]});
@@ -80,6 +89,16 @@ exports.update = async (req, res) => {
         }    
     }else{
         res.status(419).send({status: false, errors:validation.errors, data: []});       
+    }
+};
+
+
+exports.deleteall = async (req, res) => {
+    var deleteContact = await Contact.deleteMany({user:req.user.id })
+    if(deleteContact){
+        res.send({status:true, message:'All contacts deleted!', data:deleteContact});
+    }else{
+        res.status(400).json({status:'false',message:'Contacts not deleted!'});
     }
 };
 

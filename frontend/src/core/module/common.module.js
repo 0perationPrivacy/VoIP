@@ -1,6 +1,7 @@
 import ApiService from '@/core/services/api.service'
 import router from '../../router'
 import Swal from 'sweetalert2'
+import Vue from 'vue'
 // action types
 export const VERIFY_AUTH = 'verifyAuth'
 export const LOGIN = 'login'
@@ -21,6 +22,7 @@ export default {
             resolve(data)
           })
           .catch(({ response }) => {
+            console.log(response)
             if (response.status === 401) {
               Swal.fire({
                 title: 'Error',
@@ -29,7 +31,9 @@ export default {
                 confirmButtonClass: 'btn btn-secondary',
                 heightAuto: false
               })
-              localStorage.removeItem('access_token')
+              Vue.cookie.delete('access_token')
+              Vue.cookie.delete('userdata')
+              // localStorage.removeItem('access_token')
               router.push('/')
             }
             if (response.status === 400) {
@@ -60,7 +64,9 @@ export default {
                 confirmButtonClass: 'btn btn-secondary',
                 heightAuto: false
               })
-              localStorage.removeItem('access_token')
+              Vue.cookie.delete('access_token')
+              Vue.cookie.delete('userdata')
+              // localStorage.removeItem('access_token')
               router.push('/')
             }
             if (response.status === 400) {

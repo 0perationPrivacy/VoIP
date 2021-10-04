@@ -21,6 +21,11 @@
                                     <b-icon icon="cloud-download" scale="1"></b-icon>
                                 </b-button>
                             </div>
+                            <div class="ml-2">
+                              <b-button v-b-tooltip.hover title="Delete All Contact" @click="deleteAll()" class="float-left d-flex m-1" size="sm" variant="danger">
+                                    <b-icon icon="trash-fill" scale="1"></b-icon>
+                                </b-button>
+                            </div>
                             <div>
                                 <h4 class="pr-3 m-1">
                                     Contacts
@@ -341,7 +346,7 @@ export default {
           // eslint-disable-next-line no-undef
         } else if (result.isDenied) {
           // eslint-disable-next-line no-undef
-          this.$swal.fire('chat not deleted', '', 'info')
+          this.$swal.fire('contact not deleted', '', 'info')
         }
       })
     },
@@ -354,6 +359,44 @@ export default {
         note: contact.note
       }
       this.$refs['modal-contact'].show()
+    },
+    deleteAll () {
+      this.$swal.fire({
+        icon: 'info',
+        title: 'Are you sure you want to delete ALL contacts?',
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: `Yes, Delete all`,
+        denyButtonText: `No`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          var request = {
+            data: {},
+            url: 'contact/deleteall'
+          }
+          this.$store
+            .dispatch(post, request)
+            .then((data) => {
+              this.$swal({
+                icon: 'success',
+                title: 'Success',
+                text: 'All contacts deleted successfully'
+              })
+              this.$emit('onaddContact', true)
+              // this.getContacts()
+              // this.$refs['modal-contact'].hide()
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+          // contact/delete
+          // var messageData = {user: this.userdata._id, number: this.activeChat}
+          // eslint-disable-next-line no-undef
+        } else if (result.isDenied) {
+          // eslint-disable-next-line no-undef
+          this.$swal.fire('contacts not deleted', '', 'info')
+        }
+      })
     }
   }
 }

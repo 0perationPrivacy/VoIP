@@ -14,6 +14,7 @@ var User = require('../model/user.model');
 var Message = require('../model/message.model');
 const Numbers = require('twilio/lib/rest/Numbers');
 var Contact = require('../model/contact.model');
+var Email = require('../model/email.model');
 const { exists } = require('../model/setting.model');
 exports.deleteKey = async (req, res) => {
     var settingCheck = await Setting.findOne({user:req.body.user,_id:req.body.profile_id})
@@ -488,7 +489,26 @@ exports.receiveSms = async (req, res) => {
             }
         }
         global.io.to(settingCheck.user.toString()).emit('user_message',{message: messageText, number:fromnumber});
-
+        if(settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true'){
+            var emailSetting = await Email.findOne({user: settingCheck.user})
+            if(emailSetting){
+                try{
+                    const sgMail = require('@sendgrid/mail')
+                    sgMail.setApiKey(emailSetting.api_key)
+                    const msg = {
+                    to: emailSetting.to_email, // Change to your recipient
+                    from: emailSetting.sender_id, // Change to your verified sender
+                    subject: 'Message received from '+fromnumber,
+                    text: 'Message received',
+                    html: `Received Message: <br> <strong>${messageText}</strong>`,
+                    }
+                    await sgMail.send(msg)
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            
+        }
         // global.io.to(settingCheck.number).emit('new_message',{message: messageText, number:fromnumber});
         Message.create(messageData2);
     }

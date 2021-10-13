@@ -3,6 +3,11 @@
 
 > Note: Every update deletes the MMS media files/folder
 
+
+## v0.67 (Oct 13, 2021)
+- Multiple Bug fixes #58 #45
+- Pull down to refresh moved to message list section
+
 ## v0.66 (Oct 3, 2021)
 - Bug fix: number list refresh in API section
 - Pull down to refresh on mobile (on full screen, home screen shortcut)

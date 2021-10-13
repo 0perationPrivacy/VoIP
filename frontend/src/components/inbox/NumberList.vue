@@ -8,7 +8,7 @@
               <contact :contacts="contacts" @onaddContact="onaddContact"></contact>
             </div>
             <div class="bd-highlight">
-              <b-icon font-scale="1" icon="telephone" aria-hidden="true" class="m-2" title="Call"></b-icon>
+              <b-icon font-scale="1" icon="telephone" aria-hidden="true" class="m-2" title="Call" v-b-modal.modal-tall></b-icon>
             </div>
             <div class="bd-highlight">
               <b-icon  v-b-modal.modal-2 font-scale="1" icon="pencil-square" aria-hidden="true" class="m-2" title="Compose" style="cursor:pointer;"></b-icon>
@@ -47,16 +47,6 @@
             </b-dropdown-item-button>
           </b-dropdown>
         </div>
-        <!--<div class="icons mt-2">
-          <b-dropdown size="sm" class="dropDown"  variant="primary" toggle-class="text-decoration-none" no-caret>
-          <template #button-content>
-            <b-icon icon="three-dots-vertical" font-scale="1"></b-icon>
-          </template>
-          <b-dropdown-item href="#">Action</b-dropdown-item>
-          <b-dropdown-item href="#">Another action</b-dropdown-item>
-          <b-dropdown-item href="#">Something else here...</b-dropdown-item>
-        </b-dropdown>
-        </div>-->
       </div>
     </div>
     <div class="wrap-search">
@@ -343,6 +333,7 @@ import ProfileView from '@/components/setting/ProfileView.vue'
 import Contact from '@/components/setting/Contact.vue'
 import { required } from 'vuelidate/lib/validators'
 import { get, post } from '../../core/module/common.module'
+import PullToRefresh from 'pulltorefreshjs'
 export default {
   components: {
     ProfileView, ThemeButton, Contact
@@ -399,6 +390,16 @@ export default {
       }
     }
     this.onaddContact()
+    var $this = this
+    PullToRefresh.init({
+      mainElement: '.contact-list',
+      triggerElement: '.contact-list',
+      onRefresh () {
+        $this.getNumberList()
+      },
+      distThreshold: 120,
+      distMax: 140
+    })
   },
   methods: {
     onaddContact () {
@@ -474,6 +475,7 @@ export default {
       this.$router.push('/')
     },
     getNumberList () {
+      // alert('get number list')
       this.numbers = []
       var request = {
         data: {user: this.userdata._id, setting: this.activeProfile._id},

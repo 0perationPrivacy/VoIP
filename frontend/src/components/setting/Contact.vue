@@ -159,6 +159,13 @@ export default {
     exportContact () {
       this.downloadFile(this.contacts, 'contacts')
     },
+    emptyContact () {
+      this.form.first_name = ''
+      this.form.last_name = ''
+      this.form.number = ''
+      this.form.note = ''
+    },
+
     async onSelect (event) {
       this.csvFile = true
       console.log(event)
@@ -247,6 +254,7 @@ export default {
     },
     openContactModel () {
       this.editId = false
+      this.emptyContact()
       this.$refs['modal-contact'].show()
     },
     handleSubmit (e) {
@@ -278,6 +286,8 @@ export default {
           this.$refs['modal-contact'].hide()
           // this.getContacts()
           this.$emit('onaddContact', true)
+          this.emptyContact()
+          this.submitted = false
         })
         .catch((e) => {
           console.log(e)

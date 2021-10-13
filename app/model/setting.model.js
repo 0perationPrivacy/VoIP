@@ -7,6 +7,11 @@ const userSchema = mongoose.Schema({
     twilio_sid: String,
     twilio_token: String,
     profile: String,
+    emailnotification:{
+        type: String,
+        enum : ['false','true'],
+        default: 'false'
+    },
     type: {
         type: String,
         enum : ['telnyx','twilio'],
@@ -15,6 +20,18 @@ const userSchema = mongoose.Schema({
     user: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User' 
+    },
+    app_key:{
+        type: String, 
+        default: null
+    },
+    app_secret: {
+        type: String, 
+        default: null
+    },
+    twiml_app: {
+        type: String, 
+        default: null
     },
     created_at : { type : Date, default: Date.now },
      

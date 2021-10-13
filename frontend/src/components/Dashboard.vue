@@ -1,5 +1,7 @@
 <template>
   <div id="wrapbody" class="wrap">
+    <!--<setting></setting>
+    <call-view></call-view>-->
   <div id="loader" v-if="isLoading">
       <div class="d-flex loader justify-content-center align-items-center">
         <div class="sp sp-circle"></div>
@@ -214,10 +216,12 @@ import NumberList from './inbox/NumberList.vue'
 import VueTagsInput from '@johmun/vue-tags-input'
 import ThemeButton from '@/components/ThemeButton.vue'
 import { post } from '../core/module/common.module'
+import Setting from './setting/Setting.vue'
+import CallView from '@/components/CallView.vue'
 const io = require('socket.io-client')
 export default {
   name: 'dashboard',
-  components: { NumberList, VueTagsInput, ThemeButton },
+  components: { NumberList, VueTagsInput, ThemeButton, Setting, CallView },
   data () {
     return {
       isLoading: false,
@@ -286,7 +290,6 @@ export default {
     this.socket.emit('join_profile_channel', this.userdata._id.toString())
 
     this.socket.on('user_message', function (data) {
-      $this.notifyMe(data.number, data.message)
       if ($this.activeChatData) {
         $this.showChat($this.activeChat)
       } else {
@@ -294,6 +297,7 @@ export default {
         $this.$refs.numberList.refreshProfile()
       }
       $this.$refs.numberList.getNumberList()
+      $this.notifyMe(data.number, data.message)
     })
     this.headers = {
       headers: {

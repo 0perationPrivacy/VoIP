@@ -10,24 +10,6 @@ const nodemailer = require('nodemailer');
 var jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
-    /*const sgMail = require('@sendgrid/mail')
-    sgMail.setApiKey(`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`)
-    const msg = {
-    to: 'fvthakor11@gmail.com', // Change to your recipient
-    from: 'fvthakordeveloper@gmail.com', // Change to your verified sender
-    subject: 'Sending with SendGrid is Fun',
-    text: 'and easy to do anywhere, even with Node.js',
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-    }
-    sgMail
-    .send(msg)
-    .then(() => {
-        console.log('Email sent')
-    })
-    .catch((error) => {
-        console.error(error)
-    })
-  return*/
     let rules = {
         email: 'required',
         password: 'required'

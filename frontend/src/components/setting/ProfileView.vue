@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div id="loader1" v-if="isLoading">
+      <div class="d-flex loader justify-content-center align-items-center">
+        <div class="sp sp-circle"></div>
+      </div>
+  </div>
     <div v-for="profile in profiles" :key="profile._id" >
       <b-dropdown-item-button @click="changeProfile(profile)">
         <div class="d-flex flex-row">
@@ -59,6 +64,7 @@ export default {
       profiles: [],
       activeProfile: null,
       submitted3: false,
+      isLoading: false,
       form: {
         profile: ''
       }
@@ -132,6 +138,7 @@ export default {
     },
     handleSubmit (e) {
       this.submitted3 = true
+      EventBus.$emit('toggleLoader', true)
       this.$v.$touch()
       if (this.$v.$invalid) {
         return
@@ -150,14 +157,31 @@ export default {
           })
           this.$refs['add-profile'].hide()
           this.getallProfile()
+          this.isLoading = false
+          EventBus.$emit('toggleLoader', true)
         })
         .catch((e) => {
           console.log(e)
+          this.isLoading = false
+          EventBus.$emit('toggleLoader', true)
         })
     }
   }
 }
 </script>
 <style scoped>
-
+#loader1{
+  position: absolute;
+  background: white;
+  height: 100%;
+  width: 100%;
+  z-index: 2050;
+  top: 0;
+  left: 0;
+  opacity: .3;
+}
+.loader{
+  height: 100%;
+  width:100%;
+}
 </style>

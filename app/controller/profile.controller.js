@@ -3,6 +3,8 @@ var Setting = require('../model/setting.model');
 var Message = require('../model/message.model');
 const twilio = require('twilio');
 const telnyx = require('telnyx');
+const telnyxHelper = require('../helper/telnyx.helper')
+const twilioHelper = require('../helper/twilio.helper')
 exports.crateProfile = async (req, res) => {
     let rules = {
         profile: 'required'
@@ -57,18 +59,72 @@ exports.deleteProfile = async (req, res) => {
         Message.deleteMany({setting:settingCheck._id })
         if(settingCheck.type === 'telnyx' && settingCheck.api_key && settingCheck.setting){
             var Telynx = telnyx(settingCheck.api_key)  
-            await Telynx.phoneNumbers.updateMessagingSettings(
-                settingCheck.sid,
-                { messaging_profile_id: "" }
-            ); 
-            const { data: messagingProfiles } = await Telynx.messagingProfiles.retrieve(settingCheck.setting);
-            await messagingProfiles.del();
+            try{
+                await Telynx.phoneNumbers.update(
+                    settingCheck.sid,
+                    { connection_id: '' }
+                  ); 
+            }catch(error){
+                
+            }
+            if(settingCheck.sip_id){
+                try{
+                    await telnyxHelper.deleteSIPApp(settingCheck.api_key, settingCheck.sip_id)
+                }catch(error){
+
+                }
+
+                try{
+                    await telnyxHelper.deleteOutboundVoice(settingCheck.api_key, settingCheck.telnyx_outbound)
+                }catch(error){
+
+                }
+            }
+            if(settingCheck.telnyx_twiml){
+                try{
+                    await telnyxHelper.deleteTexmlApp(settingCheck.api_key, settingCheck.telnyx_twiml) 
+                }catch(error){
+    
+                }
+            }
+            try{
+                await Telynx.phoneNumbers.updateMessagingSettings(
+                    settingCheck.sid,
+                    { messaging_profile_id: "" }
+                ); 
+            }catch(error){
+
+            }
+            try{
+                const { data: messagingProfiles } = await Telynx.messagingProfiles.retrieve(settingCheck.setting);
+                await messagingProfiles.del();
+            }catch(error){
+
+            }
         }
         if(settingCheck.type === 'twilio' && settingCheck.twilio_sid && settingCheck.twilio_token && settingCheck.sid){
+
+            if(settingCheck.app_key){
+                try{
+                    await twilioHelper.removeAPIKey(settingCheck.twilio_sid, settingCheck.twilio_token, settingCheck.app_key)
+                }catch(error){
+
+                }
+            }
+            if(settingCheck.twiml_app){
+                try{
+                    await twilioHelper.deleteTwiml(settingCheck.twilio_sid, settingCheck.twilio_token, settingCheck.twiml_app)
+                } catch(error){
+
+                }
+            }
+
             const client = twilio(settingCheck.twilio_sid, settingCheck.twilio_token)
             client.incomingPhoneNumbers(settingCheck.sid)
             .update({
-                smsUrl: ''
+                smsUrl: '',
+                voiceUrl: '', 
+                statusCallback: ''
             })
         }
         await Setting.deleteOne({_id:req.body.profile_id })

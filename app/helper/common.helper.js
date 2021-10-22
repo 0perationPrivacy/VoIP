@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const algorithm = "aes-256-cbc"; 
-const nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer")
+const twilio = require('twilio')
 
 const encryptedString = (message) => {
     return new Promise(async (resolve) => {
@@ -58,6 +59,23 @@ const sendEmail = (setting,email) => {
     });
 }
 
+const creatTwiml = (sid, token) => {
+    return new Promise(async (resolve) => {
+        try {
+            const client = twilio(sid, token);
+            var twiml = await client.applications.create({
+                voiceMethod: 'POST',
+                voiceUrl: '',
+                friendlyName: 'operationprivacy VoIPSuite '
+            })
+            resolve(twiml.sid)
+        }catch (e){
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
 module.exports = {
-    encryptedString, decryptedString, sendEmail
+    encryptedString, decryptedString, sendEmail, creatTwiml
 }

@@ -78,6 +78,7 @@ export default {
                 heightAuto: false
               })
             }
+            resolve(false)
           })
       })
     }

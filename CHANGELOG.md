@@ -7,38 +7,38 @@
 ## v0.69 (Oct 22, 2021)
 
 - Settings
- - **Removed** the Call Settings section
- - Click on the `Settings cog` > `Profile Settings`
-  - Click Get Number again, select the same number and hit `save`.
+  - **Removed** the Call Settings section
+  - Click on the `Settings cog` > `Profile Settings`
+  - Click `Get Number` again, select the same number and hit `save`.
   - Clicking save takes a few seconds, in the back end, it configures telnyx or twilio with calling capabilities in multiple places easily saving you 15-20 mins and countless hours of troubleshooting.
   - If calling still doesn't work, click on the delete trash icon under profile settings (this removes settings from telnyx/twilio), and recreate the profile.
 
 ## v0.68 (Oct 21, 2021)
 
 - Settings
- - Moved settings from the profile dropdown to its own icon
- - Call settings added (instructions in the Wiki)
- - Email settings added (instructions in the Wiki)
+  - Moved settings from the profile dropdown to its own icon
+  - Call settings added (instructions in the Wiki)
+  - Email settings added (instructions in the Wiki)
 
 - VoIP Calling
-  - Call any number from your desktop browser
-  - Receive calls on your number(s) on your desktop browser
-  - Call from you mobile phone browser or web app shortcut (can't receive as mobile browsers don't support browser notifications)
-  - Call from dialpad (manual entry or contact list dropdown)
-  - Call from chat window
-  - Call integration with Twilio and Telnyx
-  - Firefox instructions to enable browser access to microphone (in the Wiki)
+   - Call any number from your desktop browser
+   - Receive calls on your number(s) on your desktop browser
+   - Call from you mobile phone browser or web app shortcut (can't receive as mobile browsers don't support browser notifications)
+   - Call from dialpad (manual entry or contact list dropdown)
+   - Call from chat window
+   - Call integration with Twilio and Telnyx
+   - Firefox instructions to enable browser access to microphone (in the Wiki)
 
 - SMS-to-Email Notifications
-  - Configure any SMTP server in the settings
-  - Enable notifications per profile with a checkbox
-  - _(Coming soon: configure email delay, skip notification if message read within delay)_
+   - Configure any SMTP server in the settings
+   - Enable notifications per profile with a checkbox
+   - _(Coming soon: configure email delay, skip notification if message read within delay)_
 
 - Firefox Setting:
-  about:config
-  permissions.default.microphone = 0
-  (0=always ask (default), 1=allow, 2=block)
-  If it was set to 2, then calling will not work. Change it to 0 and allow on the prompt when you make the call the first time.
+  - about:config
+  - permissions.default.microphone = 0
+  - (0=always ask (default), 1=allow, 2=block)
+  - If it was set to 2, then calling will not work. Change it to 0 and allow on the prompt when you make the call the first time.
 
 
 ## v0.67 (Oct 13, 2021)

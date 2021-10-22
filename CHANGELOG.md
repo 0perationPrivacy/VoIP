@@ -3,6 +3,16 @@
 
 > Note: Every update deletes the MMS media files/folder
 
+
+## v0.69 (Oct 22, 2021)
+
+- Settings
+ - **Removed** the Call Settings section
+ - Click on the `Settings cog` > `Profile Settings`
+  - Click Get Number again, select the same number and hit `save`.
+  - Clicking save takes a few seconds, in the back end, it configures telnyx or twilio with calling capabilities in multiple places easily saving you 15-20 mins and countless hours of troubleshooting.
+  - If calling still doesn't work, click on the delete trash icon under profile settings (this removes settings from telnyx/twilio), and recreate the profile.
+
 ## v0.68 (Oct 21, 2021)
 
 - Settings

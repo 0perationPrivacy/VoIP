@@ -49,6 +49,7 @@
 <script>
 import { required } from 'vuelidate/lib/validators'
 import { post } from '../../core/module/common.module'
+import { EventBus } from '@/event-bus'
 export default {
   data () {
     return {
@@ -90,6 +91,8 @@ export default {
       this.activeProfile = profile
       localStorage.setItem('activeProfile', JSON.stringify(profile))
       this.$emit('clicked', profile)
+      EventBus.$emit('clicked', true)
+      EventBus.$emit('changeProfile', true)
     },
     activeFirstProfile () {
       if (this.profiles.length > 0) {

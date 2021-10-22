@@ -1,9 +1,13 @@
 var mongoose = require('../../config/db.config');
 
 const Email = mongoose.model('Email', { 
-    api_key: String,
-    sender_id: String,
+    email:String,
+    password: String,
     to_email: String,
+    host: String,
+    port: String,
+    secure: Boolean,
+    sender_email:String,
     user: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User' 

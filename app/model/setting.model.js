@@ -33,6 +33,14 @@ const userSchema = mongoose.Schema({
         type: String, 
         default: null
     },
+    sip_username: {
+        type: String, 
+        default: null
+    },
+    sip_password: {
+        type: String, 
+        default: null
+    },
     created_at : { type : Date, default: Date.now },
      
 });

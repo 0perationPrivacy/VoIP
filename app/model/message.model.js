@@ -9,17 +9,29 @@ const Message = mongoose.model('Message', {
         enum : ['send','receive'],
         default: 'send'
     },
+    datatype: {
+        type: String,
+        enum : ['call','message'],
+        default: 'message'
+    },
     isview: {
         type: String,
         enum : ['false','true'],
         default: 'false'
     },
-    status: String,
+    status: {
+        type: String,
+        default: null
+    },
     message: String,
     media: String,
     user: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User' 
+    },
+    duration: {
+        type: Number,
+        default: null
     },
     contact: { 
         type: mongoose.Schema.Types.ObjectId, 

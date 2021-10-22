@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const algorithm = "aes-256-cbc"; 
+const nodemailer = require("nodemailer");
 
 const encryptedString = (message) => {
     return new Promise(async (resolve) => {
@@ -30,6 +31,33 @@ const decryptedString = (message) => {
     });
 }
 
+const sendEmail = (setting,email) => {
+    return new Promise(async (resolve) => {
+        try {
+            let transporter = nodemailer.createTransport({
+                host: setting.host, // "smtp.gmail.com",
+                port: setting.port, // 587,
+                secure: setting.secure, // true for 465, false for other ports
+                auth: {
+                    user:  setting.email, // process.env.EMAIL, // generated ethereal user
+                    pass: setting.password, // process.env.PASSWORD, // generated ethereal password
+                },
+            });
+            transporter.sendMail({
+                from: setting.sender_email, // sender address
+                to: setting.to_email, // list of receivers
+                subject: email.subject, // Subject line
+                text:  email.email, // plain text body
+                html: email.html
+            });
+            resolve(true);
+        }catch (e){
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
 module.exports = {
-    encryptedString, decryptedString
+    encryptedString, decryptedString, sendEmail
 }

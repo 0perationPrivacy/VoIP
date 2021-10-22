@@ -21,6 +21,8 @@
     --contact-highlighted: rgb(222, 222, 222);
     --contact-hover: rgb(233, 233, 233);
     --background-image-opacity: 0.8;
+    --text-button: #1c282f;
+
   }
   :root.dark-theme {
     --background-color-primary: rgb(18, 18, 18);
@@ -36,6 +38,7 @@
     --contact-highlighted: rgb(74, 74, 74);
     --contact-hover: rgb(59, 59, 59);
     --background-image-opacity: 0.4;
+    --text-button: #cacaca;
   }
   body{
       background: var(--background-color-secondary);
@@ -742,4 +745,23 @@ body::after {
 .list-group-item {
     color: var(--text-primary-color) !important;
     background-color: transparent !important;
+}
+
+/* dailer css */
+#modal-tall .modal-dialog {
+    max-width: 100%;
+    margin: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    display: flex;
+    position: fixed;
+    z-index: 100000;
+}
+
+.dialer-btn2 {
+    color: rgb(var(--text-button));
+    margin: 1rem;
 }

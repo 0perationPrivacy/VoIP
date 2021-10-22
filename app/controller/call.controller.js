@@ -1,20 +1,25 @@
 const Validator = require('validatorjs');
 var Setting = require('../model/setting.model');
+var Call = require('../model/message.model');
+var Contact = require('../model/contact.model');
 var twilio = require('twilio');
 
 exports.create = async (req, res) => {
     let rules = {
-        app_key: 'required',
-        app_secret: 'required',
-        twiml_app: 'required'
+        type: 'required'
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
         var checkSetting = await Setting.findById(req.body.setting_id)
         if(checkSetting){
-            checkSetting.app_key = req.body.app_key
-            checkSetting.app_secret = req.body.app_secret
-            checkSetting.twiml_app = req.body.twiml_app
+            if(checkSetting.type === 'twilio'){
+                checkSetting.app_key = req.body.app_key
+                checkSetting.app_secret = req.body.app_secret
+                checkSetting.twiml_app = req.body.twiml_app
+            }else{
+                checkSetting.sip_username = req.body.sip_username
+                checkSetting.sip_password = req.body.sip_password
+            }
             var saveData = await checkSetting.save()
             if(saveData){
                 res.send({status:true, message:'call setting updated!', data:checkSetting});
@@ -49,28 +54,212 @@ exports.get  = async (req, res) => {
 exports.getToken = async (req, res) => {
     var setting = await Setting.findById(req.body.setting_id)
     if(setting){
-        const AccessToken = twilio.jwt.AccessToken;
-        const VoiceGrant = AccessToken.VoiceGrant;
+        if (setting.type === 'twilio') {
+            const AccessToken = twilio.jwt.AccessToken;
+            const VoiceGrant = AccessToken.VoiceGrant;
 
-        // Used when generating any kind of tokens
-        const twilioAccountSid = setting.twilio_sid;
-        const twilioApiKey =  setting.app_key;
-        const twilioApiSecret = setting.app_secret;
-        const outgoingApplicationSid = setting.twiml_app;
-        const identity = req.user.id;
+            // Used when generating any kind of tokens
+            const twilioAccountSid = setting.twilio_sid;
+            const twilioApiKey =  setting.app_key;
+            const twilioApiSecret = setting.app_secret;
+            const outgoingApplicationSid = setting.twiml_app;
+            const identity = req.user.id;
 
-        const voiceGrant = new VoiceGrant({
-            outgoingApplicationSid: outgoingApplicationSid,
-            incomingAllow: true, // Optional: add to allow incoming calls
-        });
-        const token = new AccessToken(
-            twilioAccountSid,
-            twilioApiKey,
-            twilioApiSecret,
-            {identity: identity}
-        );
-        token.addGrant(voiceGrant);
-        var tokenData = token.toJwt()
-        res.send({status:true, message:'get token!', data:tokenData});
+            const voiceGrant = new VoiceGrant({
+                outgoingApplicationSid: outgoingApplicationSid,
+                incomingAllow: true, // Optional: add to allow incoming calls
+            });
+            const token = new AccessToken(
+                twilioAccountSid,
+                twilioApiKey,
+                twilioApiSecret,
+                {identity: identity}
+            );
+            token.addGrant(voiceGrant);
+            var tokenData = token.toJwt()
+            res.send({status:true, message:'get token!', data:{token: tokenData, type: setting.type}});
+        }else{
+            res.send({status:true, message:'get token!', data:{setting: setting, type: setting.type}});
+        }
+        
     }
-}
+};
+
+exports.makeCall = async (req, res) => {
+    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const response = new VoiceResponse();
+    try {
+        var settingCheck = await Setting.findOne({number:req.body.twilio_number})
+        if(settingCheck){
+            const dial = response.dial({
+                callerId: req.body.twilio_number
+            });
+            var phoneNumber = req.body.number.trim().replace("+", "")
+            var stringLen = phoneNumber.length
+            if(stringLen > 10){
+                phoneNumber = `+${phoneNumber}`
+            }else if(stringLen == 10){
+                phoneNumber = `+1${phoneNumber}`
+            }
+            var updateCall = {
+                sid: req.body.CallSid,
+                user: settingCheck.user,
+                datatype: 'call',
+                type: 'send',
+                number: phoneNumber,
+                telnyx_number: req.body.twilio_number,
+                setting: settingCheck._id,
+                isview: 'true'
+            }
+            var contact = await Contact.findOne({user: settingCheck.user, number: phoneNumber});
+            if(contact){
+                updateCall.contact = contact._id
+            }
+            Call.create(updateCall);
+            dial.number(phoneNumber);
+        }
+    } catch(error) {
+
+    }
+    res.set('Content-Type', 'text/xml');
+    return res.send(response.toString());
+};
+
+exports.status = async (req, res) => {
+    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const response = new VoiceResponse();
+    var call = await Call.findOne({sid: req.body.CallSid})
+    if(call){
+        call.duration = req.body.CallDuration
+        call.status = req.body.CallStatus
+        await call.save()
+        var settingCheck = await Setting.findOne({number:call.twilio_number})
+        if(settingCheck){
+            global.io.to(settingCheck.user.toString()).emit('user_message',{message: 'call', number:call.number});
+        }
+    }
+    res.set('Content-Type', 'text/xml');
+    res.send(response.toString());
+};
+exports.statusTelnyx = async (req, res) => {
+    console.log('Telnyx status')
+    console.log(req.body)
+    if(req.body.CallSid === undefined){
+        var event = req.body.data
+        switch (event.event_type) {
+            case 'call.initiated':
+                if(event.payload.direction === 'outgoing'){
+                    var settingCheck = await Setting.findOne({number:event.payload.from})
+                    if(settingCheck){
+                        var updateCall = {
+                            sid: event.payload.call_session_id,
+                            user: settingCheck.user,
+                            datatype: 'call',
+                            type: 'send',
+                            number: event.payload.to,
+                            telnyx_number: event.payload.from,
+                            setting: settingCheck._id,
+                            isview: 'true'
+                        }
+                        var contact = await Contact.findOne({user: settingCheck.user, number: event.payload.to});
+                        if(contact){
+                            updateCall.contact = contact._id
+                        }
+                        Call.create(updateCall);
+                    }
+                }
+                break;
+            case 'call.hangup':
+                    var call = await Call.findOne({sid: event.payload.call_session_id})
+                    if(call){
+                        var difference = (new Date(event.payload.end_time) - new Date(event.payload.start_time)) / 1000;
+                        call.duration = Math.ceil(difference)
+                        call.status = 'completed'
+                        await call.save()
+                        var settingCheck = await Setting.findOne({number:call.twilio_number})
+                        if(settingCheck){
+                            global.io.to(settingCheck.user.toString()).emit('user_message',{message: 'call', number:call.number});
+                        }
+                    }
+                break;
+        }
+    } else {
+        var call = await Call.findOne({sid: req.body.CallSid})
+        if(call){
+            call.duration = req.body.CallDuration
+            call.status = req.body.CallStatus
+            await call.save()
+            var settingCheck = await Setting.findOne({number:call.twilio_number})
+            if(settingCheck){
+                global.io.to(settingCheck.user.toString()).emit('user_message',{message: 'call', number:call.number});
+            }
+        }
+    }
+    var callXml = `<?xml version="1.0" encoding="UTF-8"?>
+                    <Response>
+                    </Response>`;
+    res.set('Content-Type', 'text/xml');
+    res.send(callXml);
+};
+
+exports.incomming = async (req, res) => {
+    const VoiceResponse = twilio.twiml.VoiceResponse;
+    const response = new VoiceResponse();
+    try{
+        var settingCheck = await Setting.findOne({number:req.body.To})
+        if(settingCheck){
+            const dial = response.dial();
+            const client = dial.client();
+            client.identity(`${settingCheck.user}`);
+            var updateCall = {
+                sid: req.body.CallSid,
+                user: settingCheck.user,
+                datatype: 'call',
+                type: 'receive',
+                number: req.body.From,
+                telnyx_number: req.body.To,
+                setting: settingCheck._id,
+                isview: 'false'
+            }
+            var contact = await Contact.findOne({user: settingCheck.user, number: req.body.From});
+            if(contact){
+                updateCall.contact = contact._id
+            }
+            Call.create(updateCall);
+        }
+    }catch(error){
+
+    }
+    res.set('Content-Type', 'text/xml');
+    res.send(response.toString());
+};
+
+exports.telnyx = async (req, res) => {
+    console.log(req.body)
+    var settingCheck = await Setting.findOne({number:req.body.To})
+    if(settingCheck && settingCheck.sip_username){
+        var callXml = `<?xml version="1.0" encoding="UTF-8"?>
+                    <Response>
+                    <Dial>
+                        <Sip>sip:${settingCheck.sip_username}@sip.telnyx.com</Sip>
+                    </Dial>
+                    </Response>`;
+        var updateCall = {
+            sid: req.body.CallSid,
+            user: settingCheck.user,
+            datatype: 'call',
+            type: 'receive',
+            number: req.body.From,
+            telnyx_number: req.body.To,
+            setting: settingCheck._id,
+            isview: 'false'
+        }
+        var contact = await Contact.findOne({user: settingCheck.user, number: req.body.From});
+        if(contact){
+            updateCall.contact = contact._id
+        }
+        Call.create(updateCall);
+    }
+    res.set('Content-Type', 'text/xml');
+    res.send(callXml);
+};

@@ -1,7 +1,6 @@
 <template>
   <div id="wrapbody" class="wrap">
-    <!--<setting></setting>
-    <call-view></call-view>-->
+    <call-view :contacts="contacts" ref="callView"></call-view>
   <div id="loader" v-if="isLoading">
       <div class="d-flex loader justify-content-center align-items-center">
         <div class="sp sp-circle"></div>
@@ -57,7 +56,11 @@
             </div>
           </h1>
         </div>
-        <div class="d-flex m-auto">
+        <div class="d-flex m-auto" v-if="activeChat">
+          <span style="cursor: pointer" @click="makeCall()" title="Delete">
+            <b-icon font-scale="2" icon="telephone" aria-hidden="true"></b-icon>
+          </span>
+          &nbsp;&nbsp;&nbsp;
           <span style="cursor: pointer" @click="deletechat()" title="Delete">
             <b-icon font-scale="2" icon="trash" aria-hidden="true"></b-icon>
           </span>
@@ -123,7 +126,12 @@
                       </a>
                     </span>
                   </span>
-                  {{ message.message }}
+                  <span v-if="message.datatype === 'call'">
+                    <span v-if="message.type === 'send'"> <b-icon icon="telephone-outbound-fill"></b-icon>&nbsp;&nbsp; Outbound</span>
+                    <span v-else><b-icon icon="telephone-inbound-fill"></b-icon>&nbsp;&nbsp; Inbound</span>
+                    Call( {{getMMSS(message.duration) }} )
+                  </span>
+                  <span v-else> {{ message.message }} </span>
                 </div>
                 <div class="time">
                   {{ message.created_at | moment("HH:mm") }}
@@ -326,6 +334,11 @@ export default {
     }
   },
   methods: {
+    makeCall () {
+      if (this.activeChat) {
+        this.$refs.callView.makeCall(this.activeChat._id)
+      }
+    },
     messageRefresh () {
       this.messages = []
     },
@@ -643,6 +656,17 @@ export default {
     },
     getVh () {
       return Math.round(Math.max(document.documentElement.innerHeight || 0, window.innerHeight || 0))
+    },
+    getMMSS (time) {
+      // Hours, minutes and seconds
+      var mins = ~~((time % 3600) / 60)
+      var secs = ~~time % 60
+
+      // Output like "1:01" or "4:03:59" or "123:03:59"
+      var ret = ''
+      ret += '' + mins + ':' + (secs < 10 ? '0' : '')
+      ret += '' + secs
+      return ret
     }
   }
 }

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@johmun/vue-tags-input": "^2.1.0",
+    "@telnyx/webrtc": "^2.5.6",
     "axios": ">=0.21.2",
     "bootstrap": "^5.1.0",
     "bootstrap-vue": "^2.21.2",

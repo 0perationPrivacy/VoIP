@@ -1,88 +1,113 @@
 <template>
     <div>
-        <b-modal id="modal-tall" hide-footer>
+        <b-modal ref="modal-tall" class="test-modal" id="modal-tall" hide-footer>
+          <template #modal-header="{ close }">
+            <!-- Emulate built in modal header close button action -->
+            <b-button v-bind:class="{ 'd-none': connection }" size="sm" variant="outline-danger" @click="close()">
+              Close
+            </b-button>
+          </template>
+          <template #default="{ hide }">
             <div class="d-flex justify-content-center">
                 <div v-if="!incoming" style="max-width:300px">
+                    <b-form-group id="input-group-2" style="margin-bottom: 10px;">
+                      <select class="form-control chat-input" @change="contactChangeEvent($event)">
+                        <option value=""> Select Contact </option>
+                        <option v-for="contact in contacts" :key="contact._id" :value="contact.number">{{contact.first_name}} {{contact.last_name}} - {{contact.number}}</option>
+                      </select>
+                    </b-form-group>
                     <b-form-group id="input-group-1" style="margin-bottom: 0;">
-                    <b-form-input id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
-                  </b-form-group>
+                      <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
+                    </b-form-group>
+                    <div v-if="!connection">
+                      <div class="d-flex justify-content-between mt-4">
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(1)">
+                            <p class="number font-weight-bolder mb-0">1</p>
+                            <p class="alpha hide"></p>
+                          </a>
+                        </div>
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(2)">
+                            <p class="number font-weight-bolder mb-0">2</p>
+                            <p class="alpha">abc</p>
+                          </a>
+                        </div>
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(3)">
+                            <p class="number font-weight-bolder">3</p>
+                            <p class="alpha">def</p>
+                          </a>
+                        </div>
+                      </div>
+
+                      <div class="d-flex justify-content-between">
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(4)">
+                            <p class="number font-weight-bolder">4</p>
+                            <p class="alpha">ghi</p>
+                          </a>
+                        </div>
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(5)">
+                            <p class="number font-weight-bolder">5</p>
+                            <p class="alpha">jkl</p>
+                          </a>
+                        </div>
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(6)">
+                            <p class="number font-weight-bolder">6</p>
+                            <p class="alpha">mno</p>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(7)">
+                            <p class="number font-weight-bolder">7</p>
+                            <p class="alpha">pqrs</p>
+                          </a>
+                        </div>
+                          <div>
+                            <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(8)">
+                              <p class="number font-weight-bolder">8</p>
+                              <p class="alpha">tuv</p>
+                            </a>
+                          </div>
+                          <div>
+                            <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(9)">
+                              <p class="number font-weight-bolder">9</p>
+                              <p class="alpha">wxyz</p>
+                            </a>
+                          </div>
+                      </div>
+
+                      <div class="d-flex justify-content-between">
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2">
+                              <p class="number font-weight-bolder">*</p>
+                          </a>
+                        </div>
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(0)">
+                              <p class="number font-weight-bolder">0</p>
+                          </a>
+                        </div>
+                        <div>
+                          <a class="btn btn-light-primary dialer-btn2 ">
+                              <p class="number font-weight-bolder">#</p>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
                     <div class="dialer-container single_header" v-if="!connection">
                         <ul class="dialer-pad">
-                            <li>
-                                <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(1)">
-                                <p class="number font-weight-bolder">1</p>
-                                <p class="alpha hide">abc</p>
-                                </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(2)">
-                                <p class="number font-weight-bolder">2</p>
-                                <p class="alpha">abc</p>
-                            </a>
-                            </li>
-                            <li>
-                                <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(3)">
-                                <p class="number font-weight-bolder">3</p>
-                                <p class="alpha">def</p>
-                                </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(4)">
-                                <p class="number font-weight-bolder">4</p>
-                                <p class="alpha">ghi</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(5)">
-                                <p class="number font-weight-bolder">5</p>
-                                <p class="alpha">jkl</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(6)">
-                                <p class="number font-weight-bolder">6</p>
-                                <p class="alpha">mno</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(7)">
-                                <p class="number font-weight-bolder">7</p>
-                                <p class="alpha">pqrs</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(8)">
-                                <p class="number font-weight-bolder">8</p>
-                                <p class="alpha">tuv</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(9)">
-                                <p class="number font-weight-bolder">9</p>
-                                <p class="alpha">wxyz</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2">
-                                <p class="number font-weight-bolder">*</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2" @click="clickDailer(0)">
-                                <p class="number font-weight-bolder">0</p>
-                            </a>
-                            </li>
-                            <li>
-                            <a class="btn btn-light-primary mr-1 dialer-btn2 ">
-                                <p class="number font-weight-bolder">#</p>
-                            </a>
-                            </li>
                             <center class="mt-4">
-                                <button type="button" class="btn btn-success m-1" @click="toggleCall()">
+                                <button type="button" v-b-tooltip.hover title="Call" class="btn btn-success m-1 px-5" @click="toggleCall()">
                                     <b-icon icon="telephone-outbound" aria-hidden="true"></b-icon>
                                 </button>
-                                <button type="button" class="btn btn-danger m-1" @click="callHangup()">
-                                    <b-icon icon="x-circle" aria-hidden="true"></b-icon>
+                                <button type="button" v-b-tooltip.hover title="Delete" class="btn btn-danger m-1 px-5" @click="removeNumber()">
+                                    <b-icon icon="backspace" aria-hidden="true"></b-icon>
                                 </button>
                             </center>
                         </ul>
@@ -129,7 +154,7 @@
                     </div>
                     <h4 class="mb-4">Incoming call</h4>
                     <button type="button" class="btn btn-success m-1" @click="acceptCall()">
-                        <b-icon icon="person-fill" aria-hidden="true"></b-icon>
+                        <b-icon icon="telephone-fill" aria-hidden="true"></b-icon>
                     </button>
                     <button type="button" class="btn btn-danger m-1" @click="rejectedCall()">
                         <b-icon icon="x-circle" aria-hidden="true"></b-icon>
@@ -137,212 +162,243 @@
                 </center>
                 </div>
             </div>
+            <b-button style="display:none" @click="hide()">Hide Modal</b-button>
+          </template>
         </b-modal>
+        <audio id="remoteMedia" autoplay="true" />
     </div>
 </template>
 
 <script>
-import Swal from 'sweetalert2'
+// import Swal from 'sweetalert2'
 import { post } from '../core/module/common.module'
+import { EventBus } from '@/event-bus'
+import { TelnyxRTC } from '@telnyx/webrtc'
 const { Device } = require('twilio-client')
 export default {
+  props: ['contacts'],
   data () {
     return {
-      tabIndex: 0,
       twilio_number: null,
       number: null,
       call_text: 'test',
       connection: null,
       name: '',
-      twilio_numbers: [],
-      userDuration2: null,
       mm: '00',
       ss: '00',
-      auth_user: null,
       incoming: false,
-      activePanel: false,
-      headers: null,
-      campaigns: [],
-      campaign: null,
-      leads: [],
-      laravelData: {},
-      selectedCampaign: false,
-      startCall: false,
-      activePage: 1,
-      activeCallLead: 0,
-      activeNumberIndex: 0,
-      form: {
-        firstname: '',
-        lastname: '',
-        email: '',
-        mobilenumber: '',
-        address: ''
-      }
+      callType: '',
+      newCall: null
     }
   },
   async mounted () {
+    EventBus.$on('clicked', this.clickHandler)
     var tokenData = await this.getToken()
     this.call_text = 'get token'
-    var callPannel = this
-    if (tokenData) {
-      Device.setup(tokenData)
-      Device.incoming(function (connection) {
-        callPannel.$refs['my-modal'].show()
-        callPannel.activePanel = true
-        callPannel.connection = connection
-        callPannel.number = connection.options.callParameters.From
-        callPannel.incoming = true
-      })
-      Device.connect(function (connection) {
-        console.log(connection)
-        callPannel.connection = connection
-        callPannel.startTimer()
-      })
-      Device.ready(function () {
-        console.log('Connected')
-        this.call_text = 'Connected'
-      })
-      Device.disconnect(function (connection) {
-        console.log('Awaiting incoming call...')
-        this.call_text = 'Awaiting incoming call...'
-        callPannel.dissconnected()
-      })
-      Device.cancel(function (device) {
-        callPannel.dissconnected()
-        callPannel.$refs['my-modal'].hide()
-      })
-    }
+    this.deviceSetup(tokenData)
   },
   methods: {
+    deviceSetup (tokenData) {
+      console.log('device setup')
+      var callPannel = this
+      if (tokenData) {
+        if (tokenData.type === 'twilio') {
+          this.callType = 'twilio'
+          Device.setup(tokenData.token)
+          Device.incoming(function (connection) {
+            callPannel.$refs['modal-tall'].show()
+            callPannel.connection = connection
+            callPannel.number = connection.options.callParameters.From
+            callPannel.incoming = true
+          })
+          Device.connect(function (connection) {
+            console.log(connection)
+            callPannel.connection = connection
+            callPannel.startTimer()
+            callPannel.getContact()
+          })
+          Device.ready(function () {
+            console.log('Connected')
+            this.call_text = 'Connected'
+          })
+          Device.disconnect(function (connection) {
+            console.log('Awaiting incoming call...')
+            this.call_text = 'Awaiting incoming call...'
+            callPannel.dissconnected()
+          })
+          Device.cancel(function (device) {
+            callPannel.dissconnected()
+            callPannel.$refs['my-modal'].hide()
+          })
+          Device.error(function (error) {
+            console.log('error')
+            console.log(error)
+          })
+        } else {
+          this.callType = 'telnyx'
+          this.client = new TelnyxRTC({
+            login: tokenData.setting.sip_username,
+            password: tokenData.setting.sip_password
+          })
+          this.client.connect()
+          this.client.remoteElement = 'remoteMedia'
+          this.client
+            .on('telnyx.ready', () => console.log('ready to call'))
+            .on('telnyx.error', () => console.log('error'))
+            .on('telnyx.notification', (notification) => {
+              const call = notification.call
+              console.log(call)
+              if (notification.type === 'callUpdate') {
+                console.log(call.state)
+                // console.log(call.direction)
+                callPannel.connection = call
+                switch (call.state) {
+                  case 'ringing':
+                    callPannel.$refs['modal-tall'].show()
+                    callPannel.number = call.options.remoteCallerNumber
+                    callPannel.incoming = true
+                    break
+                  case 'active':
+                    callPannel.connection = call
+                    callPannel.startTimer()
+                    callPannel.getContact()
+                    break
+                  case 'hangup':
+                    this.name = ''
+                    this.connection = null
+                    this.stopTimer()
+                    break
+                  case 'destroy':
+                    this.name = ''
+                    this.connection = null
+                    break
+                }
+              }
+            })
+        }
+      }
+    },
+    clickHandler () {
+      this.getSetting()
+    },
     getToken () {
       return new Promise(resolve => {
-        var profileLocal = localStorage.getItem('activeProfile')
-        var messageData = {setting_id: profileLocal._id}
+        var profileLocal = JSON.parse(localStorage.getItem('activeProfile'))
+        if (profileLocal) {
+          // if (profileLocal.type === 'twilio') {
+          var messageData = {setting_id: profileLocal._id}
+          var request = {
+            data: messageData,
+            url: 'call/token'
+          }
+          this.$store
+            .dispatch(post, request)
+            .then((response) => {
+              resolve(response.data)
+            })
+            .catch((e) => {
+              console.log(e)
+              resolve(false)
+            })
+        }
+      })
+    },
+    getContact () {
+      var request = {
+        url: 'contact/get-one',
+        data: {number: this.number}
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
+          if (response.data) {
+            this.name = response.data.first_name + ' ' + response.data.last_name
+          }
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    },
+    getSetting () {
+      var profileLocal = JSON.parse(localStorage.getItem('activeProfile'))
+      if (profileLocal) {
         var request = {
-          data: messageData,
-          url: 'call/token'
+          url: 'setting/get-setting',
+          data: {setting: profileLocal._id}
         }
         this.$store
           .dispatch(post, request)
-          .then((response) => {
-            resolve(response.data)
+          .then(async (response) => {
+            if (response.data) {
+              // console.log(response.data)
+              localStorage.setItem('activeProfile', JSON.stringify(response.data))
+              this.distroyDevice()
+              this.distroyDeviceTelnyx()
+              // .destroy()
+              var tokenData = await this.getToken()
+
+              this.deviceSetup(tokenData)
+            }
           })
           .catch((e) => {
             console.log(e)
-            resolve(false)
           })
-        /* setTimeout(() => {
-          resolve('resolved')
-        }, 10000) */
-      })
+      }
     },
-    showModal () {
-      this.$refs['my-modal'].show()
-    },
-    hideModal () {
-      this.$refs['my-modal'].hide()
-    },
-    startCampaignCall () {
-      this.startCall = true
-      var data = {user_id: this.auth_user.id, campaign_id: this.campaign}
-      // eslint-disable-next-line no-undef
-      axios.post(process.env.MIX_BASE_URL + 'api/get-campaign-lead', data, this.headers)
-        .then(response => {
-          if (response.data.data) {
-            this.activeCallLead = response.data.data.id
-            this.number = response.data.data.mobilenumber
-            this.toggleCall()
-          } else {
-            // eslint-disable-next-line no-undef
-            Swal.fire(
-              'Call!',
-              'Lead not found.',
-              'error'
-            )
-            this.activeCallLead = ''
-            this.number = ''
-            this.startCall = false
-          }
+    makeCall (number) {
+      this.muted = false
+      this.onPhone = true
+      this.number = number
+      var n = number.replace(/\D/g, '')
+      var profileLocal = JSON.parse(localStorage.getItem('activeProfile'))
+      if (this.callType === 'twilio') {
+        this.connection = Device.connect({ number: n, twilio_number: profileLocal.number })
+      } else {
+        this.newCall = this.client.newCall({
+          destinationNumber: n,
+          callerNumber: profileLocal.number
         })
-    },
-    stopCampaignCall () {
-      this.startCall = false
-    },
-    getContacts (page = 1) {
-      this.activePage = page
-      this.selectedCampaign = true
-      var data = {user_id: this.auth_user.id, campaign_id: this.campaign}
-      // eslint-disable-next-line no-undef
-      axios.post(process.env.MIX_BASE_URL + 'api/get-campaign-data?page=' + page, data, this.headers)
-        .then(response => {
-          this.laravelData = response.data.data
-        })
-    },
-    getNumbers () {
-      var data = {user_id: this.auth_user.id}
-      // eslint-disable-next-line no-undef
-      axios.post(process.env.MIX_BASE_URL + 'api/get-call-numbers', data, this.headers)
-        .then(response => {
-          if (response.data.data) {
-            var i = 0
-            response.data.data.forEach((element, index) => {
-              this.twilio_numbers.push({text: element.sysnumber, value: element.sysnumber})
-              if (i === 0) {
-                this.twilio_number = element.sysnumber
-                this.activeNumberIndex = i
-              }
-              i++
-            })
-          }
-        })
-    },
-    getCampaign () {
-      var data = {user_id: this.auth_user.id}
-      // eslint-disable-next-line no-undef
-      axios.post(process.env.MIX_BASE_URL + 'api/get-user-campaign', data, this.headers)
-        .then(response => {
-          if (response.data.data) {
-            response.data.data.forEach(element => {
-              this.campaigns.push({text: element.name, value: element.id})
-            })
-          }
-        })
-    },
-    pannelClose () {
-      this.activePanel = false
+      }
+      this.call_text = 'Calling ' + n
+      this.$refs['modal-tall'].show()
     },
     acceptCall () {
-      console.log(this.number)
-      this.connection.accept()
+      if (this.callType === 'twilio') {
+        this.connection.accept()
+      } else {
+        this.connection.answer()
+      }
       this.incoming = false
-      this.$refs['my-modal'].hide()
-      this.openLeadDetails()
-    },
-    openLeadDetails () {
-      // eslint-disable-next-line no-undef
-      axios.post(process.env.MIX_BASE_URL + 'api/get-lead', {number: this.number}, this.headers)
-        .then(response => {
-          if (response.data.data) {
-            this.form = response.data.data
-            this.$refs['my-modal2'].show()
-          }
-        })
     },
     rejectedCall () {
-      if (this.connection) {
-        this.connection.reject()
+      if (this.callType === 'twilio') {
+        if (this.connection) {
+          this.connection.reject()
+        }
+        Device.disconnectAll()
+      } else {
+        // this.connection.hangup()
+        this.dissconnected()
       }
       this.connection = null
-      Device.disconnectAll()
       this.incoming = false
-      this.$refs['my-modal'].hide()
     },
     toggleCall: function () {
       this.muted = false
       this.onPhone = true
       var n = this.number.replace(/\D/g, '')
-      this.connection = Device.connect({ number: n, twilio_number: this.twilio_number, user_id: this.auth_user.id })
+      var profileLocal = JSON.parse(localStorage.getItem('activeProfile'))
+      if (this.callType === 'twilio') {
+        this.connection = Device.connect({ number: n, twilio_number: profileLocal.number })
+      } else {
+        this.newCall = this.client.newCall({
+          destinationNumber: n,
+          callerNumber: profileLocal.number
+        })
+      }
+      // this.connection = Device.connect({ number: n, twilio_number: profileLocal.number })
       this.call_text = 'Calling ' + n
+      // this.$refs['modal-tall'].show()
     },
     startTimer () {
       var value = 0
@@ -364,11 +420,14 @@ export default {
       clearInterval(this.userDuration)
     },
     dissconnected () {
-      this.connection = null
       this.stopTimer()
-      Device.disconnectAll()
-      this.activeCallLead = null
-      this.getContacts(this.activePage)
+      if (this.callType === 'twilio') {
+        Device.disconnectAll()
+      } else {
+        this.connection.hangup()
+      }
+      this.name = ''
+      this.connection = null
     },
     callHangup () {
       this.dissconnected()
@@ -383,11 +442,28 @@ export default {
     },
     removeNumber () {
       this.number = this.number.slice(0, -1)
+    },
+    contactChangeEvent (e) {
+      console.log(e.target.value)
+      // let str = "Visit Microsoft!";
+      var str = e.target.value.replace('+', '')
+      this.number = str
+    },
+    distroyDevice () {
+      Device.destroy()
+    },
+    distroyDeviceTelnyx () {
+      this.client.disconnect()
     }
   }
 }
 </script>
 <style scoped>
+  .number{
+    margin-bottom: 0px;
+    font-size: 40px;
+    line-height: 30px;
+  }
     .dialer-container {
         display: block;
         width: 100%;
@@ -418,7 +494,9 @@ export default {
         font-size: 40px;
         line-height: 30px;
     }
-
+    .alpha {
+        margin-bottom: auto;
+    }
     .dialer-pad li .alpha {
         margin-bottom: 0;
         font-size: 15px;

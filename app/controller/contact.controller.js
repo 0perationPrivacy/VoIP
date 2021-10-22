@@ -1,6 +1,19 @@
 const Validator = require('validatorjs');
 var Contact = require('../model/contact.model');
 
+exports.getOne = async (req, res) => {
+    var phoneNumber = req.body.number.replace("+", "")
+    var stringLen = phoneNumber.length
+    if(stringLen > 10){
+        phoneNumber = `+${phoneNumber}`
+    }else if(stringLen == 10){
+        phoneNumber = `+1${phoneNumber}`
+    }
+    var checkData = {user: req.user.id, number:phoneNumber};
+    var checkProfile = await Contact.findOne(checkData)
+    res.status(200).json({status:'false',data:checkProfile});
+};
+
 exports.crate = async (req, res) => {
     let rules = {
         first_name: 'required',

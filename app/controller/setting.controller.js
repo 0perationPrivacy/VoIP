@@ -16,6 +16,7 @@ const Numbers = require('twilio/lib/rest/Numbers');
 var Contact = require('../model/contact.model');
 var Email = require('../model/email.model');
 const { exists } = require('../model/setting.model');
+const commonHelper = require('../helper/common.helper')
 exports.deleteKey = async (req, res) => {
     var settingCheck = await Setting.findOne({user:req.body.user,_id:req.body.profile_id})
     if(settingCheck.type === 'telnyx'){
@@ -182,7 +183,7 @@ exports.create = async (req, res) => {
                 if(save){
                     const client = new twilio(req.body.twilio_sid, req.body.twilio_token);
                     client.incomingPhoneNumbers(req.body.sid)
-                    .update({smsUrl: process.env.BASE_URL.trim()+"api/setting/receive-sms/"+req.body.type})
+                    .update({smsUrl: process.env.BASE_URL.trim()+"api/setting/receive-sms/"+req.body.type, voiceUrl: process.env.BASE_URL.trim()+"api/call/incomming", statusCallback: process.env.BASE_URL.trim()+"api/call/status" })
                     res.send({status:true, message:'setting saved!', data:settingCheck});
                 }else{
                     res.status(400).json({status:'false',message:'Setting not saved!'});
@@ -223,12 +224,11 @@ exports.create = async (req, res) => {
 exports.getSetting = async (req, res) => {
     try {
         let rules = {
-            user: 'required',
             setting: 'required'
         };
         let validation = new Validator(req.body, rules);
         if(validation.passes()){
-            var settingCheck = await Setting.findOne({user:req.body.user,_id:req.body.setting})
+            var settingCheck = await Setting.findOne({user:req.user.id,_id:req.body.setting})
             if(settingCheck){
                 res.send({status:true, message:'setting data!', data:settingCheck});
             }else{
@@ -493,16 +493,12 @@ exports.receiveSms = async (req, res) => {
             var emailSetting = await Email.findOne({user: settingCheck.user})
             if(emailSetting){
                 try{
-                    const sgMail = require('@sendgrid/mail')
-                    sgMail.setApiKey(emailSetting.api_key)
-                    const msg = {
-                    to: emailSetting.to_email, // Change to your recipient
-                    from: emailSetting.sender_id, // Change to your verified sender
-                    subject: 'Message received from '+fromnumber,
-                    text: 'Message received',
-                    html: `Received Message: <br> <strong>${messageText}</strong>`,
-                    }
-                    await sgMail.send(msg)
+                    var emailData = {
+                        subject: 'Message received from '+fromnumber,
+                        text: 'Message received',
+                        html: `Received Message: <br> <strong>${messageText}</strong>`,
+                    };
+                    commonHelper.sendEmail(emailSetting,emailData);
                 } catch (error) {
                     console.log(error)
                 }
@@ -572,6 +568,8 @@ exports.getNumberList = async (req, res) => {
             "id":{"$first":"$_id"},
             "created_at":{"$first":"$created_at"},
             "contact":{"$first":"$contact"},
+            "message_type":{"$first":"$datatype"},
+            "type":{"$first":"$type"},
             "telnyx_number":{"$first":"$telnyx_number"},
             "id": {"$first":"$_id"},
             "isview": {

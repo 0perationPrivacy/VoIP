@@ -4,30 +4,48 @@ var Setting = require('../model/setting.model');
 
 exports.create = async (req, res) => {
     let rules = {
-        api_key: 'required',
-        sender_id: 'required',
-        to_email: 'required'
+        email: 'required',
+        password: 'required',
+        to_email: 'required',
+        host: 'required',
+        port: 'required',
+        to_email: 'required',
+        sender_email: 'required'
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
         var storeData = {user: req.user.id};
         var checkemail = await Email.findOne(storeData)
         if(checkemail){
-            checkemail.api_key = req.body.api_key
-            checkemail.sender_id = req.body.sender_id
+            checkemail.email = req.body.email
+            checkemail.password = req.body.password
             checkemail.to_email = req.body.to_email
+            checkemail.host = req.body.host
+            checkemail.port = req.body.port
+            checkemail.secure = req.body.secure
+            checkemail.sender_email = req.body.sender_email
             var saveData = await checkemail.save()
             if(saveData){
-                res.send({status:true, message:'Email setting updated!', data:checkemail});
+                res.send({status:true, message:'Email settings updated!', data:checkemail});
             }else{
-                res.status(400).json({status:'false',message:'Email setting not updated!'});
+                res.status(400).json({status:'false',message:'Email settings not updated!'});
             }
         }else{
-            var isSave = await Email.create({user: req.user.id, api_key:req.body.api_key,sender_id: req.body.sender_id, to_email:req.body.to_email});
+            var createData = {
+                user: req.user.id, 
+                email:req.body.email,
+                password: req.body.password, 
+                to_email:req.body.to_email,
+                host:req.body.host,
+                port: req.body.port, 
+                secure:req.body.secure,
+                sender_email: req.body.sender_email
+            };
+            var isSave = await Email.create(createData);
             if(isSave){
-                res.send({status:true, message:'Email setting saved!', data:isSave});
+                res.send({status:true, message:'Email settings saved!', data:isSave});
             }else{
-                res.status(400).json({status:false,message:'Email setting not saved!'});
+                res.status(400).json({status:false,message:'Email settings not saved!'});
             }
         }
     }else{

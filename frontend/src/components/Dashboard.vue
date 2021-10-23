@@ -226,6 +226,7 @@ import ThemeButton from '@/components/ThemeButton.vue'
 import { post } from '../core/module/common.module'
 import Setting from './setting/Setting.vue'
 import CallView from '@/components/CallView.vue'
+import { EventBus } from '@/event-bus'
 const io = require('socket.io-client')
 export default {
   name: 'dashboard',
@@ -275,6 +276,9 @@ export default {
     window.removeEventListener('resize', this.updateVw, {passive: true})
   },
   mounted: function () {
+    EventBus.$on('toggleLoader', () => {
+      this.toggleLoader()
+    })
     if (!this.$cookie.get('access_token')) {
       this.$router.push('/')
     }
@@ -334,6 +338,14 @@ export default {
     }
   },
   methods: {
+    toggleLoader () {
+      console.log('loader')
+      if (this.isLoading) {
+        this.isLoading = false
+      } else {
+        this.isLoading = true
+      }
+    },
     makeCall () {
       if (this.activeChat) {
         this.$refs.callView.makeCall(this.activeChat._id)
@@ -791,5 +803,6 @@ p {
 .loader{
   height: 100%;
   width:100%;
+  z-index: 2100;
 }
 </style>

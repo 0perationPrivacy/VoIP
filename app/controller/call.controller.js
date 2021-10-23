@@ -52,36 +52,42 @@ exports.get  = async (req, res) => {
 };
 
 exports.getToken = async (req, res) => {
-    var setting = await Setting.findById(req.body.setting_id)
-    if(setting){
-        if (setting.type === 'twilio') {
-            const AccessToken = twilio.jwt.AccessToken;
-            const VoiceGrant = AccessToken.VoiceGrant;
+    try{
+        var setting = await Setting.findById(req.body.setting_id)
+        console.log(setting)
+        if(setting){
+            if (setting.type === 'twilio') {
+                const AccessToken = twilio.jwt.AccessToken;
+                const VoiceGrant = AccessToken.VoiceGrant;
 
-            // Used when generating any kind of tokens
-            const twilioAccountSid = setting.twilio_sid;
-            const twilioApiKey =  setting.app_key;
-            const twilioApiSecret = setting.app_secret;
-            const outgoingApplicationSid = setting.twiml_app;
-            const identity = req.user.id;
+                // Used when generating any kind of tokens
+                const twilioAccountSid = setting.twilio_sid;
+                const twilioApiKey =  setting.app_key;
+                const twilioApiSecret = setting.app_secret;
+                const outgoingApplicationSid = setting.twiml_app;
+                const identity = req.user.id;
 
-            const voiceGrant = new VoiceGrant({
-                outgoingApplicationSid: outgoingApplicationSid,
-                incomingAllow: true, // Optional: add to allow incoming calls
-            });
-            const token = new AccessToken(
-                twilioAccountSid,
-                twilioApiKey,
-                twilioApiSecret,
-                {identity: identity}
-            );
-            token.addGrant(voiceGrant);
-            var tokenData = token.toJwt()
-            res.send({status:true, message:'get token!', data:{token: tokenData, type: setting.type}});
-        }else{
-            res.send({status:true, message:'get token!', data:{setting: setting, type: setting.type}});
+                const voiceGrant = new VoiceGrant({
+                    outgoingApplicationSid: outgoingApplicationSid,
+                    incomingAllow: true, // Optional: add to allow incoming calls
+                });
+                const token = new AccessToken(
+                    twilioAccountSid,
+                    twilioApiKey,
+                    twilioApiSecret,
+                    {identity: identity}
+                );
+                token.addGrant(voiceGrant);
+                var tokenData = token.toJwt()
+                res.send({status:true, message:'get token!', data:{token: tokenData, type: setting.type}});
+            }else{
+                res.send({status:true, message:'get token!', data:{setting: setting, type: setting.type}});
+            }
+            
         }
-        
+    }catch(error){
+        console.log(error)
+        res.status(500).send({status:true,error:true, errorData:'something wrong in get token!', data:[] });
     }
 };
 

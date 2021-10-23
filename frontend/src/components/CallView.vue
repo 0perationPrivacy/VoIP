@@ -1,5 +1,6 @@
 <template>
     <div>
+        <b-button id="incomingCallModel" v-b-modal.modal-tall style="display:none">Launch demo modal</b-button>
         <b-modal ref="modal-tall" class="test-modal" id="modal-tall" hide-footer>
           <template #modal-header="{ close }">
             <!-- Emulate built in modal header close button action -->
@@ -192,14 +193,16 @@ export default {
     }
   },
   async mounted () {
-    EventBus.$on('clicked', this.clickHandler)
+    EventBus.$on('clicked', () => {
+      this.clickHandler()
+    })
+    // EventBus.$on('clicked', this.clickHandler)
     var tokenData = await this.getToken()
     this.call_text = 'get token'
     this.deviceSetup(tokenData)
   },
   methods: {
     deviceSetup (tokenData) {
-      console.log('device setup')
       var callPannel = this
       if (tokenData) {
         if (tokenData.type === 'twilio') {
@@ -207,8 +210,10 @@ export default {
           Device.setup(tokenData.token)
           Device.incoming(function (connection) {
             callPannel.$refs['modal-tall'].show()
+            // document.getElementById('incomingCallModel').click()
             callPannel.connection = connection
             callPannel.number = connection.options.callParameters.From
+            console.log(callPannel.number)
             callPannel.incoming = true
           })
           Device.connect(function (connection) {
@@ -228,7 +233,7 @@ export default {
           })
           Device.cancel(function (device) {
             callPannel.dissconnected()
-            callPannel.$refs['my-modal'].hide()
+            // callPannel.$refs['my-modal'].hide()
           })
           Device.error(function (error) {
             console.log('error')
@@ -450,10 +455,18 @@ export default {
       this.number = str
     },
     distroyDevice () {
-      Device.destroy()
+      try {
+        Device.destroy()
+      } catch (error) {
+
+      }
     },
     distroyDeviceTelnyx () {
-      this.client.disconnect()
+      try {
+        this.client.disconnect()
+      } catch (error) {
+
+      }
     }
   }
 }

@@ -6,8 +6,8 @@
               <ul class="list-group">
                 <li class="list-group-item" @click="enableMenu('email')" style="cursor: pointer">
                   <b-icon icon="envelope" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Email Settings</li>
-                <li class="list-group-item" @click="enableMenu('call')" style="cursor: pointer">
-                  <b-icon icon="telephone-x" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Call Settings</li>
+                <!-- <li class="list-group-item" @click="enableMenu('call')" style="cursor: pointer">
+                  <b-icon icon="telephone-x" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Call Settings</li> -->
                 <li class="list-group-item" v-b-modal.modal-1 style="cursor: pointer">
                   <b-icon icon="person-badge" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Profile Settings</li>
               </ul>

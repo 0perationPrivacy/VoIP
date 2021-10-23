@@ -33,11 +33,23 @@ const userSchema = mongoose.Schema({
         type: String, 
         default: null
     },
+    sip_id:{
+        type: String, 
+        default: null
+    },
     sip_username: {
         type: String, 
         default: null
     },
     sip_password: {
+        type: String, 
+        default: null
+    },
+    telnyx_twiml:{
+        type: String, 
+        default: null
+    },
+    telnyx_outbound:{
         type: String, 
         default: null
     },

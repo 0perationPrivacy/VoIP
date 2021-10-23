@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div id="loader1" v-if="isLoading">
+      <div class="d-flex loader justify-content-center align-items-center">
+        <div class="sp sp-circle"></div>
+      </div>
+  </div>
     <div class="profile">
       <div class="d-flex flex-row bd-highlight align-items-center align-self-center">
         <div class="mt-2">
@@ -343,6 +348,7 @@ import { required } from 'vuelidate/lib/validators'
 import { get, post } from '../../core/module/common.module'
 import PullToRefresh from 'pulltorefreshjs'
 import Setting from '@/components/setting/Setting.vue'
+import { EventBus } from '@/event-bus'
 export default {
   components: {
     ProfileView, ThemeButton, Contact, Setting
@@ -357,6 +363,7 @@ export default {
         twilio_number: '',
         profile: ''
       },
+      isLoading: false,
       contacts: [],
       activeChat: '',
       submitted: false,
@@ -669,6 +676,7 @@ export default {
           setting: this.activeProfile._id,
           profile: this.user.profile
         }
+        this.isLoading = true
         var request = {
           data: sendData,
           url: 'setting/create'
@@ -676,17 +684,20 @@ export default {
         this.$store
           .dispatch(post, request)
           .then((response) => {
-            this.$swal({
+            /* this.$swal({
               icon: 'success',
               title: 'Success',
               text: 'Settings saved successfully!'
-            })
+            }) */
             this.$refs['my-modal'].hide()
             this.activeProfile = response.data
             this.$refs.childComponent.getallProfile()
+            EventBus.$emit('clicked', true)
+            this.isLoading = false
             this.$v.$reset()
           })
           .catch((e) => {
+            this.isLoading = false
             console.log(e)
           })
       }
@@ -717,5 +728,52 @@ export default {
     border-right: 0.3em solid transparent;
     border-bottom: 0;
     border-left: 0.3em solid transparent;
+}
+.sp {
+  width: 32px;
+  height: 32px;
+  clear: both;
+  margin: 20px auto;
+}
+
+/* Spinner Circle Rotation */
+.sp-circle {
+  border: 4px rgba(0, 0, 0, 0.25) solid;
+  border-top: 4px black solid;
+  border-radius: 50%;
+  -webkit-animation: spCircRot 0.6s infinite linear;
+  animation: spCircRot 0.6s infinite linear;
+}
+
+@-webkit-keyframes spCircRot {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(359deg);
+  }
+}
+@keyframes spCircRot {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+#loader1{
+  position: absolute;
+  background: white;
+  height: 100%;
+  width: 100%;
+  z-index: 2050;
+  top: 0;
+  left: 0;
+  opacity: .3;
+}
+.loader{
+  height: 100%;
+  width:100%;
+  z-index: 2100;
 }
 </style>

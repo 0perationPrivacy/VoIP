@@ -52,7 +52,9 @@
     box-sizing: border-box;
     position: fixed;
 }*/
-
+#sidebar-email-setting .close{
+    color: var(--text-primary-color) !important;
+}
   section {
     background-color: var(--background-color-primary);
   }

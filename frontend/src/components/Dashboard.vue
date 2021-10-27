@@ -171,12 +171,13 @@
     <b-modal ref="my-modal2" id="modal-2" size="lg" title="Compose Message" hide-footer>
       <span class="small text-secondary">Input (+) and country code followed by the 10 digit phone number. If no country code is provided (+1) is assumed. Multiple numbers will be sent as Bulk SMS (individual sms's to recipients). <span class="small text-center">[Telnyx does not support group texting]</span></span>
       <form @submit.prevent="handleSubmit2" class="ml-2 mr-2">
-        <div class="form-group mt-4">
+        <v-select class="mt-4" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
+        <!-- <div class="form-group mt-4">
           <select class="form-control chat-input" v-model="selectedContact" @change="contactChangeEvent($event)">
             <option value=""> Select Contact </option>
             <option v-for="contact in contacts" :key="contact._id" :value="contact.number">{{contact.first_name}} {{contact.last_name}} - {{contact.number}}</option>
           </select>
-        </div>
+        </div> -->
         <div class="form-group mt-4">
           <vue-tags-input class="form-control chat-input"
                v-model="sms.numbers"
@@ -266,7 +267,8 @@ export default {
       vh: 0,
       modelMms: false,
       modelFileValu: '',
-      zoomImage: ''
+      zoomImage: '',
+      searchContacts: []
     }
   },
   created () {
@@ -279,6 +281,10 @@ export default {
     EventBus.$on('toggleLoader', () => {
       this.toggleLoader()
     })
+    EventBus.$on('changeProfile', () => {
+      this.activeChat = null
+    })
+
     if (!this.$cookie.get('access_token')) {
       this.$router.push('/')
     }
@@ -339,7 +345,6 @@ export default {
   },
   methods: {
     toggleLoader () {
-      console.log('loader')
       if (this.isLoading) {
         this.isLoading = false
       } else {
@@ -355,8 +360,7 @@ export default {
       this.messages = []
     },
     contactChangeEvent (e) {
-      console.log(this.sms.numbers)
-      var inputText = {'text': e.target.value, 'tiClasses': ['ti-valid']}
+      var inputText = {'text': e.code, 'tiClasses': ['ti-valid']}
       this.tags.push(inputText)
       // this.sms.numbers = e.target.value
 
@@ -365,6 +369,15 @@ export default {
     },
     onaddContact (data) {
       this.contacts = data
+      this.formatecontact(data)
+    },
+    formatecontact (contacts) {
+      var arrContact = []
+      for (var i = 0; i < contacts.length; i++) {
+        var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}
+        arrContact.push(contact)
+      }
+      this.searchContacts = arrContact
     },
     hiddenImage () {
       this.zoomImage = ''

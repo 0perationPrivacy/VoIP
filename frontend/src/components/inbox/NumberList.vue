@@ -58,7 +58,7 @@
     <div class="wrap-search">
       <div class="search">
         <i class="fa fa-search fa" aria-hidden="true"></i>
-        <input type="text" class="input-search" placeholder="Search" />
+        <input type="text" class="input-search" v-model="query" @keyup="searchContact()" placeholder="Search" />
       </div>
     </div>
     <div class="contact-list">
@@ -86,7 +86,7 @@
         </div>
       </div>
       <div
-        v-for="item in numbers"
+        v-for="item in search_numbers"
         :key="item._id"
         class="contact"
         v-on:click="firstChatShow(item)"
@@ -250,7 +250,7 @@
                   style="cursor: pointer"
                   @click="deleteApiKey()"
                   title="Delete"
-                  v-if="user.api_key != ''"
+                  v-if="activeUserData && activeUserData.api_key != '' && activeUserData.api_key != null"
                 >
                   <b-icon
                     font-scale="1.5"
@@ -324,7 +324,7 @@
                 </div>
               </div>
               <div class="col-auto m-auto">
-                <span class="float-right" style="cursor: pointer;" @click="deleteApiKey()" title="Delete" v-if="user.api_key != ''">
+                <span class="float-right" style="cursor: pointer;" @click="deleteApiKey()" title="Delete" v-if="activeUserData && activeUserData.twilio_sid != '' && activeUserData.twilio_sid != null">
                   <b-icon font-scale="1.5" icon="trash" aria-hidden="true"></b-icon>
                 </span>
               </div>
@@ -363,12 +363,14 @@ export default {
         twilio_number: '',
         profile: ''
       },
+      query: '',
       isLoading: false,
       contacts: [],
       activeChat: '',
       submitted: false,
       messageListLoader: true,
       numbers: [],
+      search_numbers: [],
       baseurl: '',
       userdata: null,
       access_token: null,
@@ -380,7 +382,8 @@ export default {
         { text: 'Telnyx', value: 'telnyx' },
         { text: 'Twilio', value: 'twilio' }
       ],
-      selected: 'telnyx'
+      selected: 'telnyx',
+      activeUserData: null
     }
   },
   validations: {
@@ -416,8 +419,27 @@ export default {
       distThreshold: 120,
       distMax: 140
     })
+    EventBus.$on('changeProfile', () => {
+      this.getOneProfile()
+    })
+    // changeProfile
   },
   methods: {
+    searchContact () {
+      // console.log(this.numbers)
+      var search = new RegExp(this.query, 'i')
+      this.search_numbers = this.numbers.filter(item => {
+        if (search.test(item._id)) {
+          return search.test(item._id)
+        } else if (item.contact && search.test(item.contact.first_name)) {
+          return search.test(item.contact.first_name)
+        } else if (item.contact && search.test(item.contact.last_name)) {
+          return search.test(item.contact.last_name)
+        } else if (search.test(item.message)) {
+          return search.test(item.message)
+        }
+      })
+    },
     onaddContact () {
       var request = {
         url: 'contact/get-all'
@@ -461,7 +483,7 @@ export default {
     },
     onClickChild2 (value) {
       this.activeProfile = value
-      this.getSetting()
+      // this.getSetting()
     },
     onClickChild (value) {
       this.activeProfile = value
@@ -499,6 +521,7 @@ export default {
         .then((response) => {
           this.numbers = response
           this.messageListLoader = false
+          this.searchContact()
         })
         .catch((e) => {
           console.log(e)
@@ -514,6 +537,7 @@ export default {
         .then((response) => {
           if (response.data) {
             this.user = response.data
+            this.activeUserData = response.data
             this.user.twilio_number = response.data.number
             if (response.data.number) {
               // this.socket.emit('join_channel', this.user.number)
@@ -684,11 +708,6 @@ export default {
         this.$store
           .dispatch(post, request)
           .then((response) => {
-            /* this.$swal({
-              icon: 'success',
-              title: 'Success',
-              text: 'Settings saved successfully!'
-            }) */
             this.$refs['my-modal'].hide()
             this.activeProfile = response.data
             this.$refs.childComponent.getallProfile()

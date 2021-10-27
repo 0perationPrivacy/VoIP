@@ -136,5 +136,79 @@ exports.updateAllProfile = async (req, res) => {
     res.send(users)
 };
 
+exports.updateUserName = async (req, res) => {
+    let rules = {
+        email: 'required',
+    };
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        var user = await User.findOne({ email: req.body.email , _id: { $ne: req.user.id } });
+        if(user){
+            res.status(400).json({status:'false',message:'username already exists!'});
+        }else{
+            var checkUser = await User.findById(req.user.id);
+            if(checkUser){
+                checkUser.email = req.body.email
+                checkUser.name = req.body.email
+                var saveEmail = await checkUser.save()
+                res.send({status:true, message:'username updated successfully!', data:checkUser});
+            }else{
+                res.status(400).json({status:'false',message:'User not found!'});
+            }
+        }
+    }else{
+        res.status(419).send({status: false, errors:validation.errors, data: []});
+    }
+}
+
+exports.updatePassword = async (req, res) => {
+    let rules = {
+        old_password: 'required',
+        password: 'required',
+        c_password: 'required'
+    };
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        var checkUser = await User.findById(req.user.id);
+        if(checkUser){
+            var checkpassword = bcrypt.compareSync(req.body.old_password, checkUser.password);
+            if(checkpassword){
+                const hash = bcrypt.hashSync(req.body.password, saltRounds);
+                checkUser.password = hash
+                var saveEmail = await checkUser.save()
+                res.send({status:true, message:'Password updated successfully!', data:checkUser});
+            }else{
+                res.status(400).json({status:'false',message:'Please enter a valid old password!'});
+            }
+        }else{
+            res.status(400).json({status:'false',message:'User not found!'});
+        }
+    }else{
+        res.status(419).send({status: false, errors:validation.errors, data: []});
+    }
+}
+
+exports.checkPassword = async (req, res) => {
+    let rules = {
+        password: 'required'
+    };
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        var checkUser = await User.findById(req.user.id);
+        if(checkUser){
+            var checkpassword = bcrypt.compareSync(req.body.password, checkUser.password);
+            if(checkpassword){
+                res.send({status:'true', message:'Password checked!', data:checkUser});
+            }else{
+                res.status(400).json({status:'false',message:'Please enter valid password!'});
+            }
+        }else{
+            res.status(400).json({status:'false',message:'User not found!'});
+        }
+    }else{
+        res.status(419).send({status: false, errors:validation.errors, data: []});
+    }
+}
+
 
 

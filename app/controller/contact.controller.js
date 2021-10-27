@@ -80,7 +80,7 @@ exports.multipleUpload = async (req, res) => {
 };
 
 exports.getAllContact = async (req, res) => {
-    var contacts = await Contact.find({user: req.user.id});
+    var contacts = await Contact.find({user: req.user.id}).collation({locale: "en" }).sort({first_name: 1});
     res.send({status:true, message:'Contact data!', data:contacts});
 };
 

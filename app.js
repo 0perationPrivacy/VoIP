@@ -6,6 +6,7 @@ var bodyParser = require('body-parser')
 const cors = require("cors");
 require('dotenv').config()
 const path = require('path');
+var RateLimit = require('express-rate-limit');
 
 const server = require('http').createServer(app);
 
@@ -22,6 +23,16 @@ db.once('open', function() {
 //app.use(cors());
 app.use(cors({ origin: ['http://localhost:8080'], }))
 
+var limiter = new RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100,
+  message: "Slow down your requests!",
+  headers: false
+});
+  
+// apply rate limiter to all requests
+app.use(limiter);
+
 
 io.on('connection', socket => {
   console.log('a user connected');
@@ -37,6 +48,18 @@ io.on('connection', socket => {
 });
 
 app.use(express.static(__dirname));
+/* app.use((req, res, next) => {
+  if (req.header('x-forwarded-proto') !== 'https')
+    res.redirect(`https://${req.header('host')}${req.url}`)
+  else
+    next()
+}) */
+/* if( process.env.HTTPS.trim() === 'true'){
+  app.enable('trust proxy')
+  app.use((req, res, next) => {
+    req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+  })
+} */
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json({limit: '500mb',parameterLimit: 10000000})); 
@@ -55,18 +78,13 @@ require("./app/routes/contact.route")(app);
 require("./app/routes/email.route")(app);
 require("./app/routes/call.route")(app);
 /*/api/auth/login*/
-app.get('/', function (req, res) {
+app.get(`/`, function (req, res) {
   //res.send('Hello World')
   res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
 })
 app.get('/:id', function (req, res) {
   //res.send('Hello World')
   res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
-})
-app.get('/test', function(req, res){
-  var msg = {test: 'test' }
-  global.io.emit('chat message', msg);
-  res.send({test:'test'});
 })
 
 app.get('/api/users/', function (req, res) {

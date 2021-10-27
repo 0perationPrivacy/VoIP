@@ -10,5 +10,10 @@ module.exports = app => {
     router.post("/get-signup", user.getSignUpOption);
     router.post("/get-version", user.getVersionOption);
 
+    router.post('/username/update', auth, user.updateUserName);
+    router.post('/password/update', auth, user.updatePassword);
+    router.post('/password/check', auth, user.checkPassword);
+    
+
     app.use('/api/auth', router);
 };

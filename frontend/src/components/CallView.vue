@@ -11,12 +11,7 @@
           <template #default="{ hide }">
             <div class="d-flex justify-content-center">
                 <div v-if="!incoming" style="max-width:300px">
-                    <b-form-group id="input-group-2" style="margin-bottom: 10px;">
-                      <select class="form-control chat-input" @change="contactChangeEvent($event)">
-                        <option value=""> Select Contact </option>
-                        <option v-for="contact in contacts" :key="contact._id" :value="contact.number">{{contact.first_name}} {{contact.last_name}} - {{contact.number}}</option>
-                      </select>
-                    </b-form-group>
+                    <v-select class="mb-2" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
                     <b-form-group id="input-group-1" style="margin-bottom: 0;">
                       <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
                     </b-form-group>
@@ -175,6 +170,7 @@
 import { post } from '../core/module/common.module'
 import { EventBus } from '@/event-bus'
 import { TelnyxRTC } from '@telnyx/webrtc'
+import 'vue-select/dist/vue-select.css'
 const { Device } = require('twilio-client')
 export default {
   props: ['contacts'],
@@ -189,7 +185,8 @@ export default {
       ss: '00',
       incoming: false,
       callType: '',
-      newCall: null
+      newCall: null,
+      searchContacts: []
     }
   },
   async mounted () {
@@ -213,11 +210,9 @@ export default {
             // document.getElementById('incomingCallModel').click()
             callPannel.connection = connection
             callPannel.number = connection.options.callParameters.From
-            console.log(callPannel.number)
             callPannel.incoming = true
           })
           Device.connect(function (connection) {
-            console.log(connection)
             callPannel.connection = connection
             callPannel.startTimer()
             callPannel.getContact()
@@ -239,7 +234,7 @@ export default {
             console.log('error')
             console.log(error)
           })
-        } else {
+        } else if (tokenData.type === 'telnyx' && tokenData.setting.sip_username && tokenData.setting.sip_password) {
           this.callType = 'telnyx'
           this.client = new TelnyxRTC({
             login: tokenData.setting.sip_username,
@@ -252,10 +247,7 @@ export default {
             .on('telnyx.error', () => console.log('error'))
             .on('telnyx.notification', (notification) => {
               const call = notification.call
-              console.log(call)
               if (notification.type === 'callUpdate') {
-                console.log(call.state)
-                // console.log(call.direction)
                 callPannel.connection = call
                 switch (call.state) {
                   case 'ringing':
@@ -335,7 +327,6 @@ export default {
           .dispatch(post, request)
           .then(async (response) => {
             if (response.data) {
-              // console.log(response.data)
               localStorage.setItem('activeProfile', JSON.stringify(response.data))
               this.distroyDevice()
               this.distroyDeviceTelnyx()
@@ -449,10 +440,7 @@ export default {
       this.number = this.number.slice(0, -1)
     },
     contactChangeEvent (e) {
-      console.log(e.target.value)
-      // let str = "Visit Microsoft!";
-      var str = e.target.value.replace('+', '')
-      this.number = str
+      this.number = e.code.replace('+', '')
     },
     distroyDevice () {
       try {
@@ -467,6 +455,21 @@ export default {
       } catch (error) {
 
       }
+    },
+    formatecontact (contacts) {
+      var arrContact = []
+      for (var i = 0; i < contacts.length; i++) {
+        var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}
+        arrContact.push(contact)
+      }
+      this.searchContacts = arrContact
+    }
+  },
+  watch: {
+    contacts: function (newVal, oldVal) {
+      this.formatecontact(newVal)
+      // this.searchContact()
+      // console.log('Prop changed: ', newVal, ' | was: ', oldVal)
     }
   }
 }

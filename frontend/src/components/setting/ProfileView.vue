@@ -155,6 +155,7 @@ export default {
             title: 'Success',
             text: 'Profile added successfully!'
           })
+          this.changeProfile(response.data)
           this.$refs['add-profile'].hide()
           this.getallProfile()
           this.isLoading = false

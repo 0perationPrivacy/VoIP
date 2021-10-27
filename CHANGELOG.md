@@ -3,6 +3,34 @@
 
 > Note: Every update deletes the MMS media files/folder
 
+---
+
+## v0.70 (Oct 27, 2021)
+
+### Contacts
+- Auto sorting contacts alphabetically by first name
+- Searching through contacts
+
+### Account Section added
+- Change username option added 
+- Change password option added
+- Delete Account option added (will delete everything)
+
+### Security
+- Rate limiter feature added (mitigates brute forcing the app)
+- New https variable added (will enable in next update)
+
+### Search
+- Search messages
+- Search Contacts
+
+### Bugs/Enhancements
+- Set min number of phone digits in contacts to 5
+- New profile creation switches to that profile now
+- API delete icon doesn't show if there's nothing to delete
+- Message bar clears when you switch profiles
+
+
 
 ## v0.69 (Oct 22, 2021)
 

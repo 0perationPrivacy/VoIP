@@ -767,3 +767,17 @@ body::after {
     color: rgb(var(--text-button));
     margin: 1rem;
 }
+ 
+.vs__dropdown-toggle{
+    background: var(--background-color-secondary);
+}
+.vs__dropdown-toggle input {
+    color: var(--text-primary-color);
+}
+.vs__selected{
+    color: var(--text-primary-color) !important;
+}
+.vs__dropdown-menu {
+    background: var(--background-color-primary);
+    color: var(--text-primary-color) !important;
+} 

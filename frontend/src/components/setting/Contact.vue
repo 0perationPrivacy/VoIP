@@ -35,8 +35,20 @@
                     </div>
                 </div>
                 <div>
+                  <div class="wrap-search">
+                    <div class="search">
+                      <div class="d-flex flex-row bd-highlight">
+                        <div class="bd-highlight">
+                          &nbsp;&nbsp;<b-icon icon="search"></b-icon>&nbsp;&nbsp;
+                        </div>
+                        <div class="bd-highlight">
+                          <input type="text" class="input-search" v-model="query" @keyup="searchContact()" placeholder="Search" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <ul class="list-group">
-                    <li v-for="contact in contacts" :key="contact._id" class="list-group-item d-flex justify-content-between align-items-center">
+                    <li v-for="contact in search_contacts" :key="contact._id" class="list-group-item d-flex justify-content-between align-items-center">
                       <div class="d-flex flex-column bd-highlight">
                         <div class="bd-highlight">
                           {{contact.first_name}} {{contact.last_name}}
@@ -112,7 +124,7 @@ import { post } from '../../core/module/common.module'
 import { required, helpers } from 'vuelidate/lib/validators'
 import Papa from 'papaparse'
 // eslint-disable-next-line no-useless-escape
-const phonenumber = helpers.regex('phonenumber', /^\+?[0-9\(\-\)\ ]{3,17}$/)
+const phonenumber = helpers.regex('phonenumber', /^\+?[0-9\(\-\)\ ]{5,17}$/)
 export default {
   props: ['contacts'],
   data () {
@@ -126,12 +138,14 @@ export default {
       editId: false,
       csvFile: null,
       submitted2: false,
+      search_contacts: [],
       form: {
         first_name: '',
         last_name: '',
         number: '',
         note: ''
       },
+      query: '',
       jsonData: [
         {
           'first_name': 'John',
@@ -407,6 +421,24 @@ export default {
           this.$swal.fire('contacts not deleted', '', 'info')
         }
       })
+    },
+    searchContact () {
+      var search = new RegExp(this.query, 'i')
+      this.search_contacts = this.contacts.filter(item => {
+        if (search.test(item.first_name)) {
+          return search.test(item.first_name)
+        } else if (search.test(item.last_name)) {
+          return search.test(item.last_name)
+        } else if (search.test(item.number)) {
+          return search.test(item.number)
+        }
+      })
+    }
+  },
+  watch: {
+    contacts: function (newVal, oldVal) {
+      this.searchContact()
+      // console.log('Prop changed: ', newVal, ' | was: ', oldVal)
     }
   }
 }

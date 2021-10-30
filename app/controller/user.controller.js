@@ -15,7 +15,7 @@ const telnyxHelper = require('../helper/telnyx.helper');
 const twilioHelper = require('../helper/twilio.helper');
 
 const remoteVersion = 'https://raw.githubusercontent.com/0perationPrivacy/VoIP/main/version.md';
-const currentVersion = 0.70; // change to read from local file version.md
+const currentVersion = process.env.APP_VERSION; // change to read from local file version.md
 
 var jwt = require('jsonwebtoken');
 

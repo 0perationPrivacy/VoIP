@@ -32,8 +32,6 @@ var limiter = new RateLimit({
   
 // apply rate limiter to all requests
 app.use(limiter);
-
-
 io.on('connection', socket => {
   console.log('a user connected');
   socket.on('join_channel', (channel) => {
@@ -44,23 +42,36 @@ io.on('connection', socket => {
     console.log(`${channel} user joined channel`);
     socket.join(channel);
   });
-  
 });
 
 app.use(express.static(__dirname));
-/* app.use((req, res, next) => {
-  if (req.header('x-forwarded-proto') !== 'https')
-    res.redirect(`https://${req.header('host')}${req.url}`)
-  else
-    next()
-}) */
-/* if( process.env.HTTPS.trim() === 'true'){
-  app.enable('trust proxy')
+// app.enable('trust proxy')
+if( process.env.HTTPS.trim() === 'true'){
   app.use((req, res, next) => {
-    req.secure ? next() : res.redirect('https://' + req.headers.host + req.url)
+    if (req.header('x-forwarded-proto') !== 'https'){
+      if(req.url == '/get-base-url'){
+        next()
+        // res.status(200).json({url: process.env.BASE_URL.trim()});
+      }else{
+        res.sendFile(path.join(__dirname, './error/index.html'));
+      }
+    } else {
+      next()
+    }
   })
-} */
 
+  /* app.use((req, res, next) => {
+    console.log(req.url)
+    console.log(req.secure)
+    if (req.secure || req.url === '/error') {
+      next()
+    } else if(req.url == '/get-base-url'){
+      res.status(200).json({url: process.env.BASE_URL.trim()});
+    }else{
+      // res.sendFile(path.join(__dirname, './error/index.html'));
+    }
+  }) */
+}
 // parse requests of content-type - application/json
 app.use(bodyParser.json({limit: '500mb',parameterLimit: 10000000})); 
 
@@ -91,4 +102,7 @@ app.get('/api/users/', function (req, res) {
   res.status(200).json({message: 'success'});
 })
 
+app.get('/get-base-url', function(req, res) {
+  res.status(200).json({url: process.env.BASE_URL.trim()});
+});
 server.listen(process.env.PORT)

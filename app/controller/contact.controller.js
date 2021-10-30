@@ -1,5 +1,6 @@
 const Validator = require('validatorjs');
 var Contact = require('../model/contact.model');
+var Message = require('../model/message.model');
 
 exports.getOne = async (req, res) => {
     var phoneNumber = req.body.number.replace("+", "")
@@ -36,8 +37,10 @@ exports.crate = async (req, res) => {
             var countContact = await Contact.countDocuments({user: req.user.id});
             if(countContact < 500){
                 var storeData = {user: req.user.id, number:phoneNumber,note: req.body.note,  first_name: req.body.first_name, last_name: req.body.last_name};
+                
                 var isSave = await Contact.create(storeData);
                 if(isSave){
+                    await Message.updateMany({user: req.user.id, number:phoneNumber}, {contact: isSave._id})
                     res.send({status:true, message:'Contact saved!', data:isSave});
                 }else{
                     res.status(400).json({status:'false',message:'Contact not saved!'});

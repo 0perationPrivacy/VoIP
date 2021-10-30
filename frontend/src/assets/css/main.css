@@ -685,7 +685,7 @@ body::after {
       opacity: 0.1;
     }
   }
-/* remove outline fron chevron arrow when clicked */
+/* remove outline from chevron arrow when clicked */
 .bi {
     outline: none;
 }
@@ -781,3 +781,39 @@ body::after {
     background: var(--background-color-primary);
     color: var(--text-primary-color) !important;
 } 
+
+.loading-bar {
+    width: 130px;
+    height: 2px;
+    margin: auto;
+    margin-left: -70px;
+    border-radius: 2px;
+    background-color:var(--chat-you);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow:hidden;
+    z-index: 5;
+    transform:rotateY(0);
+    transition:transform .3s ease-in
+   }
+   .loading-bar .blue-bar {
+    height:100%;
+    width:68px;
+    position:absolute;
+    transform:translate(-34px);
+    background-color:var(--theme-orange);
+    border-radius: 2px;
+    animation:initial-loading 1.5s ease infinite
+   }
+   @keyframes initial-loading {
+    0% {
+     transform:translate(-34px)
+    }
+    50% {
+     transform:translate(96px)
+    }
+    to {
+     transform:translate(-34px)
+    }
+   }

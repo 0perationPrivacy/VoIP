@@ -5,6 +5,12 @@
 
 ---
 
+## v0.71 (Oct 30, 2021)
+- Added _plus icon_ for contact not in list
+- Loader visible as message scrolls down at load time
+- **Fallback URL** added (redundancy, can host on 2 servers now with the same login). You will receive the message on both servers.
+- Removed error when deleting an already deleted number from Telnyx/Twilio
+
 ## v0.70 (Oct 27, 2021)
 
 ### Contacts

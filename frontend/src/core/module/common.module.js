@@ -26,7 +26,7 @@ export default {
             if (response.status === 401) {
               Swal.fire({
                 title: 'Error',
-                text: response.data.error,
+                text: 'Unauthorized Access!',
                 icon: 'error',
                 confirmButtonClass: 'btn btn-secondary',
                 heightAuto: false
@@ -35,6 +35,7 @@ export default {
               Vue.cookie.delete('userdata')
               // localStorage.removeItem('access_token')
               router.push('/')
+              // window.location.href = '/'
             }
             if (response.status === 400) {
               Swal.fire({

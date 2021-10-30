@@ -89,8 +89,9 @@
         v-for="item in search_numbers"
         :key="item._id"
         class="contact"
+        :id="`phone${item._id}`"
         v-on:click="firstChatShow(item)"
-        v-bind:class="{ activeChat: activeChat == item._id }"
+        v-bind:class="{ activeChat: activeChat == item._id}"
       >
         <b-icon
           font-scale="2"
@@ -250,7 +251,7 @@
                   style="cursor: pointer"
                   @click="deleteApiKey()"
                   title="Delete"
-                  v-if="activeUserData && activeUserData.api_key != '' && activeUserData.api_key != null"
+                  v-if="showDelete"
                 >
                   <b-icon
                     font-scale="1.5"
@@ -324,7 +325,7 @@
                 </div>
               </div>
               <div class="col-auto m-auto">
-                <span class="float-right" style="cursor: pointer;" @click="deleteApiKey()" title="Delete" v-if="activeUserData && activeUserData.twilio_sid != '' && activeUserData.twilio_sid != null">
+                <span class="float-right" style="cursor: pointer;" @click="deleteApiKey()" title="Delete" v-if="showDelete">
                   <b-icon font-scale="1.5" icon="trash" aria-hidden="true"></b-icon>
                 </span>
               </div>
@@ -378,12 +379,13 @@ export default {
       headers: null,
       tNumbers: [],
       twilioNumbers: [],
+      activeItem: null,
       options: [
         { text: 'Telnyx', value: 'telnyx' },
         { text: 'Twilio', value: 'twilio' }
       ],
       selected: 'telnyx',
-      activeUserData: null
+      showDelete: false
     }
   },
   validations: {
@@ -422,7 +424,17 @@ export default {
     EventBus.$on('changeProfile', () => {
       this.getOneProfile()
     })
-    // changeProfile
+    EventBus.$on('contactAdded', (number) => {
+      this.getNumberList()
+      setTimeout(() => {
+        if (number === 'delete' || this.activeItem._id === number) {
+          var numberClass = document.getElementsByClassName(`activeChat`)
+          if (numberClass.length > 0) {
+            numberClass[0].click()
+          }
+        }
+      }, 1500)
+    })
   },
   methods: {
     searchContact () {
@@ -499,6 +511,7 @@ export default {
         element.style.display = 'none'
       }
       this.activeChat = id._id
+      this.activeItem = id
       localStorage.setItem('activenumber', JSON.stringify(id))
       this.$emit('clicked', id)
       // this.$emit('messageRefresh', true)
@@ -507,7 +520,8 @@ export default {
     logout () {
       this.$cookie.delete('access_token')
       this.$cookie.delete('userdata')
-      this.$router.push('/')
+      // this.$router.push('/')
+      window.location.href = '/'
     },
     getNumberList () {
       // alert('get number list')
@@ -527,6 +541,15 @@ export default {
           console.log(e)
         })
     },
+    hideShowDeleteIcon (response) {
+      if (response.type === 'telnyx' && response.api_key) {
+        this.showDelete = true
+      } else if (response.type === 'twilio' && response.twilio_sid) {
+        this.showDelete = true
+      } else {
+        this.showDelete = false
+      }
+    },
     getSetting () {
       var request = {
         data: {user: this.userdata._id, setting: this.activeProfile._id},
@@ -537,7 +560,7 @@ export default {
         .then((response) => {
           if (response.data) {
             this.user = response.data
-            this.activeUserData = response.data
+            this.hideShowDeleteIcon(response.data)
             this.user.twilio_number = response.data.number
             if (response.data.number) {
               // this.socket.emit('join_channel', this.user.number)
@@ -629,6 +652,7 @@ export default {
               this.tNumbers = []
               this.twilioNumbers = []
               this.activeProfile = response.data
+              this.hideShowDeleteIcon(response.data)
               this.$refs.childComponent.getallProfile()
             })
             .catch((e) => {
@@ -710,8 +734,10 @@ export default {
           .then((response) => {
             this.$refs['my-modal'].hide()
             this.activeProfile = response.data
+            this.hideShowDeleteIcon(response.data)
             this.$refs.childComponent.getallProfile()
             EventBus.$emit('clicked', true)
+            EventBus.$emit('changeProfile2', true)
             this.isLoading = false
             this.$v.$reset()
           })

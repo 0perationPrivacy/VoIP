@@ -123,6 +123,7 @@
 import { post } from '../../core/module/common.module'
 import { required, helpers } from 'vuelidate/lib/validators'
 import Papa from 'papaparse'
+import { EventBus } from '@/event-bus'
 // eslint-disable-next-line no-useless-escape
 const phonenumber = helpers.regex('phonenumber', /^\+?[0-9\(\-\)\ ]{5,17}$/)
 export default {
@@ -167,7 +168,12 @@ export default {
     }
   },
   mounted: function () {
-    // this.getContacts()
+    EventBus.$on('addContact', (number) => {
+      this.editId = false
+      this.emptyContact()
+      this.$refs['modal-contact'].show()
+      this.form.number = number
+    })
   },
   methods: {
     exportContact () {
@@ -300,6 +306,7 @@ export default {
           this.$refs['modal-contact'].hide()
           // this.getContacts()
           this.$emit('onaddContact', true)
+          EventBus.$emit('contactAdded', this.form.number)
           this.emptyContact()
           this.submitted = false
         })
@@ -359,6 +366,7 @@ export default {
                 text: 'Contact Deleted successfully!'
               })
               this.$emit('onaddContact', true)
+              EventBus.$emit('contactAdded', 'delete')
               // this.getContacts()
               // this.$refs['modal-contact'].hide()
             })

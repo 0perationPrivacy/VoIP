@@ -186,12 +186,13 @@ export default {
       incoming: false,
       callType: '',
       newCall: null,
-      searchContacts: []
+      searchContacts: [],
+      device: null
     }
   },
   async mounted () {
     EventBus.$on('clicked', () => {
-      this.clickHandler()
+      // this.clickHandler()
     })
     // EventBus.$on('clicked', this.clickHandler)
     var tokenData = await this.getToken()
@@ -443,10 +444,11 @@ export default {
       this.number = e.code.replace('+', '')
     },
     distroyDevice () {
+      // console.log('device disconnected')
       try {
         Device.destroy()
       } catch (error) {
-
+        console.log(error)
       }
     },
     distroyDeviceTelnyx () {
@@ -468,8 +470,17 @@ export default {
   watch: {
     contacts: function (newVal, oldVal) {
       this.formatecontact(newVal)
-      // this.searchContact()
-      // console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+    }
+  },
+  beforeDestroy: function () {
+    var profileLocal = JSON.parse(localStorage.getItem('activeProfile'))
+    if (profileLocal) {
+      if (profileLocal.type === 'telnyx') {
+        this.distroyDeviceTelnyx()
+      }
+      if (profileLocal.type === 'twilio') {
+        this.distroyDevice()
+      }
     }
   }
 }

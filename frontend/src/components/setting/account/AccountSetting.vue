@@ -11,6 +11,9 @@
           <li class="list-group-item" @click="deleteAccount()" style="cursor: pointer">
             <b-icon icon="trash" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Delete Account
           </li>
+          <li class="list-group-item" @click="enableMenu('fallback')" style="cursor: pointer">
+            <b-icon icon="exclamation-circle" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Fallback Setting
+          </li>
         </ul>
       </div>
       <div v-if="activeMenu == 'username'">
@@ -35,14 +38,26 @@
         </div>
         <change-password></change-password>
       </div>
+      <div v-if="activeMenu == 'fallback'">
+        <div class="d-flex justify-content-between">
+          <div class="p-2 bd-highlight">
+            <h6>Fallback Setting</h6>
+          </div>
+          <div class="p-2 bd-highlight">
+            <b-icon icon="arrow-left" style="cursor: pointer" font-scale="1" aria-hidden="true" @click="enableMenu('setting')"></b-icon>
+          </div>
+        </div>
+        <call-setting></call-setting>
+      </div>
     </div>
 </template>
 <script>
 import ChangeUsername from './ChangeUsername.vue'
 import ChangePassword from './ChangePassword.vue'
 import { post } from '../../../core/module/common.module'
+import CallSetting from '../CallSetting.vue'
 export default {
-  components: { ChangeUsername, ChangePassword },
+  components: { ChangeUsername, ChangePassword, CallSetting },
   data () {
     return {
       activeMenu: 'setting'
@@ -106,7 +121,8 @@ export default {
           }).then((result) => {
             this.$cookie.delete('access_token')
             this.$cookie.delete('userdata')
-            this.$router.push('/')
+            window.location.href = '/'
+            // this.$router.push('/')
           })
         }
       })

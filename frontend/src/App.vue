@@ -1,5 +1,6 @@
 <template>
-  <div id="app" v-bind:class="{ 'old_version': old_version }">
+  <div id="app">
+    <span v-if="old_version" class="update_ribbon"><a href="https://github.com/0perationPrivacy/VoIP/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">update</a></span>
     <!--<theme-button style="display:none" />-->
     <!--<refresh></refresh>-->
     <router-view/>
@@ -45,26 +46,4 @@ export default {
 }
 </script>
 
-<style>
-/* Define styles for the default root window element */
-.old_version::after {
-    z-index: 99;
-    content: "update available";
-    position: fixed;
-    width: auto;
-    height: 12px;
-    padding-right: 10px;
-    padding-left: 10px;
-    background: #a74729;
-    top: 0px;
-    right: 160px;
-    text-align: center;
-    font-size: 8px;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: wheat;
-    line-height: 11px;
-    -webkit-transform: rotate(45deg);
-    transform: rotate(0deg);
-}
-</style>
+

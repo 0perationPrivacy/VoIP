@@ -6,8 +6,8 @@
             <input class="form-control main-url-control" name="main_url" v-model="form.main_url" readonly />
           </div>
           <div class="form-group mt-2">
-            <label>Webhook Fail URL</label>
-            <input class="form-control" name="url" v-model="form.url" placeholder="Enter Webhook Fail Url" :class="{ 'is-invalid': submitted3 && $v.form.url.$error }" />
+            <label>Webhook Fallback URL</label>
+            <input class="form-control" name="url" v-model="form.url" placeholder="Enter Webhook Fallback URL" :class="{ 'is-invalid': submitted3 && $v.form.url.$error }" />
             <div v-if="submitted3 && $v.form.url.$error" class="invalid-feedback">
                 <span v-if="!$v.form.url.required"> Url Is Required</span>
                 <span v-if="!$v.form.url.url">Please enter valid Url</span>

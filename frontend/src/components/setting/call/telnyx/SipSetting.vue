@@ -6,7 +6,7 @@
             <input class="form-control main-url-control" name="main_url" v-model="form.main_url" readonly />
           </div>
           <div class="form-group mt-2">
-            <label>Webhook Fail URL</label>
+            <label>Webhook Fallback URL</label>
             <input class="form-control" name="url" v-model="form.url" placeholder="Enter Twiml Fallback Url" :class="{ 'is-invalid': submitted3 && $v.form.url.$error }" />
             <div v-if="submitted3 && $v.form.url.$error" class="invalid-feedback">
                 <span v-if="!$v.form.url.required">Twiml Fallback Url Is Required</span>

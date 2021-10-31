@@ -7,7 +7,7 @@
           </div>
           <div class="form-group mt-2">
             <label>Fallback URL</label>
-            <input class="form-control" name="url" v-model="form.url" placeholder="Enter Twiml Fallback Url" :class="{ 'is-invalid': submitted3 && $v.form.url.$error }" />
+            <input class="form-control" name="url" v-model="form.url" placeholder="Enter Fallback Url" :class="{ 'is-invalid': submitted3 && $v.form.url.$error }" />
             <div v-if="submitted3 && $v.form.url.$error" class="invalid-feedback">
                 <span v-if="!$v.form.url.required">Twiml Fallback Url Is Required</span>
                 <span v-if="!$v.form.url.url">Please enter valid Twiml Fallback Url</span>

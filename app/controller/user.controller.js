@@ -7,6 +7,16 @@ const moment = require('moment')
 var User = require('../model/user.model');
 const nodemailer = require('nodemailer');
 
+var Contact = require('../model/contact.model');
+var Email = require('../model/email.model');
+var Message = require('../model/message.model'); 
+var Setting = require('../model/setting.model'); 
+const telnyxHelper = require('../helper/telnyx.helper');
+const twilioHelper = require('../helper/twilio.helper');
+
+const remoteVersion = 'https://raw.githubusercontent.com/0perationPrivacy/VoIP/main/version.md';
+const currentVersion = process.env.APP_VERSION; // change to read from local file version.md
+
 var jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
@@ -125,6 +135,30 @@ exports.getVersionOption = (req, res) => {
     }
     res.send({status:true, message:'version option!', data:version});  
 };
+
+exports.getUpdateVersion = (req, res) => {
+    var request = require('request');
+    request.get(remoteVersion, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            if(isNaN(body)){
+                res.send({update: 'false'});
+            }else{
+                // var curruntv = process.env.APP_VERSION
+                // curruntv = curruntv.replace("v", "").replace("-beta", "");
+                // console.log(body)
+                console.log(currentVersion)
+                if(currentVersion < body){
+                    res.send({update: 'true'});
+                }else{
+                    res.send({update: 'false'});
+                }
+            }
+        }else{
+            res.send({update: 'false'});
+        }
+    });
+};
+
 exports.updateAllProfile = async (req, res) => {
     var users = await User.find();
     for (var i=0; i < users.length; i++) {
@@ -135,6 +169,139 @@ exports.updateAllProfile = async (req, res) => {
     }
     res.send(users)
 };
+
+exports.updateUserName = async (req, res) => {
+    let rules = {
+        email: 'required',
+    };
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        var user = await User.findOne({ email: req.body.email , _id: { $ne: req.user.id } });
+        if(user){
+            res.status(400).json({status:'false',message:'username already exists!'});
+        }else{
+            var checkUser = await User.findById(req.user.id);
+            if(checkUser){
+                checkUser.email = req.body.email
+                checkUser.name = req.body.email
+                var saveEmail = await checkUser.save()
+                res.send({status:true, message:'username updated successfully!', data:checkUser});
+            }else{
+                res.status(400).json({status:'false',message:'User not found!'});
+            }
+        }
+    }else{
+        res.status(419).send({status: false, errors:validation.errors, data: []});
+    }
+}
+
+exports.updatePassword = async (req, res) => {
+    let rules = {
+        old_password: 'required',
+        password: 'required',
+        c_password: 'required'
+    };
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        var checkUser = await User.findById(req.user.id);
+        if(checkUser){
+            var checkpassword = bcrypt.compareSync(req.body.old_password, checkUser.password);
+            if(checkpassword){
+                const hash = bcrypt.hashSync(req.body.password, saltRounds);
+                checkUser.password = hash
+                var saveEmail = await checkUser.save()
+                res.send({status:true, message:'Password updated successfully!', data:checkUser});
+            }else{
+                res.status(400).json({status:'false',message:'Please enter a valid old password!'});
+            }
+        }else{
+            res.status(400).json({status:'false',message:'User not found!'});
+        }
+    }else{
+        res.status(419).send({status: false, errors:validation.errors, data: []});
+    }
+}
+
+exports.checkPassword = async (req, res) => {
+    console.log(req.user.id)
+    let rules = {
+        password: 'required'
+    };
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        var checkUser = await User.findById(req.user.id);
+        if(checkUser){
+            var checkpassword = bcrypt.compareSync(req.body.password, checkUser.password);
+            if(checkpassword){
+                var response = await deleteAllAccountData(req.user.id)
+                res.send(response)
+                // res.send({status:'true', message:'Password checked!', data:checkUser});
+            }else{
+                res.status(400).json({status:'false',message:'Please enter a valid password!'});
+            }
+        }else{
+            res.status(400).json({status:'false',message:'User not found!'});
+        }
+    }else{
+        res.status(419).send({status: false, errors:validation.errors, data: []});
+    }
+}
+
+const deleteAllAccountData = (userid) => {
+    // console.log(outboundProfileid)
+    return new Promise(async (resolve,reject) =>  {
+        try{
+            var response = {status:'true', message:'Password checked!', data:[]}; 
+            await Contact.deleteMany({user: userid});
+            await Email.deleteMany({user: userid});
+            await Message.deleteMany({user: userid});
+            var settings =await Setting.find({user: userid});
+            for(var i = 0; i < settings.length; i++) {
+                try{
+                    if(settings[i].type === 'telnyx'){
+                        if(settings[i].api_key && settings[i].sid){
+                            await telnyxHelper.updatePhoneNumber(settings[i].api_key, settings[i].sid)
+                        }
+                        if(settings[i].api_key && settings[i].sip_id){
+                            await telnyxHelper.deleteSIPApp(settings[i].api_key, settings[i].sip_id)
+                        }
+                        if(settings[i].api_key && settings[i].telnyx_outbound){
+                            await telnyxHelper.deleteOutboundVoice(settings[i].api_key, settings[i].telnyx_outbound)
+                        }
+                        if(settings[i].api_key && settings[i].telnyx_twiml){
+                            await telnyxHelper.deleteTexmlApp(settings[i].api_key, settings[i].telnyx_twiml)
+                        }
+                        if(settings[i]._id && settings[i].sid){
+                            await telnyxHelper.emptyMessageProfile(settings[i].api_key, settings[i].sid)
+                        }
+                        if(settings[i].api_key && settings[i].setting){
+                            await telnyxHelper.deleteMessageProfile(settings[i].api_key, settings[i].setting)
+                        }
+                    }
+                    if(settings[i].type === 'twilio' && settings[i].twilio_sid && settings[i].twilio_token){
+                        if(settings[i].app_key){
+                            await twilioHelper.removeAPIKey(settings[i].twilio_sid, settings[i].twilio_token, settings[i].app_key)
+                        }
+                        if(settings[i].app_key){
+                            await twilioHelper.deleteTwiml(settings[i].twilio_sid, settings[i].twilio_token, settings[i].twiml_app)
+                        }
+                        if(settings[i].app_key){
+                            await twilioHelper.unlinkNumber(settings[i].twilio_sid, settings[i].twilio_token, settings[i].sid)
+                        }
+                    }
+                }catch(error){
+
+                }
+            }
+            await Setting.deleteMany({user: userid});
+            await User.deleteOne({_id: userid});
+            resolve(response);
+        }catch(error){
+            console.log(error)
+            resolve(false);
+        }
+    });
+}
 
 
 

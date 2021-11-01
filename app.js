@@ -6,6 +6,7 @@ var bodyParser = require('body-parser')
 const cors = require("cors");
 require('dotenv').config()
 const path = require('path');
+var RateLimit = require('express-rate-limit');
 
 const server = require('http').createServer(app);
 
@@ -22,7 +23,15 @@ db.once('open', function() {
 //app.use(cors());
 app.use(cors({ origin: ['http://localhost:8080'], }))
 
-
+var limiter = new RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100,
+  message: "Slow down your requests!",
+  headers: false
+});
+  
+// apply rate limiter to all requests
+app.use(limiter);
 io.on('connection', socket => {
   console.log('a user connected');
   socket.on('join_channel', (channel) => {
@@ -33,11 +42,36 @@ io.on('connection', socket => {
     console.log(`${channel} user joined channel`);
     socket.join(channel);
   });
-  
 });
 
 app.use(express.static(__dirname));
+// app.enable('trust proxy')
+if( process.env.HTTPS.trim() === 'true'){
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https'){
+      if(req.url == '/get-base-url'){
+        next()
+        // res.status(200).json({url: process.env.BASE_URL.trim()});
+      }else{
+        res.sendFile(path.join(__dirname, './error/index.html'));
+      }
+    } else {
+      next()
+    }
+  })
 
+  /* app.use((req, res, next) => {
+    console.log(req.url)
+    console.log(req.secure)
+    if (req.secure || req.url === '/error') {
+      next()
+    } else if(req.url == '/get-base-url'){
+      res.status(200).json({url: process.env.BASE_URL.trim()});
+    }else{
+      // res.sendFile(path.join(__dirname, './error/index.html'));
+    }
+  }) */
+}
 // parse requests of content-type - application/json
 app.use(bodyParser.json({limit: '500mb',parameterLimit: 10000000})); 
 
@@ -55,7 +89,7 @@ require("./app/routes/contact.route")(app);
 require("./app/routes/email.route")(app);
 require("./app/routes/call.route")(app);
 /*/api/auth/login*/
-app.get('/', function (req, res) {
+app.get(`/`, function (req, res) {
   //res.send('Hello World')
   res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
 })
@@ -63,14 +97,12 @@ app.get('/:id', function (req, res) {
   //res.send('Hello World')
   res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
 })
-app.get('/test', function(req, res){
-  var msg = {test: 'test' }
-  global.io.emit('chat message', msg);
-  res.send({test:'test'});
-})
 
 app.get('/api/users/', function (req, res) {
   res.status(200).json({message: 'success'});
 })
 
+app.get('/get-base-url', function(req, res) {
+  res.status(200).json({url: process.env.BASE_URL.trim()});
+});
 server.listen(process.env.PORT)

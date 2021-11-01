@@ -58,7 +58,7 @@
     <div class="wrap-search">
       <div class="search">
         <i class="fa fa-search fa" aria-hidden="true"></i>
-        <input type="text" class="input-search" placeholder="Search" />
+        <input type="text" class="input-search" v-model="query" @keyup="searchContact()" placeholder="Search" />
       </div>
     </div>
     <div class="contact-list">
@@ -86,11 +86,12 @@
         </div>
       </div>
       <div
-        v-for="item in numbers"
+        v-for="item in search_numbers"
         :key="item._id"
         class="contact"
+        :id="`phone${item._id}`"
         v-on:click="firstChatShow(item)"
-        v-bind:class="{ activeChat: activeChat == item._id }"
+        v-bind:class="{ activeChat: activeChat == item._id}"
       >
         <b-icon
           font-scale="2"
@@ -250,7 +251,7 @@
                   style="cursor: pointer"
                   @click="deleteApiKey()"
                   title="Delete"
-                  v-if="user.api_key != ''"
+                  v-if="showDelete"
                 >
                   <b-icon
                     font-scale="1.5"
@@ -324,7 +325,7 @@
                 </div>
               </div>
               <div class="col-auto m-auto">
-                <span class="float-right" style="cursor: pointer;" @click="deleteApiKey()" title="Delete" v-if="user.api_key != ''">
+                <span class="float-right" style="cursor: pointer;" @click="deleteApiKey()" title="Delete" v-if="showDelete">
                   <b-icon font-scale="1.5" icon="trash" aria-hidden="true"></b-icon>
                 </span>
               </div>
@@ -363,12 +364,14 @@ export default {
         twilio_number: '',
         profile: ''
       },
+      query: '',
       isLoading: false,
       contacts: [],
       activeChat: '',
       submitted: false,
       messageListLoader: true,
       numbers: [],
+      search_numbers: [],
       baseurl: '',
       userdata: null,
       access_token: null,
@@ -376,11 +379,13 @@ export default {
       headers: null,
       tNumbers: [],
       twilioNumbers: [],
+      activeItem: null,
       options: [
         { text: 'Telnyx', value: 'telnyx' },
         { text: 'Twilio', value: 'twilio' }
       ],
-      selected: 'telnyx'
+      selected: 'telnyx',
+      showDelete: false
     }
   },
   validations: {
@@ -416,8 +421,37 @@ export default {
       distThreshold: 120,
       distMax: 140
     })
+    EventBus.$on('changeProfile', () => {
+      this.getOneProfile()
+    })
+    EventBus.$on('contactAdded', (number) => {
+      this.getNumberList()
+      setTimeout(() => {
+        if (number === 'delete' || this.activeItem._id === number) {
+          var numberClass = document.getElementsByClassName(`activeChat`)
+          if (numberClass.length > 0) {
+            numberClass[0].click()
+          }
+        }
+      }, 1500)
+    })
   },
   methods: {
+    searchContact () {
+      // console.log(this.numbers)
+      var search = new RegExp(this.query, 'i')
+      this.search_numbers = this.numbers.filter(item => {
+        if (search.test(item._id)) {
+          return search.test(item._id)
+        } else if (item.contact && search.test(item.contact.first_name)) {
+          return search.test(item.contact.first_name)
+        } else if (item.contact && search.test(item.contact.last_name)) {
+          return search.test(item.contact.last_name)
+        } else if (search.test(item.message)) {
+          return search.test(item.message)
+        }
+      })
+    },
     onaddContact () {
       var request = {
         url: 'contact/get-all'
@@ -461,7 +495,7 @@ export default {
     },
     onClickChild2 (value) {
       this.activeProfile = value
-      this.getSetting()
+      // this.getSetting()
     },
     onClickChild (value) {
       this.activeProfile = value
@@ -477,6 +511,7 @@ export default {
         element.style.display = 'none'
       }
       this.activeChat = id._id
+      this.activeItem = id
       localStorage.setItem('activenumber', JSON.stringify(id))
       this.$emit('clicked', id)
       // this.$emit('messageRefresh', true)
@@ -485,7 +520,8 @@ export default {
     logout () {
       this.$cookie.delete('access_token')
       this.$cookie.delete('userdata')
-      this.$router.push('/')
+      // this.$router.push('/')
+      window.location.href = '/'
     },
     getNumberList () {
       // alert('get number list')
@@ -499,10 +535,20 @@ export default {
         .then((response) => {
           this.numbers = response
           this.messageListLoader = false
+          this.searchContact()
         })
         .catch((e) => {
           console.log(e)
         })
+    },
+    hideShowDeleteIcon (response) {
+      if (response.type === 'telnyx' && response.api_key) {
+        this.showDelete = true
+      } else if (response.type === 'twilio' && response.twilio_sid) {
+        this.showDelete = true
+      } else {
+        this.showDelete = false
+      }
     },
     getSetting () {
       var request = {
@@ -514,6 +560,7 @@ export default {
         .then((response) => {
           if (response.data) {
             this.user = response.data
+            this.hideShowDeleteIcon(response.data)
             this.user.twilio_number = response.data.number
             if (response.data.number) {
               // this.socket.emit('join_channel', this.user.number)
@@ -605,6 +652,7 @@ export default {
               this.tNumbers = []
               this.twilioNumbers = []
               this.activeProfile = response.data
+              this.hideShowDeleteIcon(response.data)
               this.$refs.childComponent.getallProfile()
             })
             .catch((e) => {
@@ -684,15 +732,12 @@ export default {
         this.$store
           .dispatch(post, request)
           .then((response) => {
-            /* this.$swal({
-              icon: 'success',
-              title: 'Success',
-              text: 'Settings saved successfully!'
-            }) */
             this.$refs['my-modal'].hide()
             this.activeProfile = response.data
+            this.hideShowDeleteIcon(response.data)
             this.$refs.childComponent.getallProfile()
             EventBus.$emit('clicked', true)
+            EventBus.$emit('changeProfile2', true)
             this.isLoading = false
             this.$v.$reset()
           })

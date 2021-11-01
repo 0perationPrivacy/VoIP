@@ -42,7 +42,7 @@
                 </div>
             </div>
             <div class="form-group mt-2">
-               <b-form-checkbox id="checkbox-11" v-model="form.secure"  name="secure" :value="true" plain checked="true">
+               <b-form-checkbox id="checkbox-11" v-model="form.secure"  name="secure" :value="true" plain checked="true"  v-b-tooltip.hover.bottomright="'for 465 only'" variant="primary">
                 Secure
               </b-form-checkbox>
             </div>

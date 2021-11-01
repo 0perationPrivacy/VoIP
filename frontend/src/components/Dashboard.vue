@@ -1,6 +1,6 @@
 <template>
   <div id="wrapbody" class="wrap">
-    <call-view :contacts="contacts" ref="callView"></call-view>
+    <call-view :contacts="contacts" ref="callView" v-if="activeCallTab"></call-view>
   <div id="loader" v-if="isLoading">
       <div class="d-flex loader justify-content-center align-items-center">
         <div class="sp sp-circle"></div>
@@ -35,9 +35,9 @@
       <div class="chat-head">
         <b-icon
           font-scale="2"
-          icon="chevron-right"
+          icon="chevron-left"
           aria-hidden="true"
-          class="mx-2 my-auto d-sm-none"
+          class="mx-3 my-auto d-sm-none h2"
           v-b-toggle.sidebar-no-header
         ></b-icon>
         <b-icon
@@ -53,6 +53,10 @@
             </div>
             <div class="d-flex align-items-start align-self-center">
               <div class="mt-2 ml-4" >{{ activeChat._id }}</div>
+              &nbsp;&nbsp;&nbsp;
+              <span style="cursor: copy" title="Add Contact" @click="addContact(activeChat._id)" v-if="!activeChat.contact">
+                <b-icon font-scale="1.5" icon="plus-circle" aria-hidden="true"></b-icon>
+              </span>
             </div>
           </h1>
         </div>
@@ -86,23 +90,12 @@
       </div>
       <div class="wrap-chat" id="chat_body">
         <div class="chat row" v-if="chatListLoader">
-          <div class="box-placeholder chat_loader">
-            <div class="excerpt p-4">
-              <div class="text line"></div>
-              <div class="text line"></div>
-              <div class="text"></div>
-            </div>
-          </div>
-          <div class="box-placeholder chat_loader">
-            <div class="excerpt p-4">
-              <div class="text line"></div>
-              <div class="text line"></div>
-              <div class="text"></div>
-            </div>
+          <div class="loading-bar">
+            <div class="blue-bar"></div>
           </div>
         </div>
         <!-- v-chat-scroll="{smooth: true, notSmoothOnInit: true}" -->
-        <div class="chat" id="chat-container" >
+        <div class="chat" id="chat-container" v-bind:class="{ 'opacitynone': chatListLoader }">
           <div v-if="activeChatData">
             <div v-for="message in messages" :key="message._id">
               <div
@@ -171,12 +164,7 @@
     <b-modal ref="my-modal2" id="modal-2" size="lg" title="Compose Message" hide-footer>
       <span class="small text-secondary">Input (+) and country code followed by the 10 digit phone number. If no country code is provided (+1) is assumed. Multiple numbers will be sent as Bulk SMS (individual sms's to recipients). <span class="small text-center">[Telnyx does not support group texting]</span></span>
       <form @submit.prevent="handleSubmit2" class="ml-2 mr-2">
-        <div class="form-group mt-4">
-          <select class="form-control chat-input" v-model="selectedContact" @change="contactChangeEvent($event)">
-            <option value=""> Select Contact </option>
-            <option v-for="contact in contacts" :key="contact._id" :value="contact.number">{{contact.first_name}} {{contact.last_name}} - {{contact.number}}</option>
-          </select>
-        </div>
+        <v-select class="mt-4" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
         <div class="form-group mt-4">
           <vue-tags-input class="form-control chat-input"
                v-model="sms.numbers"
@@ -266,7 +254,9 @@ export default {
       vh: 0,
       modelMms: false,
       modelFileValu: '',
-      zoomImage: ''
+      zoomImage: '',
+      searchContacts: [],
+      activeCallTab: false
     }
   },
   created () {
@@ -279,6 +269,26 @@ export default {
     EventBus.$on('toggleLoader', () => {
       this.toggleLoader()
     })
+    EventBus.$on('contactAdded', (number) => {
+      if (this.activeChat._id === number) {
+        this.showChat(this.activeChat)
+      }
+    })
+    EventBus.$on('changeProfile2', () => {
+      this.activeChat = null
+      this.activeCallTab = false
+      setTimeout(() => {
+        this.activeCallTab = true
+      }, 1500)
+    })
+    EventBus.$on('changeProfile', () => {
+      this.activeChat = null
+      this.activeCallTab = false
+      setTimeout(() => {
+        this.activeCallTab = true
+      }, 1500)
+    })
+
     if (!this.$cookie.get('access_token')) {
       this.$router.push('/')
     }
@@ -338,8 +348,10 @@ export default {
     }
   },
   methods: {
+    addContact (number) {
+      EventBus.$emit('addContact', number)
+    },
     toggleLoader () {
-      console.log('loader')
       if (this.isLoading) {
         this.isLoading = false
       } else {
@@ -355,8 +367,7 @@ export default {
       this.messages = []
     },
     contactChangeEvent (e) {
-      console.log(this.sms.numbers)
-      var inputText = {'text': e.target.value, 'tiClasses': ['ti-valid']}
+      var inputText = {'text': e.code, 'tiClasses': ['ti-valid']}
       this.tags.push(inputText)
       // this.sms.numbers = e.target.value
 
@@ -365,6 +376,15 @@ export default {
     },
     onaddContact (data) {
       this.contacts = data
+      this.formatecontact(data)
+    },
+    formatecontact (contacts) {
+      var arrContact = []
+      for (var i = 0; i < contacts.length; i++) {
+        var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}
+        arrContact.push(contact)
+      }
+      this.searchContacts = arrContact
     },
     hiddenImage () {
       this.zoomImage = ''
@@ -613,13 +633,13 @@ export default {
         .dispatch(post, request)
         .then((response) => {
           this.messages = response
-          this.chatListLoader = false
           // var container = this.$el.querySelector('#chat-container')
           // container.scrollTop = container.scrollHeight
-          setTimeout(function () {
+          setTimeout(() => {
             var scroll = document.getElementById('chat-container')
             scroll.scrollTop = scroll.scrollHeight
             scroll.animate({scrollTop: scroll.scrollHeight})
+            this.chatListLoader = false
           }, 1000)
           this.$refs.numberList.refreshProfile()
           this.$refs.numberList.getOneProfile()
@@ -684,6 +704,9 @@ export default {
 }
 </script>
 <style scoped>
+.opacitynone{
+  opacity: 0;
+}
   .activeImageArea{
     display: block !important;
   }

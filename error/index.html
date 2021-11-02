@@ -6,7 +6,6 @@
   <meta name="robots" content="noindex,nofollow">
 	<title>Page Not Found</title>
 <style>
-
 body{ 
   display: flex;
   width: 100vw;
@@ -15,13 +14,13 @@ body{
   justify-content: center;
   margin: 0;
   background: #131313;
+}
+.errorPage{
+  animation: glitch 1s linear infinite;
+  font-size: 4rem;
   color: #fff;
   font-family: 'Fira Mono', monospace;
   letter-spacing: -3px;
-}
-div{
-  animation: glitch 1s linear infinite;
-  font-size: 4rem;
 }
 @keyframes glitch{
   2%,64%{
@@ -35,14 +34,14 @@ div{
   }
 }
 
-div:before,
-div:after{
+.errorPage:before,
+.errorPage:after{
   content: attr(title);
   position: absolute;
   left: 0;
 }
 
-div:before{
+.errorPage:before{
   animation: glitchTop 1s linear infinite;
   clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
   -webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
@@ -60,7 +59,7 @@ div:before{
   }
 }
 
-div:after{
+.errorPage:after{
   animation: glitchBotom 1.5s linear infinite;
   clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
   -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
@@ -82,6 +81,6 @@ div:after{
 </style>
 </head>
 
-<div title="404">404</div>
+<div title="404" class="errorPage">404</div>
 
 </html>

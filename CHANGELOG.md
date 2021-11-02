@@ -4,6 +4,9 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.74 (Nov 2, 2021)
+- **UI:** Error page CSS fixed
+
 ## v0.73 (Nov 2, 2021)
 ### Security
 - ***Security through Obscurity***: Put in a random directory name in `.env` under `APPDIRECTORY`. Your application will be served only on that subdirectory.

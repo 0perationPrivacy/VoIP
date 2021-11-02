@@ -11,6 +11,6 @@ Expect security holes, bugs and flaws. Use it at yor own risk.
 
 ## Reporting a Vulnerability
 
-When you find a security misconfiguration, vulnerability or anything that can heighten security, please report it by either emailing me (security@operationprivacy.com), [Twitter](https://twitter.com/0perationP) dm or mesaging me using the [Matrix/Element](https://matrix.to/#/#OperationPrivacy:matrix.org) chat.
+When you find a security misconfiguration, vulnerability or anything that can improve security, please report it by either emailing me (security@operationprivacy.com) or mesaging me using the [Matrix/Element](https://matrix.to/#/#OperationPrivacy:matrix.org) chat.
 
 **Important:** When reporting a vulnerability, please make sure to suggest a detailed fix as well, it will save me time. (Because I too have a laundry list of fixes that I'm prioritizing)

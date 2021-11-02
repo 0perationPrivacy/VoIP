@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { get } from './core/module/common.module'
+import { get, post } from './core/module/common.module'
 import ThemeButton from '@/components/ThemeButton.vue'
 export default {
   name: 'App',
@@ -20,6 +20,7 @@ export default {
   },
   mounted () {
     this.getVersion()
+    this.checkDirectoryName()
   },
   methods: {
     getVersion () {
@@ -41,9 +42,33 @@ export default {
           console.log(e)
           // resolve(false)
         })
+    },
+    checkDirectoryName () {
+      var request = {
+        url: 'auth/check-directoryname',
+        data: {dirname: this.$route.params.appdirectory}
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
+          if (response.data.status === 'nodir') {
+            if (this.$route.params.appdirectory === undefined) {
+              this.$router.push(`/voip/`)
+            } else {
+              if (this.$route.params.appdirectory !== 'voip') {
+                this.$router.push(`/404`)
+              }
+            }
+          } else if (response.data.status !== 'true') {
+            this.$router.push(`/404`)
+          }
+        })
+        .catch((e) => {
+          this.old_version = false
+          console.log(e)
+          // resolve(false)
+        })
     }
   }
 }
 </script>
-
-

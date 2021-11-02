@@ -116,20 +116,31 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.profiles = response.data
-          if (!this.activeProfile) {
-            var profileLocal = localStorage.getItem('activeProfile')
-            if (profileLocal) {
-              var acPr = JSON.parse(profileLocal)
-              for (var i = 0; i < this.profiles.length; i++) {
-                if (this.profiles[i]._id === acPr._id) {
-                  this.activeProfile = this.profiles[i]
+          if (response) {
+            this.profiles = response.data
+            if (!this.activeProfile) {
+              var profileLocal = localStorage.getItem('activeProfile')
+              if (profileLocal) {
+                var acPr = JSON.parse(profileLocal)
+                if (acPr) {
+                  for (var i = 0; i < this.profiles.length; i++) {
+                    if (this.profiles[i]._id === acPr._id) {
+                      this.activeProfile = this.profiles[i]
+                      EventBus.$emit('changeProfile2', true)
+                    }
+                  }
+                } else {
+                  localStorage.setItem('activeProfile', JSON.stringify(this.profiles[0]))
+                  this.activeProfile = this.profiles[0]
+                  EventBus.$emit('changeProfile2', true)
                 }
+              } else {
+                localStorage.setItem('activeProfile', JSON.stringify(this.profiles[0]))
+                this.activeProfile = this.profiles[0]
+                EventBus.$emit('changeProfile2', true)
               }
-            } else {
-              this.activeProfile = this.profiles[0]
+              this.$emit('clicked', this.activeProfile)
             }
-            this.$emit('clicked', this.activeProfile)
           }
         })
         .catch((e) => {
@@ -150,16 +161,18 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.$swal({
-            icon: 'success',
-            title: 'Success',
-            text: 'Profile added successfully!'
-          })
-          this.changeProfile(response.data)
-          this.$refs['add-profile'].hide()
-          this.getallProfile()
-          this.isLoading = false
-          EventBus.$emit('toggleLoader', true)
+          if (response) {
+            this.$swal({
+              icon: 'success',
+              title: 'Success',
+              text: 'Profile added successfully!'
+            })
+            this.changeProfile(response.data)
+            this.$refs['add-profile'].hide()
+            this.getallProfile()
+            this.isLoading = false
+            EventBus.$emit('toggleLoader', true)
+          }
         })
         .catch((e) => {
           console.log(e)

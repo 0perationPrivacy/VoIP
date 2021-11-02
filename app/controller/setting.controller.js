@@ -340,7 +340,7 @@ exports.create = async (req, res) => {
         }  
     } catch (error) {
         // console.log(error)
-        res.status(400).send({status: false, errors:error.message, data: []});
+        res.status(400).send({status: false, message:error.message, data: []});
     } 
 };
 exports.getSetting = async (req, res) => {
@@ -414,7 +414,7 @@ exports.sendSms = async (req, res) => {
                         var toNumber = req.body.numbers[i];
                         toNumber = toNumber.replace(/\s/g,'').replace(/\-/g,'').replace(/\)/g,'').replace(/\(/g,'')
                         var sendNumber = toNumber.length
-                        if(sendNumber <= 10){
+                        if(sendNumber == 10){
                             toNumber = `+1${toNumber}`;
                         }
                         var twilioParams = {
@@ -464,7 +464,7 @@ exports.sendSms = async (req, res) => {
                         var toNumber = req.body.numbers[i];
                         toNumber = toNumber.replace(/\s/g,'').replace(/\-/g,'').replace(/\)/g,'').replace(/\(/g,'')
                         var sendNumber = toNumber.length
-                        if(sendNumber <= 10){
+                        if(sendNumber == 10){
                             toNumber = `+1${toNumber}`;
                         }
                         var telnyxParams = {
@@ -520,7 +520,7 @@ exports.sendSms = async (req, res) => {
             res.status(419).send({status: false, errors:validation.errors, data: []});
         }  
     } catch (error) {
-        res.status(400).send({status: false, errors:error.message, data: []});
+        res.status(400).send({status: false, message:error.message, data: []});
     } 
 };
 

@@ -54,7 +54,7 @@ exports.get  = async (req, res) => {
 exports.getToken = async (req, res) => {
     try{
         var setting = await Setting.findById(req.body.setting_id)
-        console.log(setting)
+       // console.log(setting)
         if(setting){
             if (setting.type === 'twilio') {
                 const AccessToken = twilio.jwt.AccessToken;

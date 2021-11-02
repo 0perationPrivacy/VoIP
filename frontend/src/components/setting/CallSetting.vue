@@ -25,15 +25,18 @@ export default {
     }
   },
   mounted: function () {
+    console.log('load data')
     EventBus.$on('changeProfile', this.getCallSetting)
     this.getCallSetting()
   },
   methods: {
     getCallSetting () {
-      var profileLocal = localStorage.getItem('activeProfile')
+      // var profileLocal = localStorage.getItem('activeProfile')
+      var profileLocal = JSON.parse(localStorage.getItem('activeProfile'))
+      console.log(profileLocal)
       if (profileLocal) {
-        var activeProfile = JSON.parse(profileLocal)
-        this.setting = activeProfile
+        // var activeProfile = JSON.parse(profileLocal)
+        this.setting = profileLocal
       }
     },
     enableMenu (menu) {

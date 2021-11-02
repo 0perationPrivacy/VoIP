@@ -44,7 +44,7 @@ io.on('connection', socket => {
   });
 });
 
-app.use(express.static(__dirname));
+app.use('/version.md', express.static('version.md'));
 // app.enable('trust proxy')
 if( process.env.HTTPS.trim() === 'true'){
   app.use((req, res, next) => {
@@ -77,10 +77,21 @@ app.use(bodyParser.json({limit: '500mb',parameterLimit: 10000000}));
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb',parameterLimit: 10000000 }));
-app.use(express.static(path.join(__dirname, './frontend/dist')));
-
 app.use('/uploads', express.static('uploads'));
 app.use('/src', express.static('src'));
+app.use('/frontend', express.static('frontend'));
+app.use('/static', express.static('static'));
+app.get(`/error`, function (req, res) {
+  res.sendFile(path.join(__dirname, './error/index.html'));
+})
+app.get(`/:id`, function (req, res) {
+  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
+})
+app.get(`/:id/:name`, function (req, res) {
+  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
+})
+app.use(express.static(path.join(__dirname, './frontend/dist')));
+
 require("./app/routes/auth.route")(app);
 require("./app/routes/setting.route")(app);
 require("./app/routes/profile.route")(app);
@@ -88,11 +99,7 @@ require("./app/routes/media.route")(app);
 require("./app/routes/contact.route")(app);
 require("./app/routes/email.route")(app);
 require("./app/routes/call.route")(app);
-/*/api/auth/login*/
-app.get(`/`, function (req, res) {
-  //res.send('Hello World')
-  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
-})
+
 app.get('/:id', function (req, res) {
   //res.send('Hello World')
   res.sendFile(path.join(__dirname, './frontend/dist/index.html'));

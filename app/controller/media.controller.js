@@ -73,7 +73,7 @@ exports.fileUpload = async (req, res) => {
 var cron = require('node-cron');
 // cron job runs every day at 01:00
 cron.schedule('0 1 * * *', () => {
-    console.log('running a task every day at 01:00');
+    console.log('running a cron job daily at 01:00 to delete mms folder older than 7 days');
     var startdate = moment();
     startdate = startdate.subtract(7, "days");
     startdate = startdate.format("DDMMYYYY");

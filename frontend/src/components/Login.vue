@@ -32,7 +32,7 @@
                 <button class="btn btn-success mt-3" type="submit" id="login-button">Login</button>
               </div>
               <div class="my-2 small" v-if="signUpOption">
-                Don’t have an account yet? <router-link to="/signup" class="mx-2"> Sign up</router-link>
+                Don’t have an account yet? <router-link :to="signupRoute" class="mx-2"> Sign up</router-link>
               </div>
               <div  class="d-grid d-md-flex mt-2 small" v-else>
                 New registrations are disabled
@@ -90,7 +90,8 @@ export default {
         otp: ''
       },
       submitted: false,
-      submitted2: false
+      submitted2: false,
+      signupRoute: ''
     }
   },
   validations: {
@@ -100,8 +101,9 @@ export default {
     }
   },
   mounted: function () {
+    this.signupRoute = `/${this.$route.params.appdirectory}/signup`
     if (this.$cookie.get('access_token')) {
-      this.$router.push('/dashboard')
+      this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
     }
     this.getsignup()
     this.getVersion()
@@ -115,7 +117,7 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          if (response.data === 'on') {
+          if (response && response.data === 'on') {
             this.signUpOption = true
           } else {
             this.signUpOption = false
@@ -133,7 +135,9 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.versionOption = response.data
+          if (response) {
+            this.versionOption = response.data
+          }
         })
         .catch((e) => {
           // this.signUpOption = false
@@ -154,12 +158,13 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          // console.log(response.data)
-          this.$cookie.set('access_token', response.token, 30)
-          this.$cookie.set('userdata', JSON.stringify(response.data), 30)
-          console.log(this.$cookie.get('access_token'))
-          console.log(this.$cookie.get('userdata'))
-          this.$router.push('/dashboard')
+          if (response) {
+            this.$cookie.set('access_token', response.token, 30)
+            this.$cookie.set('userdata', JSON.stringify(response.data), 30)
+            console.log(this.$cookie.get('access_token'))
+            console.log(this.$cookie.get('userdata'))
+            this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
+          }
         })
         .catch((e) => {
           // this.signUpOption = false

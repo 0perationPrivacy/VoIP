@@ -89,11 +89,9 @@
         </div>
       </div>
       <div class="wrap-chat" id="chat_body">
-        <div class="chat row" v-if="chatListLoader">
-          <div class="loading-bar">
+          <div class="loading-bar" v-if="chatListLoader">
             <div class="blue-bar"></div>
           </div>
-        </div>
         <!-- v-chat-scroll="{smooth: true, notSmoothOnInit: true}" -->
         <div class="chat" id="chat-container" v-bind:class="{ 'opacitynone': chatListLoader }">
           <div v-if="activeChatData">
@@ -127,7 +125,7 @@
                   <span v-else> {{ message.message }} </span>
                 </div>
                 <div class="time">
-                  {{ message.created_at | moment("HH:mm") }}
+                  {{ message.created_at | moment("LLL") }}  <!-- January 1, 2000 10:00 AM -->
                 </div>
               </div>
             </div>
@@ -164,7 +162,7 @@
     <b-modal ref="my-modal2" id="modal-2" size="lg" title="Compose Message" hide-footer>
       <span class="small text-secondary">Input (+) and country code followed by the 10 digit phone number. If no country code is provided (+1) is assumed. Multiple numbers will be sent as Bulk SMS (individual sms's to recipients). <span class="small text-center">[Telnyx does not support group texting]</span></span>
       <form @submit.prevent="handleSubmit2" class="ml-2 mr-2">
-        <v-select class="mt-4" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
+        <v-select class="mt-4" v-model="selectedContact" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
         <div class="form-group mt-4">
           <vue-tags-input class="form-control chat-input"
                v-model="sms.numbers"
@@ -587,21 +585,23 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.messageBody = ''
-          this.sms.numbers = ''
-          this.sms.message = ''
-          this.uploadedImages = []
-          this.modelFileValu = ''
-          document.getElementById('drop-area').style.display = 'none'
-          this.tags = []
-          this.$refs.numberList.getNumberList()
-          // this.showChat(activechat)
-          if (this.activeChatData) {
-            this.showChat(this.activeChat)
-          }
-          this.$refs['my-modal2'].hide()
-          if (this.vw < 576) {
-            this.$refs['mySidebar2'].hide()
+          if (response) {
+            this.messageBody = ''
+            this.sms.numbers = ''
+            this.sms.message = ''
+            this.uploadedImages = []
+            this.modelFileValu = ''
+            document.getElementById('drop-area').style.display = 'none'
+            this.tags = []
+            this.$refs.numberList.getNumberList()
+            // this.showChat(activechat)
+            if (this.activeChatData) {
+              this.showChat(this.activeChat)
+            }
+            this.$refs['my-modal2'].hide()
+            if (this.vw < 576) {
+              this.$refs['mySidebar2'].hide()
+            }
           }
           this.isLoading = false
         })
@@ -632,17 +632,19 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.messages = response
-          // var container = this.$el.querySelector('#chat-container')
-          // container.scrollTop = container.scrollHeight
-          setTimeout(() => {
-            var scroll = document.getElementById('chat-container')
-            scroll.scrollTop = scroll.scrollHeight
-            scroll.animate({scrollTop: scroll.scrollHeight})
-            this.chatListLoader = false
-          }, 1000)
-          this.$refs.numberList.refreshProfile()
-          this.$refs.numberList.getOneProfile()
+          if (response) {
+            this.messages = response
+            // var container = this.$el.querySelector('#chat-container')
+            // container.scrollTop = container.scrollHeight
+            setTimeout(() => {
+              var scroll = document.getElementById('chat-container')
+              scroll.scrollTop = scroll.scrollHeight
+              scroll.animate({scrollTop: scroll.scrollHeight})
+              this.chatListLoader = false
+            }, 1000)
+            this.$refs.numberList.refreshProfile()
+            this.$refs.numberList.getOneProfile()
+          }
         })
         .catch((e) => {
           console.log(e)

@@ -86,12 +86,14 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((data) => {
-          this.$swal({
-            icon: 'success',
-            title: 'Success',
-            text: 'SIP Setting updated successfully!'
-          })
-          this.getCallSetting()
+          if (data) {
+            this.$swal({
+              icon: 'success',
+              title: 'Success',
+              text: 'SIP Setting updated successfully!'
+            })
+            this.getCallSetting()
+          }
         })
         .catch((e) => {
           console.log(e)

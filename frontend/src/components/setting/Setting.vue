@@ -15,6 +15,7 @@
                   <b-icon icon="person" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Account Settings
                 </li>
               </ul>
+              <div class="version">{{ versionOption }}</div>
             </div>
             <div v-if="activeMenu == 'email'">
               <div class="d-flex justify-content-between">
@@ -71,17 +72,38 @@
 import EmailSetting from './EmailSetting.vue'
 import CallSetting from './CallSetting.vue'
 import AccountSetting from './account/AccountSetting.vue'
+import { post } from '../../core/module/common.module'
+// import { post } from '../core/module/common.module'
 export default {
   components: { EmailSetting, CallSetting, AccountSetting },
   data () {
     return {
-      activeMenu: 'setting'
+      activeMenu: 'setting',
+      versionOption: 'v0'
     }
   },
-  mounted: function () {},
+  mounted: function () {
+    this.getVersion()
+  },
   methods: {
     enableMenu (menu) {
       this.activeMenu = menu
+    },
+    getVersion () {
+      var request = {
+        data: {},
+        url: 'auth/get-version'
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
+          if (response) {
+            this.versionOption = response.data
+          }
+        })
+        .catch((e) => {
+
+        })
     }
   }
 }

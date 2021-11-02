@@ -10,6 +10,8 @@ module.exports = app => {
     router.post("/get-signup", user.getSignUpOption);
     router.post("/get-version", user.getVersionOption);
     router.get("/get-update-version", user.getUpdateVersion);
+    router.post("/check-directoryname", user.checkDirectoryName);
+    
 
     router.post('/username/update', auth, user.updateUserName);
     router.post('/password/update', auth, user.updatePassword);

@@ -303,12 +303,14 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((data) => {
-          this.$refs['modal-contact'].hide()
-          // this.getContacts()
-          this.$emit('onaddContact', true)
-          EventBus.$emit('contactAdded', this.form.number)
-          this.emptyContact()
-          this.submitted = false
+          if (data) {
+            this.$refs['modal-contact'].hide()
+            // this.getContacts()
+            this.$emit('onaddContact', true)
+            EventBus.$emit('contactAdded', this.form.number)
+            this.emptyContact()
+            this.submitted = false
+          }
         })
         .catch((e) => {
           console.log(e)

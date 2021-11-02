@@ -15,7 +15,7 @@ const telnyxHelper = require('../helper/telnyx.helper');
 const twilioHelper = require('../helper/twilio.helper');
 
 const remoteVersion = 'https://raw.githubusercontent.com/0perationPrivacy/VoIP/main/version.md';
-const currentVersion = process.env.APP_VERSION; // change to read from local file version.md
+const currentVersion = process.env.BASE_URL + 'version.md'; // read from local file version.md
 
 var jwt = require('jsonwebtoken');
 
@@ -129,16 +129,36 @@ exports.getSignUpOption = async (req, res) => {
 };
 
 exports.getVersionOption = (req, res) => {
-    var version = process.env.APP_VERSION;
-    if(!version){
-        version = 'v0.0'
-    }
-    res.send({status:true, message:'version option!', data:version});  
+    var request = require('request');
+    request.get(currentVersion, async function (error, response, body) {
+       // console.log(body);
+       // console.log(error);
+        if (!error && response.statusCode == 200) {
+            if(isNaN(body)){
+                res.send({status:true, message:'Not a numeric value!', data:'v0.0'});
+            }else{
+                res.send({status:true, message:'version defined.', data:`v${body}`});
+            }
+        }else{
+            res.send({status:true, message:'version file not found!', data:'v0.0'});
+        }
+    });
 };
-
+exports.checkDirectoryName = (req, res) => {
+    var dir = process.env.APPDIRECTORY
+    if(dir){
+        if(dir === req.body.dirname){
+            res.send({status:true, message:'APPDIRECTORY!', data:{status:'true'}});
+        } else {
+            res.send({status:true, message:'APPDIRECTORY!', data:{status:'false'}});
+        }
+    }else{
+        res.send({status:true, message:'APPDIRECTORY!', data:{status:'nodir'}});
+    }
+};
 exports.getUpdateVersion = (req, res) => {
     var request = require('request');
-    request.get(remoteVersion, function (error, response, body) {
+    request.get(remoteVersion, async function (error, response, body) {
         if (!error && response.statusCode == 200) {
             if(isNaN(body)){
                 res.send({update: 'false'});
@@ -146,12 +166,24 @@ exports.getUpdateVersion = (req, res) => {
                 // var curruntv = process.env.APP_VERSION
                 // curruntv = curruntv.replace("v", "").replace("-beta", "");
                 // console.log(body)
-                console.log(currentVersion)
-                if(currentVersion < body){
-                    res.send({update: 'true'});
-                }else{
-                    res.send({update: 'false'});
-                }
+                //console.log(currentVersion)
+                request.get(currentVersion, async function (error, response, body2) {
+                    if (!error && response.statusCode == 200) {
+                        if(isNaN(body2)){
+                            res.send({update: 'false'});
+                        }else{
+                            if(body2 < body){
+                                res.send({update: 'true'});
+                            }else{
+                                res.send({update: 'false'});
+                            }
+                        }
+                    }else{
+                        res.send({update: 'false'});
+                    }
+                });
+                // console.log(currentVersion)
+                // var current
             }
         }else{
             res.send({update: 'false'});
@@ -243,7 +275,7 @@ exports.checkPassword = async (req, res) => {
             res.status(400).json({status:'false',message:'User not found!'});
         }
     }else{
-        res.status(419).send({status: false, errors:validation.errors, data: []});
+        res.status(400).send({status: false, message:'Password required!', data: []});
     }
 }
 

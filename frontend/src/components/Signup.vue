@@ -43,7 +43,7 @@
                 <button class="btn btn-primary mt-3" type="submit">Sign Up</button>
               </div>
               <div class="my-2 small">
-                Already have an account? <router-link to="/" class="mx-2">Login</router-link>
+                Already have an account? <router-link :to="loginRoute" class="mx-2">Login</router-link>
               </div>
             </form>
             <div class="d-flex my-4 justify-content-center">
@@ -75,7 +75,8 @@ export default {
         password: ''
       },
       submitted: false,
-      baseurl: ''
+      baseurl: '',
+      loginRoute: ''
     }
   },
   validations: {
@@ -87,6 +88,7 @@ export default {
     }
   },
   mounted: function () {
+    this.loginRoute = `/${this.$route.params.appdirectory}`
     var baseUrl = window.location.origin
     if (baseUrl === 'http://localhost:8080') {
       this.baseurl = 'http://localhost:3000'
@@ -105,7 +107,7 @@ export default {
       // eslint-disable-next-line no-undef
       axios.post(`auth/register`, this.user)
         .then(response => {
-          this.$router.push('/')
+          this.$router.push(`/${this.$route.params.appdirectory}/`)
         })
         .catch(error => {
           if (error.response.status === 401) {
@@ -131,7 +133,7 @@ export default {
           if (response.data.data === 'on') {
             this.signUpOption = true
           } else {
-            this.$router.push('/')
+            this.$router.push(`/${this.$route.params.appdirectory}/`)
           }
         })
         .catch(() => {

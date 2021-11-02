@@ -99,27 +99,30 @@
           aria-hidden="true"
           class="mx-2 my-auto"
         ></b-icon>
-        <div class="contact-preview">
-          <div class="contact-text">
-            <h1 class="font-name" v-if="item.contact">{{item.contact.first_name}} {{item.contact.last_name}}</h1>
-            <h1 v-else class="font-name">{{ item._id }}</h1>
-            <p class="font-preview" v-if="item.message">{{ getValidString(item.message)  }}</p>
-            <p class="font-preview" v-else>
-              <span v-if="item.message_type == 'call'">
-                <span v-if="item.type == 'send'"> Outbound </span>
-                <span v-else> Inbound </span>
-                Call
-              </span>
-            </p>
+        <div class="d-flex justify-content-between" style="width:100%">
+          <div class="contact-preview">
+            <div class="contact-text">
+              <h1 class="font-name" v-if="item.contact">{{item.contact.first_name}} {{item.contact.last_name}}</h1>
+              <h1 v-else class="font-name">{{ item._id }}</h1>
+              <p class="font-preview" v-if="item.message">{{ getValidString(item.message)  }}</p>
+              <p class="font-preview" v-else>
+                <span v-if="item.message_type == 'call'">
+                  <span v-if="item.type == 'send'"> Outbound </span>
+                  <span v-else> Inbound </span>
+                  Call
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
-        <div class="contact-time">
-          <p class="">{{ item.created_at | moment("HH:mm") }}</p>
+
+          <div class="align-self-center text-end me-3">
+          <span class="time">{{ item.created_at | moment("lll") }}</span> <!-- Jan 1, 2000 10:00 AM -->
           <span
             class="badge message_count bg-success" :id="item._id"
             v-if="item.isview > 0"
             >{{ item.isview }}</span
           >
+          </div>
         </div>
       </div>
     </div>
@@ -460,8 +463,10 @@ export default {
       this.$store
         .dispatch(get, request)
         .then((data) => {
-          this.contacts = data.data
-          this.$emit('onaddContact', data.data)
+          if (data) {
+            this.contacts = data.data
+            this.$emit('onaddContact', data.data)
+          }
         })
         .catch((e) => {
           console.log(e)
@@ -484,7 +489,9 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.activeProfile = response.data
+          if (response) {
+            this.activeProfile = response.data
+          }
         })
         .catch((e) => {
           console.log(e)
@@ -520,11 +527,9 @@ export default {
     logout () {
       this.$cookie.delete('access_token')
       this.$cookie.delete('userdata')
-      // this.$router.push('/')
-      window.location.href = '/'
+      window.location.href = `/${this.$route.params.appdirectory}/`
     },
     getNumberList () {
-      // alert('get number list')
       this.numbers = []
       var request = {
         data: {user: this.userdata._id, setting: this.activeProfile._id},
@@ -533,9 +538,11 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.numbers = response
-          this.messageListLoader = false
-          this.searchContact()
+          if (response) {
+            this.numbers = response
+            this.messageListLoader = false
+            this.searchContact()
+          }
         })
         .catch((e) => {
           console.log(e)
@@ -558,7 +565,7 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          if (response.data) {
+          if (response && response.data) {
             this.user = response.data
             this.hideShowDeleteIcon(response.data)
             this.user.twilio_number = response.data.number
@@ -679,10 +686,12 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          if (type === 'telnyx') {
-            this.tNumbers = response.data.data
-          } else {
-            this.twilioNumbers = response.data
+          if (response) {
+            if (type === 'telnyx') {
+              this.tNumbers = response.data.data
+            } else {
+              this.twilioNumbers = response.data
+            }
           }
         })
         .catch((e) => {
@@ -732,14 +741,16 @@ export default {
         this.$store
           .dispatch(post, request)
           .then((response) => {
-            this.$refs['my-modal'].hide()
-            this.activeProfile = response.data
-            this.hideShowDeleteIcon(response.data)
-            this.$refs.childComponent.getallProfile()
-            EventBus.$emit('clicked', true)
-            EventBus.$emit('changeProfile2', true)
+            if (response) {
+              this.$refs['my-modal'].hide()
+              this.activeProfile = response.data
+              this.hideShowDeleteIcon(response.data)
+              this.$refs.childComponent.getallProfile()
+              EventBus.$emit('clicked', true)
+              EventBus.$emit('changeProfile2', true)
+              this.$v.$reset()
+            }
             this.isLoading = false
-            this.$v.$reset()
           })
           .catch((e) => {
             this.isLoading = false

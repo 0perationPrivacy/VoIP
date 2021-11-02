@@ -258,7 +258,7 @@
     border: none;
     background-color: var(--background-color-secondary);
     color: var(--text-primary-color);
-    border-radius: inherit;
+    border-radius: unset; /* fixes Chromium cursor size on message search bar */
 }
 
 .input-search:focus {
@@ -485,7 +485,7 @@
 .time {
     font-size: 0.6em;
     text-align: right;
-    margin-top: -7px;
+    font-style: italic;
 }
 
 .wrap-message {
@@ -783,13 +783,12 @@ a {
 } 
 
 .loading-bar {
-    width: 130px;
+    width: 50%;
     height: 2px;
-    margin: auto;
-    margin-left: -70px;
+    margin-left: -15%;
     border-radius: 2px;
     background-color:var(--chat-you);
-    position: absolute;
+    position: relative;
     top: 50%;
     left: 50%;
     overflow:hidden;

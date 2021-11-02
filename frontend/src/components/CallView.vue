@@ -11,7 +11,7 @@
           <template #default="{ hide }">
             <div class="d-flex justify-content-center">
                 <div v-if="!incoming" style="max-width:300px">
-                    <v-select class="mb-2" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
+                    <v-select class="mb-2" v-model="selectedContact" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
                     <b-form-group id="input-group-1" style="margin-bottom: 0;">
                       <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
                     </b-form-group>
@@ -187,10 +187,13 @@ export default {
       callType: '',
       newCall: null,
       searchContacts: [],
-      device: null
+      device: null,
+      selectedContact: ''
     }
   },
   async mounted () {
+    this.formatecontact(this.contacts)
+    // console.log(this.contacts)
     EventBus.$on('clicked', () => {
       // this.clickHandler()
     })
@@ -309,7 +312,7 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          if (response.data) {
+          if (response && response.data) {
             this.name = response.data.first_name + ' ' + response.data.last_name
           }
         })
@@ -442,6 +445,7 @@ export default {
     },
     contactChangeEvent (e) {
       this.number = e.code.replace('+', '')
+      this.selectedContact = ''
     },
     distroyDevice () {
       // console.log('device disconnected')
@@ -459,6 +463,7 @@ export default {
       }
     },
     formatecontact (contacts) {
+      console.log(contacts)
       var arrContact = []
       for (var i = 0; i < contacts.length; i++) {
         var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}

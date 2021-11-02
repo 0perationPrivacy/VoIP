@@ -4,6 +4,31 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.73 (Nov 2, 2021)
+### Security
+- ***Security through Obscurity***: Put in a random directory name in `.env` under `APPDIRECTORY`. Your application will be served only on that subdirectory.
+People will not be able to browse to your app page (by discovering your public github page and _deployment_ link)
+_Example:_
+>|||
+>|---|---|
+>|APPDIRECTORY|789gh8ag96lgw7ag8fghlkg|
+>|||
+By default it is not defined. Full instructions [here](https://github.com/0perationPrivacy/voip/wiki/Bonus-Steps).
+- ### Bug fix:
+  - fixes search bar cursor size on Chromium browsers (Chrome/Brave)
+  - Delete account error on empty password fixed
+  - SMS reply to shortcode bug fixed. If provider rejects it, you will see their error message.
+  - Minor changes in code to function names, variables, comments
+
+- ### UI:
+  - Fixed loading bar size and overlapping issues
+  - **version** is now viewable under **Settings** and **Login** page (removed from .env)
+  - Full message timestamps (M D, Y H:M)
+  - On compose message, contacts dropdown now clears after seleting a contact
+  
+
+
+
 
 ## v0.72 (Oct 30, 2021)
 - ***Update ribbon*** shows when there's a newer version available. Links it to the changelog

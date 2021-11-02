@@ -121,7 +121,7 @@ export default {
           }).then((result) => {
             this.$cookie.delete('access_token')
             this.$cookie.delete('userdata')
-            window.location.href = '/'
+            window.location.href = `/${this.$route.params.appdirectory}/`
             // this.$router.push('/')
           })
         }

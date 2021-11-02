@@ -115,13 +115,14 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          console.log(response)
-          this.$swal({
-            icon: 'success',
-            title: 'Email Setting',
-            text: 'Setting saved successfully'
-          })
-          this.getEmailSetting()
+          if (response) {
+            this.$swal({
+              icon: 'success',
+              title: 'Email Setting',
+              text: 'Setting saved successfully'
+            })
+            this.getEmailSetting()
+          }
           // this.profiles = response.data
         })
         .catch((e) => {
@@ -135,8 +136,7 @@ export default {
       this.$store
         .dispatch(get, request)
         .then((response) => {
-          console.log(response)
-          if (response.data) {
+          if (response && response.data) {
             this.form = response.data
             this.showProfile = true
             this.getProfiles()
@@ -162,8 +162,9 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          console.log(response)
-          this.profiles = response.data
+          if (response) {
+            this.profiles = response.data
+          }
         })
         .catch((e) => {
           console.log(e)
@@ -177,7 +178,9 @@ export default {
       this.$store
         .dispatch(post, request)
         .then((response) => {
-          this.getProfiles()
+          if (response) {
+            this.getProfiles()
+          }
           // this.profiles = response.data
         })
         .catch((e) => {

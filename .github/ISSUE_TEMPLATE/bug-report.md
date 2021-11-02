@@ -7,11 +7,11 @@ assignees: 0perationPrivacy
 
 ---
 
-**Platform:** [Desktop or Mobile]
-**Browser:** [e.g. Firefox, Chrome, Safari, Brave]
-**App Version:** [e.g v0.60-beta]
-**Provider:** [Telnyx, Twilio, Both]
-### Describe the bug
+- **Platform:**  [Desktop or Mobile]
+- **Browser:** [e.g. Firefox, Chrome, Safari, Brave]
+- **App Version:** [e.g v0.x]
+- **Provider:** [Telnyx, Twilio, Both]
+- ### Describe the bug
 _A clear and concise description of what the bug is_
 
 **To Reproduce**

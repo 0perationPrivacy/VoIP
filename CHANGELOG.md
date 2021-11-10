@@ -5,6 +5,10 @@
 
 ---
 
+## v0.76 (Nov 9, 2021)
+### UI
+- Text message overflow word break for very long links fixed
+
 ## v0.75 (Nov 9, 2021)
 ### Security
 - Protections added as security headers for: XSS, NoSniff, HSTS, X-Powered-By, FrameGuard, DNS Prefetch, Content Security Policy.

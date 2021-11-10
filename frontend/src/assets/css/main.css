@@ -475,6 +475,7 @@
     margin: 0.5em 0;
     line-height: 120%;
     font-size: 0.9em;
+    overflow-wrap: break-word;
 }
 
 .content img {

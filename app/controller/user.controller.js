@@ -148,12 +148,12 @@ exports.checkDirectoryName = (req, res) => {
     var dir = process.env.APPDIRECTORY
     if(dir){
         if(dir === req.body.dirname){
-            res.send({status:true, message:'APPDIRECTORY!', data:{status:'true'}});
+            res.send({status:true, message:'APPDIRECTORY Matched!', data:{status:'true'}});
         } else {
-            res.send({status:true, message:'APPDIRECTORY!', data:{status:'false'}});
+            res.send({status:true, message:'APPDIRECTORY Mismatch!', data:{status:'false'}});
         }
     }else{
-        res.send({status:true, message:'APPDIRECTORY!', data:{status:'nodir'}});
+        res.send({status:true, message:'APPDIRECTORY not defined!', data:{status:'nodir'}});
     }
 };
 exports.getUpdateVersion = (req, res) => {

@@ -52,13 +52,16 @@ export default {
         .dispatch(post, request)
         .then((response) => {
           if (response.data.status === 'nodir') {
-            if (this.$route.params.appdirectory === undefined) {
-              this.$router.push(`/voip/`)
-            } else {
-              if (this.$route.params.appdirectory !== 'voip') {
-                this.$router.push(`/404`)
-              }
-            }
+            this.$router.push(`/voip/`)
+
+            // if (this.$route.params.appdirectory === undefined) {
+            //   this.$router.push(`/voip/`)
+            // } 
+            // else {
+            //   if (this.$route.params.appdirectory !== 'voip') {
+            //     this.$router.push(`/404`)
+            //   }
+            // }
           } else if (response.data.status !== 'true') {
             this.$router.push(`/404`)
           }

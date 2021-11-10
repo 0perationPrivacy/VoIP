@@ -463,7 +463,6 @@ export default {
       }
     },
     formatecontact (contacts) {
-      console.log(contacts)
       var arrContact = []
       for (var i = 0; i < contacts.length; i++) {
         var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}

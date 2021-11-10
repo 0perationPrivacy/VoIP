@@ -2,7 +2,6 @@ const Telnyx = require('telnyx');
 var axios = require('axios');
 const moment = require('moment');
 
-
 //Inside lib file declare functions
 const requestCurl = (method,url,headers,data=null) => {
     return new Promise((resolve) => {
@@ -308,6 +307,24 @@ const sIPAppGet = async (data) => {
     });
 }
 
+const getNumberData = async (data) => {
+    return new Promise(async (resolve,reject) =>  {
+        try{
+            var url = `https://api.telnyx.com/v2/phone_numbers/${data.number_sid}`;
+            var headers =  { 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/json', 
+                'Authorization': `Bearer ${data.apiKey}`
+              };
+            var response = await requestCurl('GET',url,headers);
+            resolve(response);
+        }catch(error){
+            // console.log(error)
+            resolve(false);
+        }
+    });
+}
+
 module.exports = {
-    requestCurl, createTexmlApp, updateTexmlApp, deleteTexmlApp, createSIPApp, updateSIPApp, deleteSIPApp, createOutboundVoice, deleteOutboundVoice, updatePhoneNumber, emptyMessageProfile, deleteMessageProfile, messageProfileFallback, texmlAppFalback, sIPAppFallback, messageProfileGet, texmlAppGet, sIPAppGet
+    requestCurl, createTexmlApp, updateTexmlApp, deleteTexmlApp, createSIPApp, updateSIPApp, deleteSIPApp, createOutboundVoice, deleteOutboundVoice, updatePhoneNumber, emptyMessageProfile, deleteMessageProfile, messageProfileFallback, texmlAppFalback, sIPAppFallback, messageProfileGet, texmlAppGet, sIPAppGet, getNumberData
 }

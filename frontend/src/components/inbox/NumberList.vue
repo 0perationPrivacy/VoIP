@@ -419,7 +419,9 @@ export default {
       mainElement: '.contact-list',
       triggerElement: '.contact-list',
       onRefresh () {
-        $this.getNumberList()
+        $this.pullRefreshFunction($this)
+        // $this.getNumberList()
+        // $this.getOneProfile()
       },
       distThreshold: 120,
       distMax: 140
@@ -440,6 +442,11 @@ export default {
     })
   },
   methods: {
+    pullRefreshFunction ($this) {
+      $this.getNumberList()
+      $this.getOneProfile()
+      $this.refreshProfile()
+    },
     searchContact () {
       // console.log(this.numbers)
       var search = new RegExp(this.query, 'i')
@@ -736,19 +743,98 @@ export default {
         this.isLoading = true
         var request = {
           data: sendData,
-          url: 'setting/create'
+          url: 'setting/check-setting'
         }
         this.$store
           .dispatch(post, request)
           .then((response) => {
+            var isCall = false
             if (response) {
-              this.$refs['my-modal'].hide()
-              this.activeProfile = response.data
-              this.hideShowDeleteIcon(response.data)
-              this.$refs.childComponent.getallProfile()
-              EventBus.$emit('clicked', true)
-              EventBus.$emit('changeProfile2', true)
-              this.$v.$reset()
+              if (this.selected === 'telnyx' && response.data.data.connection_id !== undefined && response.data.data.connection_id && response.data.data.connection_id !== '') {
+                isCall = true
+              }
+
+              if (this.selected === 'twilio') {
+                var appSidavilable = false
+                if (response.data.voiceApplicationSid !== undefined && response.data.voiceApplicationSid && response.data.voiceApplicationSid !== '') {
+                  isCall = true
+                  appSidavilable = true
+                }
+                if (!appSidavilable) {
+                  if (response.data.voiceUrl !== undefined && response.data.voiceUrl && response.data.voiceUrl !== '') {
+                    isCall = true
+                  }
+                }
+              }
+              if (isCall) {
+                this.$swal.fire({
+                  icon: 'warning',
+                  title: 'Call Setting',
+                  text: 'The call setting is already available. Do you want to override the call setting?',
+                  showDenyButton: true,
+                  confirmButtonText: 'Yes, override it',
+                  denyButtonText: `No, Keep old`
+                }).then((result) => {
+                  var updateCallSetting = false
+                  if (result.isConfirmed) {
+                    updateCallSetting = true
+                    sendData.override = 'true'
+                  } else if (result.isDenied) {
+                    updateCallSetting = true
+                    sendData.override = 'false'
+                  }
+                  if (updateCallSetting) {
+                    this.isLoading = true
+                    var request = {
+                      data: sendData,
+                      url: 'setting/create'
+                    }
+                    this.$store
+                      .dispatch(post, request)
+                      .then((response) => {
+                        if (response) {
+                          this.$refs['my-modal'].hide()
+                          this.activeProfile = response.data
+                          this.hideShowDeleteIcon(response.data)
+                          this.$refs.childComponent.getallProfile()
+                          EventBus.$emit('clicked', true)
+                          EventBus.$emit('changeProfile2', true)
+                          this.$v.$reset()
+                        }
+                        this.isLoading = false
+                      })
+                      .catch((e) => {
+                        this.isLoading = false
+                        console.log(e)
+                      })
+                  }
+                })
+              } else {
+                sendData.override = 'true'
+                var request = {
+                  data: sendData,
+                  url: 'setting/create'
+                }
+                this.$store
+                  .dispatch(post, request)
+                  .then((response) => {
+                    if (response) {
+                      this.$refs['my-modal'].hide()
+                      this.activeProfile = response.data
+                      this.hideShowDeleteIcon(response.data)
+                      this.$refs.childComponent.getallProfile()
+                      EventBus.$emit('clicked', true)
+                      EventBus.$emit('changeProfile2', true)
+                      this.$v.$reset()
+                    }
+                    this.isLoading = false
+                  })
+                  .catch((e) => {
+                    this.isLoading = false
+                    console.log(e)
+                  })
+              }
+              // console.log(response)
             }
             this.isLoading = false
           })

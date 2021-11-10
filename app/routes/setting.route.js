@@ -26,6 +26,8 @@ module.exports = app => {
     router.post("/telnyx/message/get",auth, fallback.telnyxMessageGet);
     router.post("/telnyx/twiml/get",auth, fallback.telnyxTwimlGet);
     router.post("/telnyx/sip/get",auth, fallback.telnyxSipGet);
+
+    router.post("/check-setting",auth, fallback.checkCallSetting);
     
     app.use('/api/setting', router);
 };

@@ -4,8 +4,19 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+
+## v0.75 (Nov 9, 2021)
+### Security
+- Protections added as security headers for: XSS, NoSniff, HSTS, X-Powered-By, FrameGuard, DNS Prefetch, Content Security Policy.
+
+### Bugs
+- Pull down to refresh now updates the notification dot and the profile inside the dropdown
+- Redirect issue to 404 fixed for non-custom directory
+
+
 ## v0.74 (Nov 2, 2021)
-- **UI:** Error page CSS fixed
+- **UI:** Error page update
+
 
 ## v0.73 (Nov 2, 2021)
 ### Security

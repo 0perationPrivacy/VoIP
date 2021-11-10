@@ -7,6 +7,29 @@ const cors = require("cors");
 require('dotenv').config()
 const path = require('path');
 var RateLimit = require('express-rate-limit');
+const helmet = require("helmet");
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    reportOnly: false,
+    directives: {
+      "default-src": ["'self'", "sdk.twilio.com","wss:","ws:"],
+      "object-src": ["'self'"],
+      "script-src": ["'self'","'unsafe-eval'"]
+    },
+  })
+);
+//sdk.twilio.com
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 const server = require('http').createServer(app);
 
@@ -44,6 +67,7 @@ io.on('connection', socket => {
   });
 });
 
+app.use('/frontend/dist/index.html', express.static('frontend/dist/index.html'));
 app.use('/version.md', express.static('version.md'));
 // app.enable('trust proxy')
 if( process.env.HTTPS.trim() === 'true'){

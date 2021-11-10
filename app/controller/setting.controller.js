@@ -19,6 +19,7 @@ const { exists } = require('../model/setting.model');
 const commonHelper = require('../helper/common.helper')
 const telnyxHelper = require('../helper/telnyx.helper')
 const twilioHelper = require('../helper/twilio.helper')
+
 exports.deleteKey = async (req, res) => {
     var settingCheck = await Setting.findOne({user:req.body.user,_id:req.body.profile_id})
     try{
@@ -141,31 +142,33 @@ exports.create = async (req, res) => {
                             settingCheck.profile = req.body.profile;
                             settingCheck.type = 'telnyx';
                             
-                            if(settingCheck.telnyx_twiml){
-                                await telnyxHelper.updateTexmlApp(req.body.api_key, settingCheck.telnyx_twiml)
-                            }else{
-                                var twimlTel = await telnyxHelper.createTexmlApp(req.body.api_key)
-                                settingCheck.telnyx_twiml = twimlTel.data.id
-                            }
-                            if(settingCheck.telnyx_outbound){
-                                // telnyxHelper.updateTexmlApp(req.body.api_key, settingCheck.telnyx_twiml)
-                            }else{
-                                var outboundTel = await telnyxHelper.createOutboundVoice(req.body.api_key)
-                                settingCheck.telnyx_outbound = outboundTel.data.id
-                            }
+                            if (req.body.override === 'true') {
+                                if(settingCheck.telnyx_twiml){
+                                    await telnyxHelper.updateTexmlApp(req.body.api_key, settingCheck.telnyx_twiml)
+                                }else{
+                                    var twimlTel = await telnyxHelper.createTexmlApp(req.body.api_key)
+                                    settingCheck.telnyx_twiml = twimlTel.data.id
+                                }
+                                if(settingCheck.telnyx_outbound){
+                                    // telnyxHelper.updateTexmlApp(req.body.api_key, settingCheck.telnyx_twiml)
+                                }else{
+                                    var outboundTel = await telnyxHelper.createOutboundVoice(req.body.api_key)
+                                    settingCheck.telnyx_outbound = outboundTel.data.id
+                                }
 
-                            if(settingCheck.sip_id){
-                                await telnyxHelper.updateSIPApp(req.body.api_key, settingCheck.sip_id, settingCheck.telnyx_outbound)
-                            }else{
-                                // console.log('==================================================================')
-                                // console.log(settingCheck.telnyx_outbound)
-                                var sipTel = await telnyxHelper.createSIPApp(req.body.api_key, req.user.id, settingCheck.telnyx_outbound)
-                                //console.log('==================================================================')
-                                // console.log(sipTel.data.id)
-                                settingCheck.sip_id = sipTel.data.id
-                                settingCheck.sip_username = sipTel.data.user_name
-                                settingCheck.sip_password = sipTel.data.password
-                            } 
+                                if(settingCheck.sip_id){
+                                    await telnyxHelper.updateSIPApp(req.body.api_key, settingCheck.sip_id, settingCheck.telnyx_outbound)
+                                }else{
+                                    // console.log('==================================================================')
+                                    // console.log(settingCheck.telnyx_outbound)
+                                    var sipTel = await telnyxHelper.createSIPApp(req.body.api_key, req.user.id, settingCheck.telnyx_outbound)
+                                    //console.log('==================================================================')
+                                    // console.log(sipTel.data.id)
+                                    settingCheck.sip_id = sipTel.data.id
+                                    settingCheck.sip_username = sipTel.data.user_name
+                                    settingCheck.sip_password = sipTel.data.password
+                                } 
+                            }
 
                             settingCheck.save();
                             var save = settingCheck;
@@ -208,10 +211,12 @@ exports.create = async (req, res) => {
                                     req.body.sid,
                                     { messaging_profile_id: telnyxSetting }
                                 ); 
+                            if (req.body.override === 'true') {
                                  await telnyx(req.body.api_key).phoneNumbers.update(
                                     req.body.sid,
                                     { connection_id: settingCheck.telnyx_twiml }
                                   ); 
+                            }
                             res.send({status:true, message:'setting saved!', data:settingCheck});
                         }else{
                             res.status(400).json({status:'false',message:'Setting not saved!'});
@@ -272,19 +277,20 @@ exports.create = async (req, res) => {
                             settingCheck.twilio_token = req.body.twilio_token;
                             settingCheck.profile = req.body.profile;
                             settingCheck.type = 'twilio';
+                            if (req.body.override === 'true') {
+                                if(settingCheck.twiml_app){
+                                    await twilioHelper.updateTwiml(req.body.twilio_sid, req.body.twilio_token, settingCheck.twiml_app)
+                                }else{
+                                    var twiml_app = await twilioHelper.creatTwiml(req.body.twilio_sid, req.body.twilio_token);
+                                    settingCheck.twiml_app = twiml_app
+                                }
+                                if(settingCheck.app_key){
 
-                            if(settingCheck.twiml_app){
-                                await twilioHelper.updateTwiml(req.body.twilio_sid, req.body.twilio_token, settingCheck.twiml_app)
-                            }else{
-                                var twiml_app = await twilioHelper.creatTwiml(req.body.twilio_sid, req.body.twilio_token);
-                                settingCheck.twiml_app = twiml_app
-                            }
-                            if(settingCheck.app_key){
-
-                            }else{
-                                var appData = await twilioHelper.creatAPIKey(req.body.twilio_sid, req.body.twilio_token);
-                                settingCheck.app_key = appData.sid
-                                settingCheck.app_secret = appData.secret
+                                }else{
+                                    var appData = await twilioHelper.creatAPIKey(req.body.twilio_sid, req.body.twilio_token);
+                                    settingCheck.app_key = appData.sid
+                                    settingCheck.app_secret = appData.secret
+                                }
                             }
                             var save = settingCheck.save();
                         }else{
@@ -300,19 +306,29 @@ exports.create = async (req, res) => {
                             var save = await Setting.create(twilioData);
                         }
                     }
-                if(save){
-                    const client = new twilio(req.body.twilio_sid, req.body.twilio_token);
-                    client.incomingPhoneNumbers(req.body.sid)
-                    .update({smsUrl: process.env.BASE_URL.trim()+"api/setting/receive-sms/"+req.body.type, voiceUrl: process.env.BASE_URL.trim()+"api/call/incomming", statusCallback: process.env.BASE_URL.trim()+"api/call/status" })
-                    res.send({status:true, message:'setting saved!', data:settingCheck});
-
-                }else{
-                    res.status(400).json({status:'false',message:'Setting not saved!'});
-                }
+                    if(save){
+                        const client = new twilio(req.body.twilio_sid, req.body.twilio_token);
+                        if (req.body.override === 'true') {
+                            var twilioUpdatedata = {
+                                smsUrl: process.env.BASE_URL.trim()+"api/setting/receive-sms/"+req.body.type, 
+                                voiceUrl: process.env.BASE_URL.trim()+"api/call/incomming", 
+                                statusCallback: process.env.BASE_URL.trim()+"api/call/status",
+                                voiceApplicationSid: "",
+                            }
+                        }else{
+                            var twilioUpdatedata = {
+                                smsUrl: process.env.BASE_URL.trim()+"api/setting/receive-sms/"+req.body.type, 
+                            }
+                        }
+                        await client.incomingPhoneNumbers(req.body.sid)
+                        .update(twilioUpdatedata)
+                        res.send({status:true, message:'setting saved!', data:settingCheck});
+                    }else{
+                        res.status(400).json({status:'false',message:'Setting not saved!'});
+                    }
                 }else{
                     res.status(400).json({status:'false',message:'Something is wrong!'});
                 }
-
             }else{
                 let rules2 = {
                     profile: 'required'

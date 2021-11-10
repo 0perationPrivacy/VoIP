@@ -265,3 +265,41 @@ exports.telnyxSipGet = async (req, res) => {
     }
 };
 
+exports.checkCallSetting = async(req, res) => {
+    if(req.body.type == 'telnyx') {
+        var rules = {
+            api_key: 'required',
+            number: 'required',
+            sid: 'required'
+        };
+    } else {
+        var rules = {
+            twilio_sid: 'required',
+            twilio_token: 'required',
+            twilio_number: 'required',
+            sid: 'required',
+        }
+    }
+    let validation = new Validator(req.body, rules);
+    if(validation.passes()){
+        if(req.body.type == 'telnyx'){
+            var updateData = {
+                number_sid : req.body.sid,
+                apiKey: req.body.api_key
+            }
+            var numberData = await telnyxHelper.getNumberData(updateData);
+            res.send({status:'true', message:'Number Data!', data:numberData});
+        }else{
+            var updateData = {
+                sid : req.body.twilio_sid,
+                token: req.body.twilio_token,
+                numbersid: req.body.sid
+            }
+            var numberData = await twilioHelper.numberGet(updateData);
+            res.send({status:'true', message:'Number Data!', data:numberData});
+        }
+    }else{
+        res.status(400).send({status: false, message:error.message, data: []});
+    }
+};
+

@@ -11,7 +11,7 @@
 ### Security
 - Added Secure Cookie session values
 - Trust Proxy
-- NOSQL injection protection of , input sanitization (100+ syntax edits)
+- NOSQL injection protection of functions, input sanitization (100+ syntax edits)
 - Secure functions (Math. to crypto.)
 - Added compression
 - Expose only directories needed, hiding root

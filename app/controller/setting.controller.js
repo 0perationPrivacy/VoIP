@@ -21,7 +21,7 @@ const telnyxHelper = require('../helper/telnyx.helper')
 const twilioHelper = require('../helper/twilio.helper')
 
 exports.deleteKey = async (req, res) => {
-    var settingCheck = await Setting.findOne({user:req.body.user,_id:req.body.profile_id})
+    var settingCheck = await Setting.findOne({user:{$eq: req.body.user},_id:{$eq: req.body.profile_id}})
     try{
         if(settingCheck.type === 'telnyx'){
             var Telynx = telnyx(settingCheck.api_key)  
@@ -127,14 +127,14 @@ exports.create = async (req, res) => {
             };
             let validation = new Validator(req.body, rules);
             if(validation.passes()){
-                var user = await User.findOne({_id: req.body.user});
+                var user = await User.findOne({_id: {$eq: req.body.user}});
                 if(user){
-                    var firstSettingCheck = await Setting.findOne({_id: { $not: { $eq: req.body.setting } } , number:req.body.number})
+                    var firstSettingCheck = await Setting.findOne({_id: { $not: { $eq: req.body.setting } } , number:{$eq: req.body.number}})
                     if(firstSettingCheck){
                         res.status(400).json({status:'false',message:'Number already assigned to another profile!'});
                     }else{
                         var settingStore = false;
-                        var settingCheck = await Setting.findOne({user:req.body.user, _id:req.body.setting})
+                        var settingCheck = await Setting.findOne({user:{$eq: req.body.user}, _id:{$eq: req.body.setting}})
                         if(settingCheck){
                             settingCheck.api_key = req.body.api_key;
                             settingCheck.number = req.body.number;
@@ -186,7 +186,7 @@ exports.create = async (req, res) => {
                             }
                             var save = await Setting.create(telynxData);
                             settingStore = true;
-                            var settingCheck = await Setting.findOne({user:req.body.user, _id:req.body.setting})
+                            var settingCheck = await Setting.findOne({user:{$eq: req.body.user}, _id:{$eq: req.body.setting}})
                         }
                         if(save){
                             if(settingStore){
@@ -232,9 +232,9 @@ exports.create = async (req, res) => {
                 };
                 let validation2 = new Validator(req.body, rules2);
                 if(validation2.passes()){
-                    var user = await User.findOne({_id: req.body.user});
+                    var user = await User.findOne({_id: {$eq: req.body.user}});
                     if(user){
-                        var firstSettingCheck = await Setting.findOne({_id:req.body.setting})
+                        var firstSettingCheck = await Setting.findOne({_id:{$eq: req.body.setting}})
                         if(firstSettingCheck){
                             firstSettingCheck.profile = req.body.profile
                             firstSettingCheck.save()
@@ -261,14 +261,14 @@ exports.create = async (req, res) => {
             };
             let validation = new Validator(req.body, rules);
             if(validation.passes()){
-                var user = await User.findOne({_id: req.body.user});
+                var user = await User.findOne({_id: {$eq: req.body.user}});
                 if(user){
-                    var firstSettingCheck = await Setting.findOne({_id: { $not: { $eq: req.body.setting } } , number:req.body.twilio_number})
+                    var firstSettingCheck = await Setting.findOne({_id: { $not: { $eq: req.body.setting } } , number: { $eq: req.body.twilio_number}})
                     if(firstSettingCheck){
                         res.status(400).json({status:'false',message:'Number already assigned to another profile!'});
                     }else{
                         var settingStore = false;
-                        var settingCheck = await Setting.findOne({user:req.body.user, _id:req.body.setting})
+                        var settingCheck = await Setting.findOne({user:{$eq: req.body.user}, _id:{$eq: req.body.setting}})
                         if(settingCheck){
                             settingCheck.api_key = null;
                             settingCheck.number = req.body.twilio_number;
@@ -335,9 +335,9 @@ exports.create = async (req, res) => {
                 };
                 let validation2 = new Validator(req.body, rules2);
                 if(validation2.passes()){
-                    var user = await User.findOne({_id: req.body.user});
+                    var user = await User.findOne({_id: {$eq: req.body.user} });
                     if(user){
-                        var firstSettingCheck = await Setting.findOne({_id:req.body.setting})
+                        var firstSettingCheck = await Setting.findOne({_id:{$eq: req.body.setting}})
                         if(firstSettingCheck){
                             firstSettingCheck.profile = req.body.profile
                             firstSettingCheck.save()
@@ -366,7 +366,7 @@ exports.getSetting = async (req, res) => {
         };
         let validation = new Validator(req.body, rules);
         if(validation.passes()){
-            var settingCheck = await Setting.findOne({user:req.user.id,_id:req.body.setting})
+            var settingCheck = await Setting.findOne({user: {$eq: req.user.id},_id:{$eq: req.body.setting}})
             if(settingCheck){
                 res.send({status:true, message:'setting data!', data:settingCheck});
             }else{
@@ -421,7 +421,7 @@ exports.sendSms = async (req, res) => {
         };
         let validation = new Validator(req.body, rules);
         if(validation.passes()){
-            var settingCheck = await Setting.findOne({user:req.body.user, _id:req.body.profile._id})
+            var settingCheck = await Setting.findOne({user:{$eq: req.body.user}, _id:{$eq: req.body.profile._id}})
             if(settingCheck){
                 if(settingCheck.type == 'twilio'){
                     const client = require('twilio')(settingCheck.twilio_sid, settingCheck.twilio_token);
@@ -456,12 +456,12 @@ exports.sendSms = async (req, res) => {
                                 message: req.body.message,
                                 setting: settingCheck._id
                             };
-                            var contact = await Contact.findOne({user: req.body.user, number: toNumber});
+                            var contact = await Contact.findOne({user: {$eq: req.body.user}, number: {$eq: toNumber}});
                             if(contact){
                                 messageData.contact = contact._id
                             }else{
                                 toNumber = toNumber.slice(-10)
-                                var contact2 = await Contact.findOne({user: req.body.user, number: toNumber});
+                                var contact2 = await Contact.findOne({user: {$eq: req.body.user}, number: {$eq: toNumber}});
                                 if(contact2){
                                     messageData.contact = contact2._id
                                 }
@@ -505,12 +505,12 @@ exports.sendSms = async (req, res) => {
                                 message: req.body.message,
                                 setting: settingCheck._id
                             };
-                            var contact = await Contact.findOne({user: req.body.user, number: toNumber});
+                            var contact = await Contact.findOne({user: {$eq: req.body.user }, number: {$eq: toNumber}});
                             if(contact){
                                 messageData.contact = contact._id
                             }else{
                                 toNumber = toNumber.slice(-10)
-                                var contact2 = await Contact.findOne({user: req.body.user, number: toNumber});
+                                var contact2 = await Contact.findOne({user: {$eq: req.body.user}, number: {$eq: toNumber}});
                                 if(contact2){
                                     messageData.contact = contact2._id
                                 }
@@ -600,7 +600,7 @@ exports.receiveSms = async (req, res) => {
             media = fackMedia;
         }
     }
-    var settingCheck = await Setting.findOne({number:toNumber})
+    var settingCheck = await Setting.findOne({number:{$eq: toNumber}})
     if(settingCheck){
         var messageData2 = {
             sid: sid,
@@ -614,13 +614,13 @@ exports.receiveSms = async (req, res) => {
             setting: settingCheck._id,
             media: JSON.stringify(media)
         };
-        var contact = await Contact.findOne({user: settingCheck.user, number: fromnumber});
+        var contact = await Contact.findOne({user: { $eq: settingCheck.user }, number: {$eq: fromnumber}});
         if(contact){
             messageData2.contact = contact._id
         }else{
             var fromnumber2 = fromnumber.slice(-10)
             // console.log(fromnumber2)
-            var contact2 = await Contact.findOne({user: settingCheck.user, number: fromnumber2});
+            var contact2 = await Contact.findOne({user: {$eq: settingCheck.user}, number: {$eq: fromnumber2}});
             // console.log(contact2)
             if(contact2){
                 messageData2.contact = contact2._id
@@ -628,7 +628,7 @@ exports.receiveSms = async (req, res) => {
         }
         global.io.to(settingCheck.user.toString()).emit('user_message',{message: messageText, number:fromnumber});
         if(settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true'){
-            var emailSetting = await Email.findOne({user: settingCheck.user})
+            var emailSetting = await Email.findOne({user: {$eq: settingCheck.user}})
             if(emailSetting){
                 try{
                     var emailData = {
@@ -669,7 +669,7 @@ exports.smsStatus = async (req, res) => {
         var status = req.body.MessageStatus;
         var sid = req.body.MessageSid;
         if(req.body.MessageStatus === 'delivered' || req.body.MessageStatus === 'undelivered' || req.body.MessageStatus === 'failed'){
-            var settingCheck = await Setting.findOne({number:req.body.From})
+            var settingCheck = await Setting.findOne({number:{$eq: req.body.From}})
             if(settingCheck){
                 if(settingCheck.type === 'twilio'){
                     const client = twilio(settingCheck.twilio_sid, settingCheck.twilio_token);
@@ -682,7 +682,7 @@ exports.smsStatus = async (req, res) => {
         var status = data.to[0].status;
         var sid = data.id;
     }
-    var message = await Message.findOne({sid: sid});
+    var message = await Message.findOne({sid: {$eq: sid}});
     if(message){
         message.status = status;
         message.save();
@@ -741,7 +741,12 @@ exports.messageDelete = async (req, res) => {
 
 exports.messageList = async (req, res) => {
     await Message.updateMany({user:req.body.user,telnyx_number:req.body.number.telnyx_number, number: req.body.number._id,setting:req.body.profile.id, isview: 'false'}, { isview: 'true' });
-    var messages = await Message.find({user: req.body.user,setting:req.body.profile.id,telnyx_number:req.body.number.telnyx_number, number: req.body.number._id});
+    var messages = await Message.find({
+        user: { $eq: req.body.user },
+        setting: { $eq: req.body.profile.id },
+        telnyx_number: { $eq: req.body.number.telnyx_number }, 
+        number: {$eq: req.body.number._id }
+    });
     res.send(messages);
 };
 

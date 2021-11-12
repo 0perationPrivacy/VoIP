@@ -11,11 +11,12 @@ exports.crateProfile = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var storeData = {user: req.user.id, profile:req.body.profile };
-        var checkProfile = await Setting.findOne(storeData)
-        if(checkProfile){
+        var checkprofile = {user: { $eq: req.user.id }, profile: { $eq: req.body.profile} };
+        var checkProfileData = await Setting.findOne(checkprofile)
+        if(checkProfileData){
             res.status(400).json({status:'false',message:'Profile already exists!'});
         }else{
+            var storeData = {user: req.user.id , profile: req.body.profile };
             var isSave = await Setting.create(storeData);
             if(isSave){
                 res.send({status:true, message:'Profile saved!', data:isSave});
@@ -30,7 +31,7 @@ exports.crateProfile = async (req, res) => {
 };
 
 exports.getOneProfile = async (req, res) => {
-    var getData = await Setting.findOne({user:req.user.id, _id:req.body.setting}).populate({
+    var getData = await Setting.findOne({user: {$eq: req.user.id }, _id:{ $eq: req.body.setting}}).populate({
         path: 'messageCount',
         match: { isview: 'false' }
     }).populate({
@@ -42,7 +43,7 @@ exports.getOneProfile = async (req, res) => {
     res.send({status:true, message:'Profile data!', data:getData});
 };
 exports.getProfile = async (req, res) => {
-    var getData = await Setting.find({user:req.user.id}).populate({
+    var getData = await Setting.find({user:{ $eq: req.user.id}}).populate({
         path: 'messageCount',
         match: { isview: 'false' }
     }).populate({
@@ -53,7 +54,7 @@ exports.getProfile = async (req, res) => {
 };
 exports.deleteProfile = async (req, res) => {
     
-    var settingCheck = await Setting.findOne({_id:req.body.profile_id })
+    var settingCheck = await Setting.findOne({_id:{$eq: req.body.profile_id} })
     // var getData = await Setting.deleteOne({_id:req.body.profile_id })
     if(settingCheck){
         Message.deleteMany({setting:settingCheck._id })
@@ -141,7 +142,8 @@ exports.updateProfile = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var setting = await Setting.findById(req.body.profile_id)
+        // var setting = await Setting.findById(req.body.profile_id)
+        var setting = await Setting.findOne({_id: { $eq: req.body.profile_id}})
         setting.profile = req.body.profile;
         var save = setting.save();
         if(save){

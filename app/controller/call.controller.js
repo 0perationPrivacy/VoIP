@@ -10,7 +10,8 @@ exports.create = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id : {$eq: req.body.setting_id}})
         if(checkSetting){
             if(checkSetting.type === 'twilio'){
                 checkSetting.app_key = req.body.app_key
@@ -33,7 +34,8 @@ exports.create = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-    var checkSetting = await Setting.findById(req.body.setting_id)
+    // var checkSetting = await Setting.findById(req.body.setting_id)
+    var checkSetting = await Setting.findOne({_id : {$eq: req.body.setting_id}})
     if(checkemail){
         checkSetting.app_key = null
         checkSetting.app_secret = null
@@ -47,13 +49,15 @@ exports.delete = async (req, res) => {
     }
 };
 exports.get  = async (req, res) => {
-    var checkSetting = await Setting.findById(req.body.setting_id)
+    // var checkSetting = await Setting.findById(req.body.setting_id)
+    var checkSetting = await Setting.findOne({_id : {$eq: req.body.setting_id}})
     res.send({status:true, message:'get Call setting!', data:checkSetting});
 };
 
 exports.getToken = async (req, res) => {
     try{
-        var setting = await Setting.findById(req.body.setting_id)
+        // var setting = await Setting.findById(req.body.setting_id)
+        var setting = await Setting.findOne({_id : {$eq: req.body.setting_id}})
        // console.log(setting)
         if(setting){
             if (setting.type === 'twilio') {
@@ -95,8 +99,9 @@ exports.makeCall = async (req, res) => {
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const response = new VoiceResponse();
     try {
-        var settingCheck = await Setting.findOne({number:req.body.twilio_number})
-        if(settingCheck){
+        // var settingCheck = await Setting.findOne({number:req.body.twilio_number})
+        var checkSetting = await Setting.findOne({number : {$eq: req.body.twilio_number}})
+        if(checkSetting){
             const dial = response.dial({
                 callerId: req.body.twilio_number
             });
@@ -117,7 +122,7 @@ exports.makeCall = async (req, res) => {
                 setting: settingCheck._id,
                 isview: 'true'
             }
-            var contact = await Contact.findOne({user: settingCheck.user, number: phoneNumber});
+            var contact = await Contact.findOne({user: { $eq: settingCheck.user}, number: {$eq: phoneNumber}});
             if(contact){
                 updateCall.contact = contact._id
             }
@@ -134,12 +139,12 @@ exports.makeCall = async (req, res) => {
 exports.status = async (req, res) => {
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const response = new VoiceResponse();
-    var call = await Call.findOne({sid: req.body.CallSid})
+    var call = await Call.findOne({sid: { $eq: req.body.CallSid}})
     if(call){
         call.duration = req.body.CallDuration
         call.status = req.body.CallStatus
         await call.save()
-        var settingCheck = await Setting.findOne({number:call.twilio_number})
+        var settingCheck = await Setting.findOne({number:{$eq: call.twilio_number}})
         if(settingCheck){
             global.io.to(settingCheck.user.toString()).emit('user_message',{message: 'call', number:call.number});
         }
@@ -155,7 +160,7 @@ exports.statusTelnyx = async (req, res) => {
         switch (event.event_type) {
             case 'call.initiated':
                 if(event.payload.direction === 'outgoing'){
-                    var settingCheck = await Setting.findOne({number:event.payload.from})
+                    var settingCheck = await Setting.findOne({number:{ $eq: event.payload.from}})
                     if(settingCheck){
                         var updateCall = {
                             sid: event.payload.call_session_id,
@@ -167,7 +172,7 @@ exports.statusTelnyx = async (req, res) => {
                             setting: settingCheck._id,
                             isview: 'true'
                         }
-                        var contact = await Contact.findOne({user: settingCheck.user, number: event.payload.to});
+                        var contact = await Contact.findOne({user: { $eq: settingCheck.user}, number: { $eq: event.payload.to}});
                         if(contact){
                             updateCall.contact = contact._id
                         }
@@ -176,13 +181,13 @@ exports.statusTelnyx = async (req, res) => {
                 }
                 break;
             case 'call.hangup':
-                    var call = await Call.findOne({sid: event.payload.call_session_id})
+                    var call = await Call.findOne({sid: {$eq: event.payload.call_session_id}})
                     if(call){
                         var difference = (new Date(event.payload.end_time) - new Date(event.payload.start_time)) / 1000;
                         call.duration = Math.ceil(difference)
                         call.status = 'completed'
                         await call.save()
-                        var settingCheck = await Setting.findOne({number:call.twilio_number})
+                        var settingCheck = await Setting.findOne({number:{ $eq: call.twilio_number}})
                         if(settingCheck){
                             global.io.to(settingCheck.user.toString()).emit('user_message',{message: 'call', number:call.number});
                         }
@@ -190,12 +195,12 @@ exports.statusTelnyx = async (req, res) => {
                 break;
         }
     } else {
-        var call = await Call.findOne({sid: req.body.CallSid})
+        var call = await Call.findOne({sid: { $eq: req.body.CallSid}})
         if(call){
             call.duration = req.body.CallDuration
             call.status = req.body.CallStatus
             await call.save()
-            var settingCheck = await Setting.findOne({number:call.twilio_number})
+            var settingCheck = await Setting.findOne({number: { $eq: call.twilio_number}})
             if(settingCheck){
                 global.io.to(settingCheck.user.toString()).emit('user_message',{message: 'call', number:call.number});
             }
@@ -212,7 +217,7 @@ exports.incomming = async (req, res) => {
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const response = new VoiceResponse();
     try{
-        var settingCheck = await Setting.findOne({number:req.body.To})
+        var settingCheck = await Setting.findOne({number: {$eq: req.body.To}})
         if(settingCheck){
             const dial = response.dial();
             const client = dial.client();
@@ -227,7 +232,7 @@ exports.incomming = async (req, res) => {
                 setting: settingCheck._id,
                 isview: 'false'
             }
-            var contact = await Contact.findOne({user: settingCheck.user, number: req.body.From});
+            var contact = await Contact.findOne({user: { $eq: settingCheck.user}, number: {$eq: req.body.From}});
             if(contact){
                 updateCall.contact = contact._id
             }
@@ -242,7 +247,7 @@ exports.incomming = async (req, res) => {
 
 exports.telnyx = async (req, res) => {
     console.log(req.body)
-    var settingCheck = await Setting.findOne({number:req.body.To})
+    var settingCheck = await Setting.findOne({number: { $eq: req.body.To}})
     if(settingCheck && settingCheck.sip_username){
         var callXml = `<?xml version="1.0" encoding="UTF-8"?>
                     <Response>
@@ -260,7 +265,7 @@ exports.telnyx = async (req, res) => {
             setting: settingCheck._id,
             isview: 'false'
         }
-        var contact = await Contact.findOne({user: settingCheck.user, number: req.body.From});
+        var contact = await Contact.findOne({user: { $eq: settingCheck.user}, number: {$eq: req.body.From}});
         if(contact){
             updateCall.contact = contact._id
         }

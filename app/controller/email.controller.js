@@ -14,7 +14,7 @@ exports.create = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var storeData = {user: req.user.id};
+        var storeData = {user: {$eq: req.user.id}};
         var checkemail = await Email.findOne(storeData)
         if(checkemail){
             checkemail.email = req.body.email
@@ -54,7 +54,7 @@ exports.create = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-    var storeData = {user: req.user.id};
+    var storeData = {user: {$eq: req.user.id}};
     var checkemail = await Email.findOne(storeData)
     if(checkemail){
         var deleteEmail = checkemail.delete()
@@ -68,13 +68,14 @@ exports.delete = async (req, res) => {
     }
 };
 exports.get  = async (req, res) => {
-    var storeData = {user: req.user.id};
+    var storeData = {user: {$eq: req.user.id}};
     var checkemail = await Email.findOne(storeData)
     res.send({status:true, message:'Get Email Settings!', data:checkemail});
 };
 
 exports.saveSetting = async (req, res) => {
-    var checkemail = await Setting.findById(req.body.setting_id)
+    // var checkemail = await Setting.findById(req.body.setting_id)
+    var checkemail = await Setting.findOne({_id: { $eq: req.body.setting_id}})
     if(checkemail){
         checkemail.emailnotification = req.body.status
         var updateData = await checkemail.save()

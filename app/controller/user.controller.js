@@ -27,7 +27,7 @@ exports.login = async (req, res) => {
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
         var email = req.body.email.toLowerCase()
-        var userData = {email:email};
+        var userData = {email:{ $eq: email}};
         var user = await User.findOne(userData);
         //res.send(user);
         if(user){
@@ -80,7 +80,7 @@ exports.login = async (req, res) => {
 };
 //otp-verify
 exports.otpVerify = async (req, res) => {
-    var userData = {_id:req.body.user};
+    var userData = {_id:{$eq: req.body.user}};
     var user = await User.findOne(userData);
     if(user && user.otp == req.body.otp){
         var obj = {id:user.id,email:user.email,name:user.name};
@@ -103,7 +103,7 @@ exports.register = async (req, res) => {
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
         var email = req.body.email.toLowerCase()
-        var checkEmail = await User.findOne({email: email});
+        var checkEmail = await User.findOne({email: {$eq: email}});
         if(checkEmail){
             var errors = {errors: {email:['Username already exists!']}};
             res.status(400).send({status: false, errors:errors, data: []});
@@ -191,28 +191,18 @@ exports.getUpdateVersion = (req, res) => {
     });
 };
 
-exports.updateAllProfile = async (req, res) => {
-    var users = await User.find();
-    for (var i=0; i < users.length; i++) {
-        var email = users[i].email.toLowerCase()
-        var user = await User.findById(users[i]._id);
-        user.email = email;
-        user.save();
-    }
-    res.send(users)
-};
-
 exports.updateUserName = async (req, res) => {
     let rules = {
         email: 'required',
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var user = await User.findOne({ email: req.body.email , _id: { $ne: req.user.id } });
+        var user = await User.findOne({ email: { $eq: req.body.email } , _id: { $ne: req.user.id } });
         if(user){
             res.status(400).json({status:'false',message:'username already exists!'});
         }else{
-            var checkUser = await User.findById(req.user.id);
+            // var checkUser = await User.findById(req.user.id);
+            var checkUser = await User.findOne({_id: { $eq: req.user.id }});
             if(checkUser){
                 checkUser.email = req.body.email
                 checkUser.name = req.body.email
@@ -235,7 +225,8 @@ exports.updatePassword = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkUser = await User.findById(req.user.id);
+        // var checkUser = await User.findById(req.user.id);
+        var checkUser = await User.findOne({_id: { $eq: req.user.id }});
         if(checkUser){
             var checkpassword = bcrypt.compareSync(req.body.old_password, checkUser.password);
             if(checkpassword){
@@ -261,7 +252,8 @@ exports.checkPassword = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkUser = await User.findById(req.user.id);
+        // var checkUser = await User.findById(req.user.id);
+        var checkUser = await User.findOne({_id: {$eq: req.user.id }});
         if(checkUser){
             var checkpassword = bcrypt.compareSync(req.body.password, checkUser.password);
             if(checkpassword){
@@ -287,7 +279,7 @@ const deleteAllAccountData = (userid) => {
             await Contact.deleteMany({user: userid});
             await Email.deleteMany({user: userid});
             await Message.deleteMany({user: userid});
-            var settings =await Setting.find({user: userid});
+            var settings =await Setting.find({user:{ $eq: userid}});
             for(var i = 0; i < settings.length; i++) {
                 try{
                     if(settings[i].type === 'telnyx'){

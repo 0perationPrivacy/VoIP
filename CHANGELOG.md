@@ -4,6 +4,17 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.77 (Nov 11, 2021)
+### UI/Bug
+- Added cancel button on attachment window
+
+### Security
+- Added Secure Cookie session values
+- Trust Proxy
+- NOSQL injection protection of , input sanitization (100+ syntax edits)
+- Secure functions (Math. to crypto.)
+- Added compression
+- Expose only directories needed, hiding root
 
 ## v0.76 (Nov 9, 2021)
 ### UI

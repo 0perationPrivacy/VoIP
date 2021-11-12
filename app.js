@@ -6,6 +6,32 @@ var bodyParser = require('body-parser')
 const cors = require("cors");
 require('dotenv').config()
 const path = require('path');
+var session = require('cookie-session')
+var compression = require('compression')
+app.use(compression())
+
+var expiryDate = new Date(Date.now() + 60 * 60 * (1000 * 12 * 30)) // 30 day
+app.use(session({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  cookie: {
+    secure: true,
+    httpOnly: true,
+    expires: expiryDate
+  }
+}))
+
+let setCache = function (req, res, next) {
+  const period = 60 * 60 * 24
+  if (req.method == 'GET') {
+    res.set('Cache-control', `public, max-age=${period}`)
+  } else {
+    res.set('Cache-control', `no-store`)
+  }
+  next()
+}
+app.use(setCache)
+
 var RateLimit = require('express-rate-limit');
 const helmet = require("helmet");
 app.use(
@@ -30,7 +56,8 @@ app.use(helmet.noSniff());
 app.use(helmet.permittedCrossDomainPolicies());
 app.use(helmet.referrerPolicy());
 app.use(helmet.xssFilter());
-
+app.disable('x-powered-by');
+app.set('trust proxy', 1)
 const server = require('http').createServer(app);
 
 global.io = require('socket.io')(server,{ cors: { origin: '*' } });

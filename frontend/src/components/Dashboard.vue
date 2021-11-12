@@ -74,6 +74,9 @@
         <div id="drop-area" style="z-index: 1;"  :class="uploadedImages.length > 0 ?'activeImageArea':'inactive'">
           <form class="my-form">
             <p>Upload multiple files by dragging and dropping images inside this box</p>
+            <div class="text-center m-auto">
+            <button type="button" class="btn btn-danger px-4" @click="hideImageDrag()">Cancel</button>
+            </div>
             <input type="file" id="fileElem" multiple accept="image/*" @change="handleFiles($event.target.files)">
             <!-- <label class="button" for="fileElem">Select some files</label> -->
           </form>
@@ -576,6 +579,10 @@ export default {
       var numbers = [ activechat._id ]
       this.commonSendMessage(numbers, this.messageBody)
     },
+    hideImageDrag () {
+      this.uploadedImages = []
+      document.getElementById('drop-area').style.display = 'none'
+    },
     commonSendMessage (numbers, message) {
       var messageData = {user: this.userdata._id, numbers: numbers, message: message, profile: this.activeProfile, media: this.uploadedImages}
       var request = {
@@ -830,4 +837,5 @@ p {
   width:100%;
   z-index: 2100;
 }
+
 </style>

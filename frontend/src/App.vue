@@ -53,10 +53,9 @@ export default {
         .then((response) => {
           if (response.data.status === 'nodir') {
             this.$router.push(`/voip/`)
-
             // if (this.$route.params.appdirectory === undefined) {
             //   this.$router.push(`/voip/`)
-            // } 
+            // }
             // else {
             //   if (this.$route.params.appdirectory !== 'voip') {
             //     this.$router.push(`/404`)

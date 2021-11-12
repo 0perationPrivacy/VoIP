@@ -1,7 +1,7 @@
 const Telnyx = require('telnyx');
 var axios = require('axios');
 const moment = require('moment');
-
+const crypto = require('crypto')
 //Inside lib file declare functions
 const requestCurl = (method,url,headers,data=null) => {
     return new Promise((resolve) => {
@@ -86,7 +86,7 @@ const createSIPApp = (apiKey, userid, outboundProfileid) => {
         try{
             const telnyx = Telnyx(apiKey);
             // In Node 10
-            var password = Math.floor((Math.random() * 1000000000) + 999999999);
+            var password = crypto.randomBytes(16).toString('hex');
             const credentialConnection = await telnyx.credentialConnections.create({
                 connection_name: `sip${moment().format('YYYYMMDDHHmm')}`,
                 user_name: `user${moment().format('YYYYMMDDHHmm')}`,

@@ -11,7 +11,8 @@ exports.twilioTwimlFallback = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: { $eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 sid: checkSetting.twilio_sid,
@@ -47,7 +48,8 @@ exports.twilioNumberFallback = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: { $eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 sid: checkSetting.twilio_sid,
@@ -72,7 +74,8 @@ exports.twilioTwimlGet = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 sid: checkSetting.twilio_sid,
@@ -95,7 +98,8 @@ exports.twilioNumberGet = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 sid: checkSetting.twilio_sid,
@@ -119,7 +123,8 @@ exports.telnyxMessageFallback = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 apiKey: checkSetting.api_key,
@@ -158,7 +163,8 @@ exports.telnyxTwimlFallback = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 apiKey: checkSetting.api_key,
@@ -182,7 +188,8 @@ exports.telnyxSipFallback = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 apiKey: checkSetting.api_key,
@@ -205,7 +212,8 @@ exports.telnyxMessageGet = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 apiKey: checkSetting.api_key,
@@ -227,7 +235,8 @@ exports.telnyxTwimlGet = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 apiKey: checkSetting.api_key,
@@ -249,7 +258,8 @@ exports.telnyxSipGet = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var checkSetting = await Setting.findById(req.body.setting_id)
+        // var checkSetting = await Setting.findById(req.body.setting_id)
+        var checkSetting = await Setting.findOne({_id: {$eq: req.body.setting_id}})
         if(checkSetting){
             var updateData = {
                 apiKey: checkSetting.api_key,

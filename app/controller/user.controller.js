@@ -19,9 +19,6 @@ const currentVersion = process.env.BASE_URL + 'version.md'; // read from local f
 
 var jwt = require('jsonwebtoken');
 
-const Speakeasy = require("speakeasy");
-const QRCode = require("qrcode");
-
 exports.login = async (req, res) => {
     let rules = {
         email: 'required',
@@ -38,15 +35,39 @@ exports.login = async (req, res) => {
             if(checkpassword){
                 var obj = {id:user.id,email:user.email,name:user.name};
                 var token = jwt.sign(obj, process.env.COOKIE_KEY);
+                //console.log(token)
+                //res.status(401).json({status:'false',message:'Unauthorized Access!'});
+                // return
+                //var strObj = JSON.stringify(obj);
+                //let buff = Buffer.from(strObj, "utf8");
+                //let base64data = buff.toString('base64');
                 user.token = token;
-                user.save();      
-                if(user.mfa && user.mfa === 'true'){
-                    res.send({status:'mfa', message:'user data!', data:user, token:token});
-                }else{
-                    res.send({status:'true', message:'user data!', data:user, token:token});
-                }   
+                user.save();                
+                /*var min = 100000;
+                var max = 999999;
+                var otp = Math.floor(Math.random() * (max - min)) + min;
+                user.otp = otp;
+                user.save();
                 
-                return;
+                let transporter = nodemailer.createTransport({
+                    host: "smtp.gmail.com",
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: process.env.EMAIL, // generated ethereal user
+                        pass: process.env.PASSWORD, // generated ethereal password
+                    },
+                });
+
+                transporter.sendMail({
+                    from: process.env.EMAIL, // sender address
+                    to: user.email, // list of receivers
+                    subject: "Verify OTP✔", // Subject line
+                    text: "Your otp is " +otp, // plain text body
+                  });
+                  var data = {_id:user._id, email:user.email};*/
+                  res.send({status:true, message:'user data!', data:user, token:token});
+                  return;
             }else{
                 res.status(401).json({status:'false',message:'Unauthorized Access!'});
             }
@@ -61,17 +82,16 @@ exports.login = async (req, res) => {
 exports.otpVerify = async (req, res) => {
     var userData = {_id:{$eq: req.body.user}};
     var user = await User.findOne(userData);
-    if(user){
-        var verifyData = Speakeasy.totp.verify({
-            secret: user.mfa_token,
-            encoding: 'base32',
-            token: req.body.verification_code
-        });
-        if(verifyData){
-            res.status(200).json({status:'true',data:[],message:'verified successfully!'});
-        }else{
-            res.status(400).json({status:'false',message:'Please enter valid verification code!'});
-        }
+    if(user && user.otp == req.body.otp){
+        var obj = {id:user.id,email:user.email,name:user.name};
+        var strObj = JSON.stringify(obj);
+        let buff = Buffer.from(strObj, "utf8");
+        let base64data = buff.toString('base64');
+        user.token = base64data;
+        user.save();
+        res.send({status:true, message:'user data!', data:user, token:base64data});
+    }else{
+        res.status(401).json({status:'false',message:'Unauhtorize user!'}); 
     }
 };
 
@@ -197,72 +217,6 @@ exports.updateUserName = async (req, res) => {
     }
 }
 
-exports.getUser = async (req, res) => {
-    var user = await User.findOne({ _id: { $eq: req.user.id } });
-    if(user){
-        res.status(200).json({status:'true',data:user,message:'user get!'});
-    }else{
-        res.status(400).json({status:'false',message:'User not found!'});
-    }
-}
-
-exports.saveMfa = async (req, res) => {
-    let rules = {
-        status: 'required',
-    };
-    let validation = new Validator(req.body, rules);
-    if(validation.passes()){
-        var user = await User.findOne({ _id: { $eq: req.user.id } });
-        if(user){
-            if(req.body.status === 'true'){
-                if(req.body.qr === 'true'){
-                    const secretCode = Speakeasy.generateSecret({
-                        name: `Operation Privacy (${req.user.email})`,
-                      });
-                      user.mfa_token = secretCode.base32
-                      await user.save()
-                      var image = await QRCode.toDataURL(secretCode.otpauth_url)
-                      var respnse = {
-                          image: image,
-                          secret: secretCode.base32
-                      }
-                      res.send(respnse);
-                }else{
-                    var verifyData = Speakeasy.totp.verify({
-                        secret: user.mfa_token,
-                        encoding: 'base32',
-                        token: req.body.code
-                    });
-                    if(verifyData){
-                        user.mfa = 'true'
-                        await user.save()
-                        res.status(200).json({status:'true',data:user,message:'verified successfully!'});
-                    }else{
-                        res.status(400).json({status:'false',message:'Please enter valid verification code!'});
-                    }
-                }
-            }else{
-                user.mfa = req.body.status
-                await user.save()
-                res.status(200).json({status:'true',data:user,message:'status saved successfully!'});
-            }
-        }else{
-            // var checkUser = await User.findById(req.user.id);
-            var checkUser = await User.findOne({_id: { $eq: req.user.id }});
-            if(checkUser){
-                checkUser.email = req.body.email
-                checkUser.name = req.body.email
-                var saveEmail = await checkUser.save()
-                res.send({status:true, message:'username updated successfully!', data:checkUser});
-            }else{
-                res.status(400).json({status:'false',message:'User not found!'});
-            }
-        }
-    }else{
-        res.status(419).send({status: false, errors:validation.errors, data: []});
-    }
-}
-
 exports.updatePassword = async (req, res) => {
     let rules = {
         old_password: 'required',
@@ -290,28 +244,9 @@ exports.updatePassword = async (req, res) => {
         res.status(419).send({status: false, errors:validation.errors, data: []});
     }
 }
-exports.passwordVerify = async(req, res) => {
-    let rules = {
-        password: 'required'
-    };
-    let validation = new Validator(req.body, rules);
-    if(validation.passes()){
-        var checkUser = await User.findOne({_id: {$eq: req.user.id }});
-        if(checkUser){
-            var checkpassword = bcrypt.compareSync(req.body.password, checkUser.password);
-            if(checkpassword){
-                res.send({status:'true', message:'Password checked!', data:checkUser});
-            }else{
-                res.status(400).json({status:'false',message:'please enter valid password!'});
-            }
-        }else{
-            res.status(400).json({status:'false',message:'User not found!'});
-        }
-    }else{
-        res.status(400).send({status: false, message:'Password required!', data: []});
-    }
-}
+
 exports.checkPassword = async (req, res) => {
+    console.log(req.user.id)
     let rules = {
         password: 'required'
     };

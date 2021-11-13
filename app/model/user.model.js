@@ -5,16 +5,7 @@ const User = mongoose.model('User', {
     email: String,
     password: String,
     token: String,
-    otp: String,
-    mfa: {
-        type: String,
-        enum : ['false','true'],
-        default: 'false'
-    },
-    mfa_token: {
-        type: String,
-        default: null
-    },
+    otp: String
 });
 
 

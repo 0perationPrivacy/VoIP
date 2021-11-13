@@ -8,7 +8,7 @@
                   <b-input-group-prepend is-text>
                     <b-icon icon="person-fill"></b-icon>
                   </b-input-group-prepend>
-                <input class="form-control chat-input" type="text" placeholder="Username" v-model="user.email" :class="{ 'is-invalid': submitted && $v.user.email.$error }" title="Enter Username">
+                <input class="form-control chat-input" type="text" placeholder="Username" v-model="user.email" :class="{ 'is-invalid': submitted && $v.user.email.$error }">
                 </b-input-group>
                 <div v-if="submitted && $v.user.email.$error" class="invalid-feedback">
                   <span v-if="!$v.user.email.required">Username is required</span>
@@ -20,7 +20,7 @@
                   <b-input-group-prepend is-text>
                     <b-icon icon="shield-lock"></b-icon>
                   </b-input-group-prepend>
-                <input class="chat-input form-control" v-model="user.password"  type="password" placeholder="Password" :class="{ 'is-invalid': submitted && $v.user.password.$error }" title="Enter Password">
+                <input class="chat-input form-control" v-model="user.password"  type="password" placeholder="Password" :class="{ 'is-invalid': submitted && $v.user.password.$error }">
                 </b-input-group>
                 <div v-if="submitted && $v.user.password.$error" class="invalid-feedback">
                     <span v-if="!$v.user.password.required">Password is required</span>
@@ -32,7 +32,7 @@
                   <b-input-group-prepend is-text>
                     <b-icon icon="shield-lock"></b-icon>
                   </b-input-group-prepend>
-                <input class="chat-input form-control" v-model="user.c_password"  type="password" placeholder="Confirm Password" id="clogin-input" :class="{ 'is-invalid': submitted && $v.user.c_password.$error }" title="Enter Password Again">
+                <input class="chat-input form-control" v-model="user.c_password"  type="password" placeholder="Confirm Password" id="clogin-input" :class="{ 'is-invalid': submitted && $v.user.c_password.$error }">
                 </b-input-group>
                 <div v-if="submitted && $v.user.c_password.$error" class="invalid-feedback">
                     <span v-if="!$v.user.c_password.required">Password is required<br></span>
@@ -47,13 +47,13 @@
               </div>
             </form>
             <div class="d-flex my-4 justify-content-center">
-                 <a href="https://www.twitter.com/0perationP" target="_blank" rel="noopener noreferrer" aria-label="Twitter" title="Twitter">
+                 <a href="https://www.twitter.com/0perationP" target="_blank" aria-label="Twitter" title="Twitter">
                     <b-icon font-scale="2" icon="twitter" variant="secondary" class="mx-2"></b-icon>
                  </a>
-                 <a href="https://github.com/0perationPrivacy/" target="_blank" rel="noopener noreferrer" aria-label="Github" title="Github">
+                 <a href="https://github.com/0perationPrivacy/" target="_blank" aria-label="Github" title="Github">
                   <b-icon font-scale="2" icon="github" variant="secondary" class="mx-2"></b-icon>
                  </a>
-                 <a href="https://www.OperationPrivacy.com/Donate" target="_blank" rel="noopener noreferrer" aria-label="Donate" title="Donate">
+                 <a href="https://www.OperationPrivacy.com/Donate" target="_blank" aria-label="Donate" title="Donate">
                   <b-icon font-scale="2" icon="credit-card" variant="secondary" class="mx-2"></b-icon>
                  </a>
               </div>

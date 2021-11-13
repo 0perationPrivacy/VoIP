@@ -4,6 +4,15 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+
+## v0.78 (Nov 12, 2021)
+### Security
+- **MFA - TOTP** QR code (or manual entry) functionality added!
+- Few more syntax edits for input sanitization (prevent NOSQL injections)
+
+### Feature
+- Preserves an existing call setting when presseing save in a profile and only configures sms. (in case you have Linphone configured, asks to overwright or skip call settings)
+
 ## v0.77 (Nov 11, 2021)
 ### UI/Bug
 - Added cancel button on attachment window

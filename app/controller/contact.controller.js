@@ -92,7 +92,7 @@ exports.getAllContact = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-    var deleteContact = await Contact.deleteOne({_id:req.body.contact_id })
+    var deleteContact = await Contact.deleteOne({_id: { $eq: req.body.contact_id} })
     if(deleteContact){
         res.send({status:true, message:'Contact deleted successfully!', data:deleteContact});
     }else{

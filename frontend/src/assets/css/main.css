@@ -61,7 +61,7 @@
   .switch-label-mode{
     height: 38px !important;
       width: 80px !important;
-      top:5px !important ;
+      /* top:5px !important ; */
       right: 0 !important;
       float: right !important;
   }
@@ -554,6 +554,7 @@ a {
     flex: 1 1 auto;
     min-height: 1px;
     padding: 1.25rem;
+    background-color: var(--accent-color);
 }
 .card {
     overflow: hidden;
@@ -841,3 +842,16 @@ a {
        color: inherit;
        text-decoration: none;
    }
+   .totp {
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: 0.8rem;
+    width: 200px;
+    color: var(--accent-color);
+    border-radius: 5px;
+    font-size: 1.5em;
+   }
+   .clickcopy:hover {
+    border-color: var(--accent-color);
+    background: var(--contact-hover);
+  }

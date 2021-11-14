@@ -128,7 +128,7 @@ exports.deleteProfile = async (req, res) => {
                 statusCallback: ''
             })
         }
-        await Setting.deleteOne({_id:req.body.profile_id })
+        await Setting.deleteOne({_id:{ $eq: req.body.profile_id } })
         res.send({status:true, message:'Profile deleted successfully!', data:settingCheck});
     }else{
         res.status(400).json({status:'false',message:'Profile not deleted!'});

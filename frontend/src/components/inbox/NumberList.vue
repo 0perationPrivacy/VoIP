@@ -426,7 +426,7 @@ export default {
       distThreshold: 120,
       distMax: 140
     })
-    EventBus.$on('changeProfile', () => {
+    EventBus.$on('changeProfile', (data) => {
       this.getOneProfile()
     })
     EventBus.$on('contactAdded', (number) => {
@@ -489,20 +489,22 @@ export default {
       return newStr2
     },
     getOneProfile () {
-      var request = {
-        data: { setting: this.activeProfile._id },
-        url: 'profile/getdata-one'
+      if (this.activeProfile._id !== undefined) {
+        var request = {
+          data: { setting: this.activeProfile._id },
+          url: 'profile/getdata-one'
+        }
+        this.$store
+          .dispatch(post, request)
+          .then((response) => {
+            if (response) {
+              this.activeProfile = response.data
+            }
+          })
+          .catch((e) => {
+            console.log(e)
+          })
       }
-      this.$store
-        .dispatch(post, request)
-        .then((response) => {
-          if (response) {
-            this.activeProfile = response.data
-          }
-        })
-        .catch((e) => {
-          console.log(e)
-        })
     },
     refreshProfile () {
       this.$refs.childComponent.getallProfile()

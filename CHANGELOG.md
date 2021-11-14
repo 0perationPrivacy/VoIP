@@ -4,6 +4,18 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+
+## v0.79 (Nov 13, 2021)
+### Bugs
+- Bug fixes
+### Features
+- Add dialpad and DTMF tones
+
+## v0.78 (Nov 12, 2021)
+### Security
+- **MFA - TOTP** QR code (or manual entry) functionality added!
+- Few more syntax edits for input sanitization (prevent NOSQL injections)
+
 ## v0.77 (Nov 11, 2021)
 ### UI/Bug
 - Added cancel button on attachment window

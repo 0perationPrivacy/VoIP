@@ -15,7 +15,7 @@
                     <b-form-group id="input-group-1" style="margin-bottom: 0;">
                       <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
                     </b-form-group>
-                    <div v-if="!connection">
+                    <div>
                       <div class="d-flex justify-content-between mt-4">
                         <div>
                           <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(1)">
@@ -81,7 +81,7 @@
                       <div class="d-flex justify-content-between">
                         <div>
                           <a class="btn btn-light-primary dialer-btn2">
-                              <p class="number font-weight-bolder">*</p>
+                              <p class="number font-weight-bolder" @click="clickDailer('*')">*</p>
                           </a>
                         </div>
                         <div>
@@ -90,7 +90,7 @@
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2 ">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer('#')">
                               <p class="number font-weight-bolder">#</p>
                           </a>
                         </div>
@@ -112,13 +112,6 @@
                         <div class="dropdown float-right dropleft row m-0"  style="width: 100%" id="call_number">
                         <div class='dialer_bg multiCallData' id='data.call.sid' style='width:100%'>
                             <div class='row dialer_bg p-2'>
-                                <div class="d-flex flex-row bd-highlight mb-3 justify-content-center" style="width:100%">
-                                <a class="btn btn-icon btn-success mr-3 dialer-btn mt-4">
-                                    <button type="button" class="btn btn-success m-1">
-                                        <b-icon icon="person-fill" aria-hidden="true"></b-icon>
-                                    </button>
-                                </a>
-                                </div>
                                 <div class="d-flex justify-content-center" style="width:100%">
                                     <span class='multiCallData_name'>{{name}}</span>
                                 </div>
@@ -433,11 +426,20 @@ export default {
       this.dissconnected()
     },
     clickDailer (number) {
-      if (this.number) {
-        var num1 = this.number
-        this.number = num1.toString() + number.toString()
+      if (this.connection) {
+        console.log(number)
+        if (this.callType === 'twilio') {
+          this.connection.sendDigits(number.toString())
+        } else {
+          this.connection.dtmf(number.toString())
+        }
       } else {
-        this.number = number
+        if (this.number) {
+          var num1 = this.number
+          this.number = num1.toString() + number.toString()
+        } else {
+          this.number = number
+        }
       }
     },
     removeNumber () {

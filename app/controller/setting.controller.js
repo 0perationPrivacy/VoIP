@@ -726,7 +726,7 @@ exports.getNumberList = async (req, res) => {
 };
 exports.messageDelete = async (req, res) => {
     try {
-        var deletecon = {user: req.body.user, number: req.body.number};
+        var deletecon = {user: { $eq: req.body.user}, number: { $eq: req.body.number}};
         var messages = await Message.deleteMany(deletecon);
         if(messages){
             res.status(200).send({status: true, errors:'', data: messages});
@@ -740,7 +740,14 @@ exports.messageDelete = async (req, res) => {
 };
 
 exports.messageList = async (req, res) => {
-    await Message.updateMany({user:req.body.user,telnyx_number:req.body.number.telnyx_number, number: req.body.number._id,setting:req.body.profile.id, isview: 'false'}, { isview: 'true' });
+    var where = {
+        user: { $eq: req.body.user},
+        telnyx_number:{ $eq: req.body.number.telnyx_number }, 
+        number: { $eq: req.body.number._id },
+        setting: { $eq: req.body.profile.id }, 
+        isview: { $eq: 'false' }
+    };
+    await Message.updateMany(where, { isview: 'true' });
     var messages = await Message.find({
         user: { $eq: req.body.user },
         setting: { $eq: req.body.profile.id },

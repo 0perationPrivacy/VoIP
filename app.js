@@ -13,7 +13,7 @@ app.use(compression())
 var expiryDate = new Date(Date.now() + 60 * 60 * (1000 * 12 * 30)) // 30 day
 app.use(session({
   name: 'session',
-  keys: ['key1', 'key2'],
+  keys: [process.env.COOKIE_KEY, process.env.COOKIE_KEY2],
   cookie: {
     secure: true,
     httpOnly: true,
@@ -41,7 +41,7 @@ app.use(
     directives: {
       "default-src": ["'self'", "sdk.twilio.com","wss:","ws:"],
       "object-src": ["'self'"],
-      "script-src": ["'self'","'unsafe-eval'"]
+      "script-src": ["'self'","'unsafe-eval'", "'unsafe-inline'"]
     },
   })
 );

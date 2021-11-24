@@ -5,11 +5,22 @@
 
 ---
 
+## v0.80 (Nov 24, 2021)
+### Security
+- Headers refined, directory exposure reduced
+- Initial code added for Hardware Keys (function, frontend, library, conditions, db) (final testing remaining for the next release)
+
+### UI
+- dial pad colors, alignment adjusted
+- Minor bug fixes
+
+- Open Source License added (GPLv3)
+
 ## v0.79 (Nov 13, 2021)
 ### Bugs
 - Bug fixes
 ### Features
-- Add dialpad and DTMF tones
+- Add dial pad and DTMF tones
 
 ## v0.78 (Nov 12, 2021)
 ### Security

@@ -40,8 +40,11 @@ exports.login = async (req, res) => {
                 var token = jwt.sign(obj, process.env.COOKIE_KEY);
                 user.token = token;
                 user.save();      
-                if(user.mfa && user.mfa === 'true'){
-                    res.send({status:'mfa', message:'user data!', data:user, token:token});
+                //if(user.mfa && user.mfa === 'true'){
+                /* if(user.hardwarekey && user.hardwarekey === 'true'){
+                    res.send({status:'hardwarekey', message:'user data!', data:user, token:token});
+                } */if(user.mfa && user.mfa === 'true'){
+                    res.send({status:'mfa', message:'user data!', data:user, token:token}); 
                 }else{
                     res.send({status:'true', message:'user data!', data:user, token:token});
                 }   

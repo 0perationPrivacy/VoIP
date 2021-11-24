@@ -39,7 +39,8 @@ app.use(
     useDefaults: true,
     reportOnly: false,
     directives: {
-      "default-src": ["'self'", "sdk.twilio.com","wss:","ws:"],
+      "default-src": ["'self'", "sdk.twilio.com","wss:","ws:","eventgw.twilio.com"
+    ],
       "object-src": ["'self'"],
       "script-src": ["'self'","'unsafe-eval'", "'unsafe-inline'"]
     },
@@ -131,7 +132,8 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '500mb',parameterLimit: 1
 app.use('/uploads', express.static('uploads'));
 app.use('/src', express.static('src'));
 app.use('/frontend', express.static('frontend'));
-app.use('/static', express.static('static'));
+// app.use('/frontend', express.static('frontend'));
+app.use('/frontend/dist/static/', express.static('frontend/dist/static'));
 app.get(`/error`, function (req, res) {
   res.sendFile(path.join(__dirname, './error/index.html'));
 })
@@ -150,6 +152,7 @@ require("./app/routes/media.route")(app);
 require("./app/routes/contact.route")(app);
 require("./app/routes/email.route")(app);
 require("./app/routes/call.route")(app);
+require("./app/routes/hardwarekey.route")(app);
 
 app.get('/:id', function (req, res) {
   //res.send('Hello World')

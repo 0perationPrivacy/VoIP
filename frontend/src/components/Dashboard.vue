@@ -503,7 +503,7 @@ export default {
       this.firstChatShow(value)
     },
     notifyMe (user, message) {
-      let msgIcon = 'https://www.operationprivacy.com/img/favicon/favicon.ico'
+      let msgIcon = require(`@/assets/img/icon.png`)
       if (!('Notification' in window)) {
         alert('This browser does not support desktop notification')
       } else if (Notification.permission === 'granted') {

@@ -426,8 +426,16 @@ export default {
       distThreshold: 120,
       distMax: 140
     })
+    EventBus.$on('getOneProfile', (data) => {
+      try {
+        this.getOneProfile()
+      } catch (e) {
+        // console.log(e)
+      }
+    })
     EventBus.$on('changeProfile', (data) => {
-      this.getOneProfile()
+      // console.log(data)
+      // this.getOneProfile()
     })
     EventBus.$on('contactAdded', (number) => {
       this.getNumberList()

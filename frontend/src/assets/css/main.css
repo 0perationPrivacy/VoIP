@@ -769,6 +769,12 @@ a {
     color: rgb(var(--text-button));
     margin: 1rem;
 }
+.dialer-btn2:hover{
+    color: rgb(var(--text-button)); 
+}
+.dialer-btn2:active{
+    color: #212529; 
+}
  
 .vs__dropdown-toggle{
     background: var(--background-color-secondary);

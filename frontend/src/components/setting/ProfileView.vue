@@ -99,6 +99,8 @@ export default {
       this.$emit('clicked', profile)
       EventBus.$emit('clicked', true)
       EventBus.$emit('changeProfile', true)
+      EventBus.$emit('getOneProfile', true)
+      // EventBus.$emit('changeProfile', true)
     },
     activeFirstProfile () {
       if (this.profiles.length > 0) {

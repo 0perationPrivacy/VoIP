@@ -3,7 +3,7 @@
         <div class="login-box dark-mode p-3">
             <theme-button id-hide="false" />
             <h1 class="dark-mode">Login</h1>
-            <form @submit.prevent="handleSubmit" class="ml-2 mr-2" v-if="!otpScreen">
+            <form @submit.prevent="handleSubmit" class="ml-2 mr-2" v-if="!otpScreen && !keyScreen">
               <div class="form-group mt-4">
                 <b-input-group>
                   <b-input-group-prepend is-text>
@@ -50,6 +50,13 @@
                 <button class="btn btn-success m-3 px-5" type="button" v-on:click="handleSubmit2($event)" id="login-button2">Verify</button>
               </div>
             </form>
+
+            <form class="ml-2 mr-2 text-center" v-if="keyScreen">
+              <div class="form-group my-4">
+                <label>Please connect your hardware key</label>
+              </div>
+            </form>
+
             <div class="d-flex my-4 justify-content-center">
                  <a href="https://www.twitter.com/0perationP" target="_blank" rel="noopener noreferrer" aria-label="Twitter" title="Twitter">
                     <b-icon font-scale="2" icon="twitter" variant="secondary" class="mx-2"></b-icon>
@@ -95,7 +102,9 @@ export default {
       },
       submitted: false,
       submitted2: false,
-      signupRoute: ''
+      signupRoute: '',
+      keyScreen: false,
+      keyTotpScreen: false
     }
   },
   validations: {
@@ -163,15 +172,19 @@ export default {
         .dispatch(post, request)
         .then((response) => {
           if (response) {
-            if (response.status === 'mfa') {
+            /* if (response.status === 'hardwarekey') {
+              this.activeUser.token = response.token
+              this.activeUser.user = response.data
+              this.keyScreen = true
+              this.otpScreen = false
+              this.login()
+            } */ if (response.status === 'mfa') {
               this.activeUser.token = response.token
               this.activeUser.user = response.data
               this.otpScreen = true
             } else {
               this.$cookie.set('access_token', response.token, 30)
               this.$cookie.set('userdata', JSON.stringify(response.data), 30)
-              console.log(this.$cookie.get('access_token'))
-              console.log(this.$cookie.get('userdata'))
               this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
             }
           }
@@ -180,6 +193,57 @@ export default {
           // this.signUpOption = false
         })
     },
+    /* login () {
+      try {
+        if (window.u2f && window.u2f.sign) {
+          console.log('============================login uf2 response==========================')
+          console.log(window.u2f)
+          console.log('============================/login uf2 response==========================')
+          console.log('============================sign response==========================')
+          console.log(window.u2f.sign)
+          console.log('============================/sign response==========================')
+          var request = {
+            data: {user: this.activeUser.user._id},
+            url: 'hardwarekey/login-key'
+          }
+          this.$store
+            .dispatch(post, request)
+            .then((result) => {
+              if (result) {
+                window.u2f.sign(result.appId, [result.challenge], [result], response => {
+                  console.log('============================loginResponse==========================')
+                  console.log(response)
+                  console.log('============================/loginResponse==========================')
+                  var request2 = {
+                    data: {loginResponse: response, result: result, user: this.activeUser.user._id},
+                    url: 'hardwarekey/login'
+                  }
+                  this.$store
+                    .dispatch(post, request2)
+                    .then((result) => {
+                      if (result) {
+                        this.$cookie.set('access_token', this.activeUser.token, 30)
+                        this.$cookie.set('userdata', JSON.stringify(this.activeUser.user), 30)
+                        this.activeUser.token = ''
+                        this.activeUser.user = null
+                        this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
+                        // console.log(result)
+                      }
+                    })
+                    .catch((e) => {
+
+                    })
+                })
+              }
+            })
+            .catch((e) => {
+
+            })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }, */
     handleSubmit2 (e) {
       this.submitted2 = true
       if (this.otpForm.otp.trim() !== '') {

@@ -102,9 +102,10 @@ exports.makeCall = async (req, res) => {
         // var settingCheck = await Setting.findOne({number:req.body.twilio_number})
         var checkSetting = await Setting.findOne({number : {$eq: req.body.twilio_number}})
         if(checkSetting){
-            const dial = response.dial({
+            var dial = response.dial({
                 callerId: req.body.twilio_number
             });
+
             var phoneNumber = req.body.number.trim().replace("+", "")
             var stringLen = phoneNumber.length
             if(stringLen > 10){
@@ -114,26 +115,29 @@ exports.makeCall = async (req, res) => {
             }
             var updateCall = {
                 sid: req.body.CallSid,
-                user: settingCheck.user,
+                user: checkSetting.user,
                 datatype: 'call',
                 type: 'send',
                 number: phoneNumber,
                 telnyx_number: req.body.twilio_number,
-                setting: settingCheck._id,
+                setting: checkSetting._id,
                 isview: 'true'
             }
-            var contact = await Contact.findOne({user: { $eq: settingCheck.user}, number: {$eq: phoneNumber}});
+            var contact = await Contact.findOne({user: { $eq: checkSetting.user}, number: {$eq: phoneNumber}});
             if(contact){
                 updateCall.contact = contact._id
             }
-            Call.create(updateCall);
+            await Call.create(updateCall);
             dial.number(phoneNumber);
+            res.set('Content-Type', 'text/xml');
+            return res.send(response.toString());
         }
     } catch(error) {
-
+        console.log(error)
+        res.set('Content-Type', 'text/xml');
+        return res.send(response.toString());
     }
-    res.set('Content-Type', 'text/xml');
-    return res.send(response.toString());
+    
 };
 
 exports.status = async (req, res) => {

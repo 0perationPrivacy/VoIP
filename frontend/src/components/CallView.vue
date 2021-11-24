@@ -11,10 +11,31 @@
           <template #default="{ hide }">
             <div class="d-flex justify-content-center">
                 <div v-if="!incoming" style="max-width:300px">
-                    <v-select class="mb-2" v-model="selectedContact" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
-                    <b-form-group id="input-group-1" style="margin-bottom: 0;">
-                      <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
-                    </b-form-group>
+                    <div v-if="!connection">
+                      <v-select class="mb-2" v-model="selectedContact" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
+                      <b-form-group id="input-group-1" style="margin-bottom: 0;">
+                        <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
+                      </b-form-group>
+                    </div>
+                    <div v-else>
+                        <div class="dropdown float-right dropleft row m-0"  style="width: 100%" id="call_number">
+                        <div class='dialer_bg multiCallData' id='data.call.sid' style='width:100%'>
+                            <div class='row dialer_bg p-2'>
+                                <div class="d-flex justify-content-center" style="width:100%">
+                                    <span class='multiCallData_name'>{{name}}</span>
+                                </div>
+                                <div class="d-flex justify-content-center" style="width:100%">
+                                <span class='multiCallData_name'> {{number}}</span>
+                                </div>
+                                <div class="d-flex justify-content-center" style="width:100%">
+                                <span class='timerContainer font-weight-bold mx-auto float-right mt-2' style='font-size: 45px;color:#4d64bc'><span class='multiCallData_minute' id='data.call.sid'>{{mm}}</span>:<span class='multiCallData_second' id=' data.call.sid'>{{ss}}</span></span>
+                                </div>
+                            </div>
+                            <div class='p-1 mt-1'><button @click="callHangup()" class='btn btn-danger multiCallData_hangup w-100' data-id=' number + "' data-sid='data.call.sid+"' data-type='callType+"' style='width: 100%;font-size: 30px;'>Hangup</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
                     <div>
                       <div class="d-flex justify-content-between mt-4">
                         <div>
@@ -107,25 +128,6 @@
                                 </button>
                             </center>
                         </ul>
-                    </div>
-                    <div v-else>
-                        <div class="dropdown float-right dropleft row m-0"  style="width: 100%" id="call_number">
-                        <div class='dialer_bg multiCallData' id='data.call.sid' style='width:100%'>
-                            <div class='row dialer_bg p-2'>
-                                <div class="d-flex justify-content-center" style="width:100%">
-                                    <span class='multiCallData_name'>{{name}}</span>
-                                </div>
-                                <div class="d-flex justify-content-center" style="width:100%">
-                                <span class='multiCallData_name'> {{number}}</span>
-                                </div>
-                                <div class="d-flex justify-content-center" style="width:100%">
-                                <span class='timerContainer font-weight-bold mx-auto float-right mt-2' style='font-size: 45px;color:#4d64bc'><span class='multiCallData_minute' id='data.call.sid'>{{mm}}</span>:<span class='multiCallData_second' id=' data.call.sid'>{{ss}}</span></span>
-                                </div>
-                            </div>
-                            <div class='p-1 mt-5 pt-5'><button @click="callHangup()" class='btn btn-danger multiCallData_hangup w-100' data-id=' number + "' data-sid='data.call.sid+"' data-type='callType+"' style='width: 100%;font-size: 30px;'>Hangup</button>
-                            </div>
-                        </div>
-                        </div>
                     </div>
                 </div>
                 <div v-else style="max-width:300px">

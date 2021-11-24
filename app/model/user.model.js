@@ -15,6 +15,11 @@ const User = mongoose.model('User', {
         type: String,
         default: null
     },
+    hardwarekey:{
+        type: String,
+        enum : ['false','true'],
+        default: 'false'
+    }
 });
 
 

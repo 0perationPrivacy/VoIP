@@ -33,7 +33,7 @@
     transform: translate(-2px,0) skew(0deg);
   }
   62%{
-    transform: translate(0,0) skew(5deg); 
+    transform: translate(0,0) skew(5deg);
   }
 }
 
@@ -58,7 +58,7 @@
     transform: translate(-2px,2px);
   }
   62%{
-    transform: translate(13px,-1px) skew(-13deg); 
+    transform: translate(13px,-1px) skew(-13deg);
   }
 }
 
@@ -76,7 +76,7 @@
     transform: translate(-2px,0);
   }
   62%{
-    transform: translate(-22px,5px) skew(21deg); 
+    transform: translate(-22px,5px) skew(21deg);
   }
 }
 </style>

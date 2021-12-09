@@ -4,6 +4,9 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.81 (Dec 9, 2021)
+### Bug
+- Custom APPDIRECTORY route issue fixed
 
 ## v0.80 (Nov 24, 2021)
 ### Security

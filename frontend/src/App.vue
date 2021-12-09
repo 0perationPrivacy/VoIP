@@ -4,23 +4,26 @@
     <!--<theme-button style="display:none" />-->
     <!--<refresh></refresh>-->
     <router-view/>
+    <check-dir />
   </div>
 </template>
 
 <script>
-import { get, post } from './core/module/common.module'
+import { get } from './core/module/common.module'
 import ThemeButton from '@/components/ThemeButton.vue'
+import CheckDir from '@/components/CheckDir.vue'
 export default {
   name: 'App',
-  components: { ThemeButton },
+  components: { ThemeButton, CheckDir },
   data () {
     return {
-      old_version: false
+      old_version: false,
+      dir: ''
     }
   },
   mounted () {
     this.getVersion()
-    this.checkDirectoryName()
+    // this.checkDirectoryName()
   },
   methods: {
     getVersion () {
@@ -35,34 +38,6 @@ export default {
             this.old_version = true
           } else {
             this.old_version = false
-          }
-        })
-        .catch((e) => {
-          this.old_version = false
-          console.log(e)
-          // resolve(false)
-        })
-    },
-    checkDirectoryName () {
-      var request = {
-        url: 'auth/check-directoryname',
-        data: {dirname: this.$route.params.appdirectory}
-      }
-      this.$store
-        .dispatch(post, request)
-        .then((response) => {
-          if (response.data.status === 'nodir') {
-            this.$router.push(`/voip/`)
-            // if (this.$route.params.appdirectory === undefined) {
-            //   this.$router.push(`/voip/`)
-            // }
-            // else {
-            //   if (this.$route.params.appdirectory !== 'voip') {
-            //     this.$router.push(`/404`)
-            //   }
-            // }
-          } else if (response.data.status !== 'true') {
-            this.$router.push(`/404`)
           }
         })
         .catch((e) => {

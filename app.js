@@ -154,10 +154,6 @@ require("./app/routes/email.route")(app);
 require("./app/routes/call.route")(app);
 require("./app/routes/hardwarekey.route")(app);
 
-app.get('/:id', function (req, res) {
-  //res.send('Hello World')
-  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
-})
 
 app.get('/api/users/', function (req, res) {
   res.status(200).json({message: 'success'});

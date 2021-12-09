@@ -309,7 +309,7 @@ exports.checkCallSetting = async(req, res) => {
             res.send({status:'true', message:'Number Data!', data:numberData});
         }
     }else{
-        res.status(400).send({status: false, message:error.message, data: []});
+        res.status(400).send({status: false, message:'Please enter valid data', data: []});
     }
 };
 

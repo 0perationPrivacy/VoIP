@@ -30,7 +30,7 @@
                   </div>
                 </div>
                 <div class="col-auto">
-              Status: <span v-if="realMfs">Active</span><span v-else>Deactive</span>
+              Status: <span v-if="realMfs">Active</span><span v-else>Inactive</span>
                 </div>
               </div>
             </div>

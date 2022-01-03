@@ -262,11 +262,13 @@ export default {
                   case 'hangup':
                     this.name = ''
                     this.connection = null
+                    this.incoming = false
                     this.stopTimer()
                     break
                   case 'destroy':
                     this.name = ''
                     this.connection = null
+                    this.incoming = false
                     break
                 }
               }
@@ -422,6 +424,7 @@ export default {
         this.connection.hangup()
       }
       this.name = ''
+      this.incoming = false
       this.connection = null
     },
     callHangup () {

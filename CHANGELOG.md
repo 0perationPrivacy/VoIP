@@ -4,9 +4,13 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.83 (Jan 12, 2022)
+### Bug
+- fixed issue 107, inbound call option stays open even after call hangs up.
+
 ## v0.82 (Jan 3, 2022)
 ### Bug
-- fixed issue 103, inbound call option stays open even after call hangs up.
+- fixed issue 103, email settings save issue.
 
 ## v0.81 (Dec 9, 2021)
 ### Bug

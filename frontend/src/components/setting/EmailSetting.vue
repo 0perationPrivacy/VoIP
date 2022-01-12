@@ -131,7 +131,7 @@ export default {
     },
     getEmailSetting () {
       var request = {
-        url: 'email/get'
+        url: 'email/setting-get'
       }
       this.$store
         .dispatch(get, request)

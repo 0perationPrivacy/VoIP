@@ -67,8 +67,8 @@ exports.delete = async (req, res) => {
         res.status(400).json({status:'false',message:'Email settings not found!'});
     }
 };
-exports.get  = async (req, res) => {
-    var storeData = {user: {$eq: req.user.id}};
+exports.getEmail  = async (req, res) => {
+    var storeData = {user: req.user.id };
     var checkemail = await Email.findOne(storeData)
     res.send({status:true, message:'Get Email Settings!', data:checkemail});
 };

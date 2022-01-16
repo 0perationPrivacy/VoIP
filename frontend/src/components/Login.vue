@@ -115,13 +115,50 @@ export default {
   },
   mounted: function () {
     this.signupRoute = `/${this.$route.params.appdirectory}/signup`
-    if (this.$cookie.get('access_token')) {
-      this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
-    }
+    this.fnLogin()
     this.getsignup()
     this.getVersion()
   },
   methods: {
+    fnLogin () {
+      // console.log('login')
+      var request = {
+        url: 'auth/check-directoryname',
+        data: {dirname: this.$route.params.appdirectory}
+      }
+      this.$store
+        .dispatch(post, request)
+        .then((response) => {
+          if (this.$cookie.get('access_token')) {
+            // alert('login')
+            if (response.data.status === 'nodir' || response.data.status === 'no-name') {
+              this.$router.push(`/${response.data.dir}/dashboard`)
+            } else if (response.data.status === 'false') {
+              this.$router.push(`/404`)
+            } else if (response.data.status === 'true') {
+              this.$router.push(`/${response.data.dir}/dashboard`)
+            }
+          } else {
+            // alert(JSON.stringify(response.data))
+            if (response.data.status === 'nodir' && response.data.dir === 'voip') {
+              // this.$router.push(`/404`)
+              this.$router.push(`/${response.data.dir}`)
+            } else if (response.data.status === 'no-name' && response.data.dir === 'voip') {
+              this.$router.push(`/${response.data.dir}`)
+            } else if (response.data.status === 'false' || response.data.status === 'no-name') {
+              this.$router.push(`/404`)
+            }
+            // else if (response.data.status === 'nodir' && response.data.dir === 'voip') {
+            //   this.$router.push(`/${response.data.dir}`)
+            // }
+          }
+        })
+        .catch((e) => {
+          this.old_version = false
+          console.log(e)
+          // resolve(false)
+        })
+    },
     getsignup () {
       var request = {
         data: {},

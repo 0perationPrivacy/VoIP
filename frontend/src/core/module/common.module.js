@@ -49,6 +49,7 @@ export default {
     },
     [get] (context, request) {
       console.log(window.location.pathname)
+      console.log(request)
       return new Promise(resolve => {
         ApiService.setHeader()
         ApiService.get(request.url)

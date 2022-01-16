@@ -4,17 +4,16 @@
     <!--<theme-button style="display:none" />-->
     <!--<refresh></refresh>-->
     <router-view/>
-    <check-dir />
   </div>
 </template>
 
 <script>
 import { get } from './core/module/common.module'
 import ThemeButton from '@/components/ThemeButton.vue'
-import CheckDir from '@/components/CheckDir.vue'
+
 export default {
   name: 'App',
-  components: { ThemeButton, CheckDir },
+  components: { ThemeButton },
   data () {
     return {
       old_version: false,

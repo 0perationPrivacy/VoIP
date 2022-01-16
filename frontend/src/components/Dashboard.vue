@@ -1,5 +1,6 @@
 <template>
   <div id="wrapbody" class="wrap">
+    <check-dir />
     <call-view :contacts="contacts" ref="callView" v-if="activeCallTab"></call-view>
   <div id="loader" v-if="isLoading">
       <div class="d-flex loader justify-content-center align-items-center">
@@ -215,11 +216,12 @@ import ThemeButton from '@/components/ThemeButton.vue'
 import { post } from '../core/module/common.module'
 import Setting from './setting/Setting.vue'
 import CallView from '@/components/CallView.vue'
+import CheckDir from '@/components/CheckDir.vue'
 import { EventBus } from '@/event-bus'
 const io = require('socket.io-client')
 export default {
   name: 'dashboard',
-  components: { NumberList, VueTagsInput, ThemeButton, Setting, CallView },
+  components: { NumberList, VueTagsInput, ThemeButton, Setting, CallView, CheckDir },
   data () {
     return {
       isLoading: false,

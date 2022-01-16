@@ -133,6 +133,25 @@ export default {
       var request = {
         url: 'email/setting-get'
       }
+      // eslint-disable-next-line no-undef
+      // axios
+      //   .get('http://localhost:3000/api/email/setting-get')
+      //   .then(response => {
+      //     // response.data = response.data.data
+      //     if (response.data && response.data.data) {
+      //       this.form = response.data.data
+      //       this.showProfile = true
+      //       this.getProfiles()
+      //     } else {
+      //       this.form.email = ''
+      //       this.form.password = ''
+      //       this.form.to_email = ''
+      //       this.form.host = ''
+      //       this.form.port = ''
+      //       this.form.secure = false
+      //       this.form.sender_email = ''
+      //     }
+      //   })
       this.$store
         .dispatch(get, request)
         .then((response) => {

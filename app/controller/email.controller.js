@@ -3,6 +3,7 @@ var Email = require('../model/email.model');
 var Setting = require('../model/setting.model');
 
 exports.create = async (req, res) => {
+    //return res.send(req.body);
     let rules = {
         email: 'required',
         password: 'required',
@@ -14,7 +15,7 @@ exports.create = async (req, res) => {
     };
     let validation = new Validator(req.body, rules);
     if(validation.passes()){
-        var storeData = {user: {$eq: req.user.id}};
+        var storeData = {user: req.user.id};
         var checkemail = await Email.findOne(storeData)
         if(checkemail){
             checkemail.email = req.body.email
@@ -70,6 +71,8 @@ exports.delete = async (req, res) => {
 exports.getEmail  = async (req, res) => {
     var storeData = {user: req.user.id };
     var checkemail = await Email.findOne(storeData)
+    //console.log('checkemail');
+    // console.log(checkemail);
     res.send({status:true, message:'Get Email Settings!', data:checkemail});
 };
 

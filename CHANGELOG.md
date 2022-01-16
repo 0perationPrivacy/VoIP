@@ -4,6 +4,10 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.84 (Jan 16, 2022)
+### Bug
+- fixed issue #107, #110, email settings save issue, custom APPDIRECTORY caching issue.
+
 ## v0.83 (Jan 12, 2022)
 ### Bug
 - fixed issue 107, email settings save issue.

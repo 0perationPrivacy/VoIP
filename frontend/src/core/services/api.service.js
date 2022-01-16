@@ -22,6 +22,11 @@ const ApiService = {
    * Set the default HTTP request headers
    */
   setHeader () {
+    // eslint-disable-next-line standard/computed-property-even-spacing
+    Vue.axios.defaults.headers.common[
+      'Cache-Control'
+    // eslint-disable-next-line camelcase
+    ] = 'no-cache'
     // eslint-disable-next-line camelcase
     var access_token = Vue.cookie.get('access_token')
     // eslint-disable-next-line standard/computed-property-even-spacing

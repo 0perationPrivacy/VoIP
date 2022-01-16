@@ -130,13 +130,25 @@ exports.getVersionOption = (req, res) => {
 exports.checkDirectoryName = (req, res) => {
     var dir = process.env.APPDIRECTORY
     if(dir){
-        if(dir === req.body.dirname){
-            res.send({status:true, message:'APPDIRECTORY Matched!', data:{status:'true'}});
-        } else {
-            res.send({status:true, message:'APPDIRECTORY Mismatch!', data:{status:'false'}});
+        if(req.body.dirname){
+            if(dir === req.body.dirname){
+                res.send({status:true, message:'APPDIRECTORY Matched!', data:{status:'true', dir: dir}});
+            } else {
+                res.send({status:true, message:'APPDIRECTORY Mismatch!', data:{status:'false', dir: dir}});
+            }
+        }else{
+            res.send({status:true, message:'APPDIRECTORY Mismatch!', data:{status:'no-name', dir: dir}});
         }
     }else{
-        res.send({status:true, message:'APPDIRECTORY not defined!', data:{status:'nodir'}});
+        if(req.body.dirname){
+            if('voip' === req.body.dirname){
+                res.send({status:true, message:'APPDIRECTORY not defined!', data:{status:'nodir', dir: 'voip'}});
+            }else{
+                res.send({status:true, message:'APPDIRECTORY Mismatch!', data:{status:'false', dir: dir}});
+            }
+        }else{
+            res.send({status:true, message:'APPDIRECTORY not defined!', data:{status:'no-name',  dir: 'voip'}});
+        }
     }
 };
 exports.getUpdateVersion = (req, res) => {

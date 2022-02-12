@@ -20,6 +20,10 @@ export default new Router({
   mode: 'history',
   routes: [
     {
+      path: '/:appdirectory/test-key',
+      component: () => import('@/components/HardwarkeyTest')
+    },
+    {
       path: '/404',
       component: () => import('@/components/ErrorPage')
     },

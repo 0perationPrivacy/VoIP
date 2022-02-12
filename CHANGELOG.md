@@ -4,6 +4,10 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+## v0.85 (Feb 12, 2022)
+### Feature
+- Hardware Key support added. You can add multiple security keys that support U2F (e.g., Yubikey, OnlyKey, Titan, etc).
+
 ## v0.84 (Jan 16, 2022)
 ### Bug
 - fixed issue #107, #110, email settings save issue, custom APPDIRECTORY caching issue.

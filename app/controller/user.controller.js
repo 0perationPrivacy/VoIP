@@ -6,7 +6,7 @@ const moment = require('moment')
 
 var User = require('../model/user.model');
 const nodemailer = require('nodemailer');
-
+var Hardwarekey = require('../model/hardwarekey.model');
 var Contact = require('../model/contact.model');
 var Email = require('../model/email.model');
 var Message = require('../model/message.model'); 
@@ -40,15 +40,27 @@ exports.login = async (req, res) => {
                 var token = jwt.sign(obj, process.env.COOKIE_KEY);
                 user.token = token;
                 user.save();      
-                //if(user.mfa && user.mfa === 'true'){
-                /* if(user.hardwarekey && user.hardwarekey === 'true'){
-                    res.send({status:'hardwarekey', message:'user data!', data:user, token:token});
-                } */if(user.mfa && user.mfa === 'true'){
-                    res.send({status:'mfa', message:'user data!', data:user, token:token}); 
+                var status = 'true';
+                var harwarekey, mfa;
+                if(user.hardwarekey && user.hardwarekey === 'true'){
+                    var mfa = false
+                    if(user.mfa && user.mfa === 'true') {
+                        mfa = true;
+                    }
+                    status = 'hardwarekey';
+                    // harwarekey = false
+                    harwarekey = await Hardwarekey.find({ user:user._id, registrationComplete: true });
+                    // res.send({status:'hardwarekey', message:'user data!', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
+                } else
+                if(user.mfa && user.mfa === 'true'){
+                    status = 'mfa';
+                    harwarekey = false
+                    mfa=true
                 }else{
-                    res.send({status:'true', message:'user data!', data:user, token:token});
+                    harwarekey = false;
+                    mfa = false;
                 }   
-                
+                res.send({status:status, message:'user data!', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
                 return;
             }else{
                 res.status(401).json({status:'false',message:'Unauthorized Access!'});

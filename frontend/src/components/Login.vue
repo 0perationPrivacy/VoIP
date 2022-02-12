@@ -49,11 +49,57 @@
               <div class="text-center">
                 <button class="btn btn-success m-3 px-5" type="button" v-on:click="handleSubmit2($event)" id="login-button2">Verify</button>
               </div>
+              <div class="p-2">
+                   <a href="javascript:void(0)" @click="chooseMethods('show_method')">Choose A Different Verification Method</a>
+              </div>
             </form>
 
             <form class="ml-2 mr-2 text-center" v-if="keyScreen">
-              <div class="form-group my-4">
-                <label>Please connect your hardware key</label>
+              <div class="" v-if="verification_method">
+                <div class="card my-4"  v-if="keys.length > 0">
+                  <div class="card-body" style="cursor: pointer;" @click="chooseMethods('hardware_key')">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="px-4">
+                        <b-icon icon="key"></b-icon>
+                      </div>
+                      <div class="border-dark px-2" style="border-left: 1px solid;">
+                        <h4>Security Key</h4>
+                        <p>Use a hardwaree security key that is paired with your account. </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card" v-if="mfa">
+                  <div class="card-body" style="cursor: pointer;" @click="chooseMethods('mfa')" >
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="px-4">
+                        <b-icon icon="calculator-fill"></b-icon>
+                      </div>
+                      <div class="border-dark px-2" style="border-left: 1px solid;">
+                        <h4>TOTP Code</h4>
+                        <p>Use a time based on-time verification passcode. </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-2">
+                  <a class="mt-2" href="javascript:void(0)" @click="chooseMethods('Cancel')">Cancel</a>
+                </div>
+              </div>
+              <div v-else>
+                <div class="card my-4" v-for="key in keys" :key="key._id">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <b-icon icon="key"></b-icon><span class="mr-2"> {{key.title}} </span>
+                      </div>
+                      <div>
+                        <button type="button" @click="verifyKey(key)" class="btn btn-success">Verify</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <a href="javascript:void(0)" @click="chooseMethods('show_method')">Choose A Different Verification Method</a>
               </div>
             </form>
 
@@ -74,9 +120,13 @@
 </template>
 
 <script>
+// import { decode } from '../../../base64url-arraybuffer'
+import { decode, encode } from '../base64url-arraybuffer'
 import { post } from '../core/module/common.module'
 import ThemeButton from '@/components/ThemeButton.vue'
 import { required, minLength } from 'vuelidate/lib/validators'
+// import { constants } from 'zlib'
+// const CBOR = require('cbor-js')
 export default {
   name: 'Login',
   components: { ThemeButton },
@@ -104,7 +154,13 @@ export default {
       submitted2: false,
       signupRoute: '',
       keyScreen: false,
-      keyTotpScreen: false
+      keyTotpScreen: false,
+      keys: [],
+      mfa: false,
+      harwarekey: false,
+      activeKey: false,
+      verification_method: false,
+      crid: null
     }
   },
   validations: {
@@ -209,13 +265,18 @@ export default {
         .dispatch(post, request)
         .then((response) => {
           if (response) {
-            /* if (response.status === 'hardwarekey') {
+            this.keys = response.harwarekey
+            this.mfa = response.mfa
+            this.verification_method = false
+            if (response.status === 'hardwarekey') {
               this.activeUser.token = response.token
               this.activeUser.user = response.data
               this.keyScreen = true
               this.otpScreen = false
-              this.login()
-            } */ if (response.status === 'mfa') {
+              this.activeKey = response.harwarekey[0]
+              // this.keys = response.harwarekey
+              // this.login()
+            } else if (response.status === 'mfa') {
               this.activeUser.token = response.token
               this.activeUser.user = response.data
               this.otpScreen = true
@@ -230,57 +291,97 @@ export default {
           // this.signUpOption = false
         })
     },
-    /* login () {
-      try {
-        if (window.u2f && window.u2f.sign) {
-          console.log('============================login uf2 response==========================')
-          console.log(window.u2f)
-          console.log('============================/login uf2 response==========================')
-          console.log('============================sign response==========================')
-          console.log(window.u2f.sign)
-          console.log('============================/sign response==========================')
-          var request = {
-            data: {user: this.activeUser.user._id},
-            url: 'hardwarekey/login-key'
-          }
-          this.$store
-            .dispatch(post, request)
-            .then((result) => {
-              if (result) {
-                window.u2f.sign(result.appId, [result.challenge], [result], response => {
-                  console.log('============================loginResponse==========================')
-                  console.log(response)
-                  console.log('============================/loginResponse==========================')
-                  var request2 = {
-                    data: {loginResponse: response, result: result, user: this.activeUser.user._id},
-                    url: 'hardwarekey/login'
-                  }
-                  this.$store
-                    .dispatch(post, request2)
-                    .then((result) => {
-                      if (result) {
-                        this.$cookie.set('access_token', this.activeUser.token, 30)
-                        this.$cookie.set('userdata', JSON.stringify(this.activeUser.user), 30)
-                        this.activeUser.token = ''
-                        this.activeUser.user = null
-                        this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
-                        // console.log(result)
-                      }
-                    })
-                    .catch((e) => {
-
-                    })
-                })
-              }
-            })
-            .catch((e) => {
-
-            })
-        }
-      } catch (error) {
-        console.log(error)
+    verifyKey (key) {
+      var request = {
+        data: { user: this.activeUser.user._id, title: key.title },
+        url: 'hardwarekey/login-key'
       }
-    }, */
+      this.$store
+        .dispatch(post, request)
+        .then(async (getAssertionChallenge) => {
+          if (getAssertionChallenge) {
+            getAssertionChallenge = await this.preformatGetAssertReq(getAssertionChallenge)
+            try {
+              var newCredentialInfo = await navigator.credentials.get({publicKey: getAssertionChallenge})
+              newCredentialInfo = this.publicKeyCredentialToJSON(newCredentialInfo)
+              var request = {
+                data: newCredentialInfo,
+                url: 'hardwarekey/login'
+              }
+              this.$store
+                .dispatch(post, request)
+                .then(async (serverResponse) => {
+                  if (serverResponse) {
+                    if (serverResponse.status !== 'true') { throw new Error('Error registering user! Server returned: ' + serverResponse.errorMessage) }
+                    this.$cookie.set('access_token', this.activeUser.token, 30)
+                    this.$cookie.set('userdata', JSON.stringify(this.activeUser.user), 30)
+                    this.activeUser.token = ''
+                    this.activeUser.user = null
+                    this.$router.push(`/${this.$route.params.appdirectory}/dashboard`)
+                  }
+                })
+                .catch((e) => {
+                  // this.signUpOption = false
+                })
+              // console.log(data)
+            } catch (error) {
+              console.log(error)
+              // error.message
+              this.$swal.fire(
+                'Key!',
+                'Login failed with security key.',
+                'error'
+              )
+            }
+          }
+        })
+        .catch((e) => {
+          // this.signUpOption = false
+        })
+    },
+    generateRandomBuffer (length) {
+      if (!length) { length = 32 }
+
+      var randomBuff = new Uint8Array(length)
+      window.crypto.getRandomValues(randomBuff)
+      return randomBuff
+    },
+    publicKeyCredentialToJSON (pubKeyCred) {
+      if (pubKeyCred instanceof Array) {
+        let arr = []
+        for (let i of pubKeyCred) { arr.push(this.publicKeyCredentialToJSON(i)) }
+
+        return arr
+      }
+
+      if (pubKeyCred instanceof ArrayBuffer) {
+        return encode(pubKeyCred)
+      }
+
+      if (pubKeyCred instanceof Object) {
+        let obj = {}
+
+        for (let key in pubKeyCred) {
+          obj[key] = this.publicKeyCredentialToJSON(pubKeyCred[key])
+        }
+
+        return obj
+      }
+
+      return pubKeyCred
+    },
+    preformatGetAssertReq (getAssert) {
+      return new Promise((resolve, reject) => {
+        getAssert.challenge = decode(getAssert.challenge)
+        if (getAssert.allowCredentials) {
+          for (let allowCred of getAssert.allowCredentials) {
+            console.log(allowCred.id)
+            allowCred.id = decode(allowCred.id)
+          }
+        }
+        resolve(getAssert)
+      })
+    },
     handleSubmit2 (e) {
       this.submitted2 = true
       if (this.otpForm.otp.trim() !== '') {
@@ -306,6 +407,32 @@ export default {
           })
       } else {
         this.otpError = true
+      }
+    },
+    chooseMethods (method) {
+      if (method === 'hardware_key') {
+        this.otpScreen = false
+        this.keyScreen = true
+        this.verification_method = false
+      } else if (method === 'show_method') {
+        this.otpScreen = false
+        this.keyScreen = true
+        this.verification_method = true
+      } else if (method === 'Cancel') {
+        this.otpScreen = false
+        this.keyScreen = false
+        this.activeUser = {
+          user: null,
+          token: ''
+        }
+        this.user = {
+          email: '',
+          password: ''
+        }
+      } else if (method === 'mfa') {
+        this.keyScreen = false
+        this.otpScreen = true
+        this.verification_method = false
       }
     }
   }

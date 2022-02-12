@@ -673,7 +673,7 @@ exports.smsStatus = async (req, res) => {
             if(settingCheck){
                 if(settingCheck.type === 'twilio'){
                     const client = twilio(settingCheck.twilio_sid, settingCheck.twilio_token);
-                    client.messages(sid).remove();      //remove Twilio sms from server right after sent with any status reply state
+                    await client.messages(sid).remove();      //remove Twilio sms from server right after sent with any status reply state
                 }
             }
         }

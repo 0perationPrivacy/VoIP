@@ -4,6 +4,11 @@
 > Note: Every update deletes the MMS media files/folder
 
 ---
+
+## v0.86 (Feb 14, 2022)
+### Bug
+- Fixed issue with web browser based calling on a Twilio number.
+
 ## v0.85 (Feb 12, 2022)
 ### Feature
 - Hardware Key support added. You can add multiple security keys that support U2F (e.g., Yubikey, OnlyKey, Titan, etc).

@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-button id="incomingCallModel" v-b-modal.modal-tall style="display:none">Launch demo modal</b-button>
-        <b-modal ref="modal-tall" class="test-modal" id="modal-tall" hide-footer>
+        <b-modal ref="modalTall" class="test-modal" id="modal-tall" hide-footer>
           <template #modal-header="{ close }">
             <!-- Emulate built in modal header close button action -->
             <b-button v-bind:class="{ 'd-none': connection }" size="sm" variant="outline-danger" @click="close()">
@@ -204,32 +204,32 @@ export default {
         if (tokenData.type === 'twilio') {
           this.callType = 'twilio'
           Device.setup(tokenData.token)
-          Device.incoming(function (connection) {
-            callPannel.$refs['modal-tall'].show()
+          Device.incoming((connection) => {
+            callPannel.$refs['modalTall'].show()
             // document.getElementById('incomingCallModel').click()
             callPannel.connection = connection
             callPannel.number = connection.options.callParameters.From
             callPannel.incoming = true
           })
-          Device.connect(function (connection) {
+          Device.connect((connection) => {
             callPannel.connection = connection
             callPannel.startTimer()
             callPannel.getContact()
           })
-          Device.ready(function () {
+          Device.ready(() => {
             console.log('Connected')
             this.call_text = 'Connected'
           })
-          Device.disconnect(function (connection) {
+          Device.disconnect((connection) => {
             console.log('Awaiting incoming call...')
             this.call_text = 'Awaiting incoming call...'
             callPannel.dissconnected()
           })
-          Device.cancel(function (device) {
+          Device.cancel((device) => {
             callPannel.dissconnected()
             // callPannel.$refs['my-modal'].hide()
           })
-          Device.error(function (error) {
+          Device.error((error) => {
             console.log('error')
             console.log(error)
           })
@@ -250,7 +250,8 @@ export default {
                 callPannel.connection = call
                 switch (call.state) {
                   case 'ringing':
-                    callPannel.$refs['modal-tall'].show()
+                    callPannel.$refs['modalTall'].show()
+                    // document.getElementById('incomingCallModel').click()
                     callPannel.number = call.options.remoteCallerNumber
                     callPannel.incoming = true
                     break
@@ -357,7 +358,9 @@ export default {
         })
       }
       this.call_text = 'Calling ' + n
-      this.$refs['modal-tall'].show()
+      this.$refs['modalTall'].show()
+      // this.$refs.myModalRef.show()
+      // document.getElementById('incomingCallModel').click()
     },
     acceptCall () {
       if (this.callType === 'twilio') {
@@ -395,7 +398,6 @@ export default {
       }
       // this.connection = Device.connect({ number: n, twilio_number: profileLocal.number })
       this.call_text = 'Calling ' + n
-      // this.$refs['modal-tall'].show()
     },
     startTimer () {
       var value = 0

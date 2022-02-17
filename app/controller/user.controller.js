@@ -3,6 +3,7 @@ const saltRounds = 10;
 const Validator = require('validatorjs');
 
 const moment = require('moment')
+const fs = require('fs')
 
 var User = require('../model/user.model');
 const nodemailer = require('nodemailer');
@@ -15,7 +16,7 @@ const telnyxHelper = require('../helper/telnyx.helper');
 const twilioHelper = require('../helper/twilio.helper');
 
 const remoteVersion = 'https://raw.githubusercontent.com/0perationPrivacy/VoIP/main/version.md';
-const currentVersion = process.env.BASE_URL + 'version.md'; // read from local file version.md
+const currentVersion = 'version.md'; // read from local file version.md
 
 var jwt = require('jsonwebtoken');
 
@@ -124,20 +125,31 @@ exports.getSignUpOption = async (req, res) => {
 };
 
 exports.getVersionOption = (req, res) => {
-    var request = require('request');
-    request.get(currentVersion, async function (error, response, body) {
-       // console.log(body);
-       // console.log(error);
-        if (!error && response.statusCode == 200) {
-            if(isNaN(body)){
-                res.send({status:true, message:'Not a numeric value!', data:'v0.0'});
-            }else{
-                res.send({status:true, message:'version defined.', data:`v${body}`});
-            }
-        }else{
-            res.send({status:true, message:'version file not found!', data:'v0.0'});
-        }
-    });
+    // var request = require('request');
+    // console.log(currentVersion);
+    try {
+        const data = fs.readFileSync(currentVersion, 'utf8')
+        console.log(data)
+        res.send({status:true, message:'version defined.', data:`v${data}`});
+      } catch (err) {
+        console.error(err)
+        res.send({status:true, message:'version file not found!', data:'v0.0'});
+      }
+    // request.get(currentVersion, async function (error, response, body) {
+    //     console.log('currentVersion check');
+    //     console.log(error);
+    //     console.log('status => '+ response.statusCode);
+    //     if (!error && response.statusCode == 200) {
+    //         console.log('body =>'+body);
+    //         if(isNaN(body)){
+    //             res.send({status:true, message:'Not a numeric value!', data:'v0.0'});
+    //         }else{
+    //             res.send({status:true, message:'version defined.', data:`v${body}`});
+    //         }
+    //     }else{
+    //         res.send({status:true, message:'version file not found!', data:'v0.0'});
+    //     }
+    // });
 };
 exports.checkDirectoryName = (req, res) => {
     var dir = process.env.APPDIRECTORY
@@ -174,21 +186,32 @@ exports.getUpdateVersion = (req, res) => {
                 // curruntv = curruntv.replace("v", "").replace("-beta", "");
                 // console.log(body)
                 //console.log(currentVersion)
-                request.get(currentVersion, async function (error, response, body2) {
-                    if (!error && response.statusCode == 200) {
-                        if(isNaN(body2)){
-                            res.send({update: 'false'});
-                        }else{
-                            if(body2 < body){
-                                res.send({update: 'true'});
-                            }else{
-                                res.send({update: 'false'});
-                            }
-                        }
+                try {
+                    const body2 = fs.readFileSync(currentVersion, 'utf8')
+                    if(body2 < body){
+                        res.send({update: 'true'});
                     }else{
                         res.send({update: 'false'});
                     }
-                });
+                  } catch (err) {
+                    console.error(err)
+                    res.send({update: 'false'});
+                  }
+                // request.get(currentVersion, async function (error, response, body2) {
+                //     if (!error && response.statusCode == 200) {
+                //         if(isNaN(body2)){
+                //             res.send({update: 'false'});
+                //         }else{
+                //             if(body2 < body){
+                //                 res.send({update: 'true'});
+                //             }else{
+                //                 res.send({update: 'false'});
+                //             }
+                //         }
+                //     }else{
+                //         res.send({update: 'false'});
+                //     }
+                // });
                 // console.log(currentVersion)
                 // var current
             }

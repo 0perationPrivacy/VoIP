@@ -1,9 +1,16 @@
 
 # Changelog
 
-> Note: Every update deletes the MMS media files/folder
+> Note: Every update deletes the MMS media files/folder that's stored locally and not in the database.
 
 ---
+
+## v0.87 (Feb 16, 2022)
+### Bug
+- Messages are removed from Twilio's internal logs with an API call. Sometimes it was failing to delete. Now message log deletion waits for confirmation from the API and retries 5 times if one is not received before giving up. Fixes issue #112
+- Fixed issue #105 (images in mobile view were saving as .bin)
+- Fixed version display
+- TOTP toggle asks for confirmation before disabling
 
 ## v0.86 (Feb 14, 2022)
 ### Bug

@@ -80,15 +80,37 @@ export default {
   methods: {
     mfaStatusChange () {
       var status = this.mfaStatus ? 'true' : 'false'
+      if (!this.mfaStatus) {
+        this.$swal.fire({
+          title: 'Are you sure?',
+          text: "Software token will be deleted. You will have to reconfigure it!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.commonMfa({status: status, qr: 'true'})
+            this.qr = false
+          } else {
+            this.mfaStatus = true
+          }
+        })
+      } else {
+        this.commonMfa({status: status, qr: 'true'})
+      }
+    },
+    commonMfa (data) {
       var request = {
-        data: {status: status, qr: 'true'},
+        data: data,
         url: 'auth/mfa/save'
       }
       this.$store
         .dispatch(post, request)
         .then((response) => {
           if (response) {
-            if (status === 'true') {
+            if (data.status === 'true') {
               this.qr = response.image
               this.secret = response.secret
             } else {

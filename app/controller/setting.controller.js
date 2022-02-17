@@ -551,9 +551,17 @@ exports.receiveSms = async (req, res) => {
             var fackMedia = [];
             for(var i=0; i < req.body.NumMedia; i++){
                 var tMedia = `MediaUrl${i}`;
+                var tMediaType = `MediaContentType${i}`;
                 const url = req.body[tMedia]; // link to file you want to download
                 //var name = `uploads/${Date.now()}${req.body.SmsSid}.png`;
-                var name = crypto.randomBytes(24).toString('hex');
+                // var name = crypto.randomBytes(24).toString('hex');
+                if(tMediaType == 'image/gif'){
+                    var name = `${crypto.randomBytes(24).toString('hex')}.gif`;
+                }else if(tMediaType == 'image/jpeg'){
+                    var name = `${crypto.randomBytes(24).toString('hex')}.jpg`;
+                }else{
+                    var name = `${crypto.randomBytes(24).toString('hex')}.png`;
+                }
                 var date = moment(new Date()).format('MMDDYYYY');
                 try {
                     await fs.promises.access("./uploads/"+date);
@@ -583,7 +591,14 @@ exports.receiveSms = async (req, res) => {
             for(var i=0; i < messageData.media.length; i++){
                 const url = messageData.media[i].url; // link to file you want to download
                 // var name = `uploads/${Date.now()}${sid}.png`;
-                var name = crypto.randomBytes(24).toString('hex');
+                if(messageData.media[i].content_type == 'image/gif'){
+                    var name = `${crypto.randomBytes(24).toString('hex')}.gif`;
+                }else if(messageData.media[i].content_type == 'image/jpeg'){
+                    var name = `${crypto.randomBytes(24).toString('hex')}.jpg`;
+                }else{
+                    var name = `${crypto.randomBytes(24).toString('hex')}.png`;
+                }
+                
                 var date = moment(new Date()).format('MMDDYYYY');
                 try {
                     await fs.promises.access("./uploads/"+date);
@@ -651,7 +666,7 @@ exports.receiveSms = async (req, res) => {
     console.log(response.toString());
     res.set('Content-Type', 'text/xml');
     if(settingCheck && settingCheck.type == 'twilio'){
-        sleep(settingCheck, req.body.SmsSid);
+        sleep(settingCheck, req.body.SmsSid)
     }
     res.send();
 };
@@ -659,9 +674,20 @@ function sleep(settingCheck, sid) {
     return new Promise((resolve) => {
       setTimeout(async function(){
         const client = twilio(settingCheck.twilio_sid, settingCheck.twilio_token);
-        var deleteMessage = await client.messages(sid).remove();
-          resolve(true)
-      }, 3000);
+        
+            for(var i = 0; i < 5; i++){
+                try{
+                    var deleteMessage = await client.messages(sid).remove();
+                    if (deleteMessage) { break; }
+                }catch(error){
+                }
+            }
+            if(deleteMessage){
+                resolve(true)
+            }else{
+                resolve(false)
+            }
+      }, 5000);
     });
 }   
 exports.smsStatus = async (req, res) => {
@@ -673,7 +699,14 @@ exports.smsStatus = async (req, res) => {
             if(settingCheck){
                 if(settingCheck.type === 'twilio'){
                     const client = twilio(settingCheck.twilio_sid, settingCheck.twilio_token);
-                    await client.messages(sid).remove();      //remove Twilio sms from server right after sent with any status reply state
+                    for(var i = 0; i < 5; i++){
+                        try{
+                            var isDelete = await client.messages(sid).remove(); 
+                            if (isDelete) { break; }
+                        }catch(error){
+                            
+                        }
+                    }     //remove Twilio sms from server right after sent with any status reply state
                 }
             }
         }

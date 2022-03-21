@@ -83,7 +83,7 @@ export default {
       if (!this.mfaStatus) {
         this.$swal.fire({
           title: 'Are you sure?',
-          text: "Software token will be deleted. You will have to reconfigure it!",
+          text: 'Software token will be deleted. You will have to reconfigure it!',
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',

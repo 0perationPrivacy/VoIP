@@ -4,6 +4,9 @@
 > Note: Every update deletes the MMS media files/folder that's stored locally and not in the database.
 
 ---
+## v0.88 (March 20, 2022)
+### Typo
+- Email settings: TO, FROM field labels corrected.
 
 ## v0.87 (Feb 16, 2022)
 ### Bug

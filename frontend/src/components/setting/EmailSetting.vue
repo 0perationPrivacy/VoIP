@@ -16,17 +16,17 @@
                 </div>
             </div>
              <div class="form-group mt-2">
-                <input class="form-control" name="sender_email" v-model="form.sender_email" placeholder="Enter Sender Email" :class="{ 'is-invalid': submitted3 && $v.form.sender_email.$error }" />
+                <input class="form-control" name="sender_email" v-model="form.sender_email" placeholder="Email FROM" :class="{ 'is-invalid': submitted3 && $v.form.sender_email.$error }" />
                 <div v-if="submitted3 && $v.form.to_email.$error" class="invalid-feedback">
-                    <span v-if="!$v.form.sender_email.required">Sender Email is required</span>
-                    <span v-if="!$v.form.sender_email.email">Enter Valid Sender Email</span>
+                    <span v-if="!$v.form.sender_email.required">FROM Email is required</span>
+                    <span v-if="!$v.form.sender_email.email">Enter Valid FROM Email</span>
                 </div>
             </div>
              <div class="form-group mt-2">
-                <input class="form-control" name="to_email" v-model="form.to_email" placeholder="Enter From Email" :class="{ 'is-invalid': submitted3 && $v.form.to_email.$error }" />
+                <input class="form-control" name="to_email" v-model="form.to_email" placeholder="Email TO" :class="{ 'is-invalid': submitted3 && $v.form.to_email.$error }" />
                 <div v-if="submitted3 && $v.form.to_email.$error" class="invalid-feedback">
-                    <span v-if="!$v.form.to_email.required">To Email is required</span>
-                    <span v-if="!$v.form.to_email.email">Enter Valid To Email</span>
+                    <span v-if="!$v.form.to_email.required">TO Email is required</span>
+                    <span v-if="!$v.form.to_email.email">Enter Valid TO Email</span>
                 </div>
             </div>
             <div class="form-group mt-2">

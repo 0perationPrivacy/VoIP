@@ -212,7 +212,7 @@ By default it is not defined. Full instructions [here](https://github.com/0perat
 - Contacts
   - `Add` Manually
   - `Import` CSV file
-  - `Expoert` CSV file
+  - `Export` CSV file
   - `Dropdown` in compose message
 - Bug Fix
   - Send empty message error

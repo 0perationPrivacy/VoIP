@@ -8,134 +8,142 @@ var Handel = require('../model/handel.model');
 
 var sessData = {};
 exports.registerSession = async (req, res) => {
-    console.log(req.user);
-    var payload = req.body;
-    var userexists = await userExists(payload.title, req.user.id);
-    var getuser = await Hardwarekey.findOne({title: payload.title, user: req.user.id, id: sessData.id});
-    // console.log(getuser)
-    if(userexists && getuser && getuser.registrationComplete){
-        res.status(400).send({'status': 'false', 'message': 'Title already exists!'});
-    }else{
-        await deleteUser(payload.title, req.user.id);
-        payload.id = base64url.encode(await generateRandomBuffer(32));
-        payload.credentials = [];
-        var user = await addUser(payload.title, payload, req.user.id);
-        console.log(user);
-        sessData = req.session;
-        sessData.title = payload.title;
-        sessData.user = req.user.id;
-        sessData.id = payload.id;
-        res.send({'status': 'startFIDOEnrolment'});
+    try{
+        var payload = req.body;
+        var userexists = await userExists(payload.title, req.user.id);
+        var getuser = await Hardwarekey.findOne({title: payload.title, user: req.user.id, id: sessData.id});
+        // console.log(getuser)
+        if(userexists && getuser && getuser.registrationComplete){
+            res.status(400).send({'status': 'false', 'message': 'Title already exists!'});
+        }else{
+            await deleteUser(payload.title, req.user.id);
+            payload.id = base64url.encode(await generateRandomBuffer(32));
+            payload.credentials = [];
+            var user = await addUser(payload.title, payload, req.user.id);
+            console.log(user);
+            sessData = req.session;
+            sessData.title = payload.title;
+            sessData.user = req.user.id;
+            sessData.id = payload.id;
+            res.send({'status': 'startFIDOEnrolment'});
+        }
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
 }
 exports.register = async (req, res) => {
-    if(!sessData.title){
-        res.status(400).send({'status': 'failed', 'message': 'Access denied!'});
-        return;
+    try{
+        if(!sessData.title){
+            res.status(400).send({'status': 'failed', 'message': 'Access denied!'});
+            return;
+        }
+        let user = await getUser(sessData.title, sessData.user);
+        var userData = await User.findOne({_id: sessData.user});
+        sessData.challenge = base64url.encode(await generateRandomBuffer(32));
+        var publicKey = {
+            challenge: sessData.challenge,
+            'rp': {
+                'name': 'Operation Privacy'
+            },
+            'user': {
+                'id': user.id,
+                'name': userData.email,
+                'displayName': userData.name
+            },
+            'pubKeyCredParams': [
+                { 'type': 'public-key', 'alg': -7   },
+                { 'type': 'public-key', 'alg': -257 },
+            ],
+            'attestation': 'direct'
+        };
+        if(req.body.options) {
+            var options = req.body.options
+            if(!publicKey.authenticatorSelection)
+                publicKey.authenticatorSelection = {};
+
+            if(options.attestation)
+                publicKey.attestation = options.attestation;
+
+            if(options.rpId)
+                publicKey.rp.id = options.rpId;
+
+            if(options.uv)
+                publicKey.authenticatorSelection.userVerification = 'required';
+        }
+
+        if(sessData.rk) {
+            if(!publicKey.authenticatorSelection)
+                publicKey.authenticatorSelection = {};
+
+            publicKey.authenticatorSelection.requireResidentKey = true;
+        }
+        var hardwarekey = await Hardwarekey.find({user: req.user.id, registrationComplete:true});
+        res.send({publicKey:publicKey, hardwarekey:hardwarekey});
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
-    let user = await getUser(sessData.title, sessData.user);
-    var userData = await User.findOne({_id: sessData.user});
-    sessData.challenge = base64url.encode(await generateRandomBuffer(32));
-    var publicKey = {
-        challenge: sessData.challenge,
-        'rp': {
-            'name': 'Operation Privacy'
-        },
-        'user': {
-            'id': user.id,
-            'name': userData.email,
-            'displayName': userData.name
-        },
-        'pubKeyCredParams': [
-            { 'type': 'public-key', 'alg': -7   },
-            { 'type': 'public-key', 'alg': -257 },
-        ],
-        'attestation': 'direct'
-    };
-    if(req.body.options) {
-        var options = req.body.options
-        if(!publicKey.authenticatorSelection)
-            publicKey.authenticatorSelection = {};
-
-        if(options.attestation)
-            publicKey.attestation = options.attestation;
-
-        if(options.rpId)
-            publicKey.rp.id = options.rpId;
-
-        if(options.uv)
-            publicKey.authenticatorSelection.userVerification = 'required';
-    }
-
-    if(sessData.rk) {
-        if(!publicKey.authenticatorSelection)
-            publicKey.authenticatorSelection = {};
-
-        publicKey.authenticatorSelection.requireResidentKey = true;
-    }
-    var hardwarekey = await Hardwarekey.find({user: req.user.id, registrationComplete:true});
-    res.send({publicKey:publicKey, hardwarekey:hardwarekey});
 }
 
 exports.verify = async (req, res) => {
-    var payload = req.body;
+    try{
+        var payload = req.body;
 
-    if(!sessData.title){
-        return res.status(400).send({'status': 'false', message:'Access denied!', 'errorMessage': 'Access denied!'});
+        if(!sessData.title){
+            return res.status(400).send({'status': 'false', message:'Access denied!', 'errorMessage': 'Access denied!'});
+        }
+        let user = await getUser(sessData.title, sessData.user);
+        var cr = user.credentials;
+        cr.push(payload.id);
+        var updateData = {
+            registrationComplete: true,
+            credentials: cr, 
+            aaguid: payload.aaguid
+        };
+        let updateuser = await updateUser(sessData.title, sessData.user, updateData);
+        if(updateuser.registrationComplete == true){
+            await User.updateOne({_id: sessData.user}, {hardwarekey: 'true'});
+        }
+        console.log(updateuser)
+        sessData = {};
+        res.send({'status': 'ok'});
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
-    // var checkKey = await Hardwarekey.findOne({user: sessData.user, aaguid: payload.aaguid});
-    // if(checkKey){
-    //     var handel = await Handel.deleteOne({user: sessData.user, username : sessData.title});
-    //     console.log(handel);
-    //     sessData = {};
-    //     return res.status(400).json({status:'false',message:'Harware key already exits!'}); 
-    // }
-    let user = await getUser(sessData.title, sessData.user);
-    var cr = user.credentials;
-    cr.push(payload.id);
-    var updateData = {
-        registrationComplete: true,
-        credentials: cr, 
-        aaguid: payload.aaguid
-    };
-    let updateuser = await updateUser(sessData.title, sessData.user, updateData);
-    if(updateuser.registrationComplete == true){
-        await User.updateOne({_id: sessData.user}, {hardwarekey: 'true'});
-    }
-    console.log(updateuser)
-    sessData = {};
-    res.send({'status': 'ok'});
 };
 
 exports.loginSession = async (req, res) => {
-    var payload = req.body
-    var userexit = await userExists(payload.title, payload.user)
-    if(!userexit){
-        res.status(400).send({status: 'error', message: 'Wrong username or password!'});
-        return;
-    }else{
-        sessData.title = payload.title;
-        sessData.user = payload.user;
-    }
-    sessData.challenge = base64url.encode(await generateRandomBuffer(32));
-    var publicKey = {
-        'challenge': sessData.challenge,
-        'status': 'ok'
-    }
-    let user = await getUser(sessData.title, sessData.user);
-    console.log(user);
-    publicKey.allowCredentials = user.credentials.map((credId) => {
-        return { 'type': 'public-key', 'id': credId }
-    })
-    
-    if(sessData.rk) {
-        delete publicKey.allowCredentials
-    }
+    try{
+        var payload = req.body
+        var userexit = await userExists(payload.title, payload.user)
+        if(!userexit){
+            res.status(400).send({status: 'error', message: 'Wrong username or password!'});
+            return;
+        }else{
+            sessData.title = payload.title;
+            sessData.user = payload.user;
+        }
+        sessData.challenge = base64url.encode(await generateRandomBuffer(32));
+        var publicKey = {
+            'challenge': sessData.challenge,
+            'status': 'ok'
+        }
+        let user = await getUser(sessData.title, sessData.user);
+        console.log(user);
+        publicKey.allowCredentials = user.credentials.map((credId) => {
+            return { 'type': 'public-key', 'id': credId }
+        })
+        
+        if(sessData.rk) {
+            delete publicKey.allowCredentials
+        }
 
-    if(sessData.uv) {
-        publicKey.userVerification = 'required';
+        if(sessData.uv) {
+            publicKey.userVerification = 'required';
+        }
+        res.send(publicKey);
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
-    res.send(publicKey);
 }
 
 function preformatGetAssertReq (getAssert) {
@@ -149,32 +157,44 @@ function preformatGetAssertReq (getAssert) {
   }
 
 exports.login = async (req, res) => {
-    var payload = req.body
-    var userwhere = sessData.user
-    var checkHandel = await getUserByUserHandle(payload.response.userHandle, userwhere);
-    if(!sessData.title && !checkHandel){
-        res.status(400).send({'status': 'false', message: 'Something is wrong!'});
-    }else{
-        sessData = {};
-        res.send({'status': 'true'});
+    try{
+        var payload = req.body
+        var userwhere = sessData.user
+        var checkHandel = await getUserByUserHandle(payload.response.userHandle, userwhere);
+        if(!sessData.title && !checkHandel){
+            res.status(400).send({'status': 'false', message: 'Something is wrong!'});
+        }else{
+            sessData = {};
+            res.send({'status': 'true'});
+        }
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
 }
 
 exports.getKey = async (req, res) => {
-    var harewarekeys = await Hardwarekey.find({user:req.user.id, registrationComplete: true});
-    res.send({status:'true', message:'hardware key list!', data:harewarekeys});
+    try{
+        var harewarekeys = await Hardwarekey.find({user:req.user.id, registrationComplete: true});
+        res.send({status:'true', message:'hardware key list!', data:harewarekeys});
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
+    }
 }
 exports.delete = async (req, res) => {
-    var harewarekey = await Hardwarekey.findOne({_id: req.body.id});
-    if(harewarekey){
-        await Handel.deleteOne({username: harewarekey.title, user: harewarekey.user});
-        await harewarekey.delete()
+    try{
+        var harewarekey = await Hardwarekey.findOne({_id: req.body.id});
+        if(harewarekey){
+            await Handel.deleteOne({username: harewarekey.title, user: harewarekey.user});
+            await harewarekey.delete()
+        }
+        var harewarekeys = await Hardwarekey.findOne({user:req.user.id, registrationComplete: true});
+        if(!harewarekeys){
+            await User.updateOne({_id: req.user.id}, {hardwarekey: 'false'});
+        }
+        res.send({status:'true', message:'hardware key deleted!', data:[]});
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
-    var harewarekeys = await Hardwarekey.findOne({user:req.user.id, registrationComplete: true});
-    if(!harewarekeys){
-        await User.updateOne({_id: req.user.id}, {hardwarekey: 'false'});
-    }
-    res.send({status:'true', message:'hardware key deleted!', data:[]});
 }
 
 async function getUserByUserHandle(userHandle, userwhere) {

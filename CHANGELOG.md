@@ -4,6 +4,10 @@
 > Note: Every update deletes the MMS media files/folder that's stored locally and not in the database.
 
 ---
+## v0.89 (April 1, 2022)
+### Bug
+- App would randomly crash with some API pulls, hard to replicate. Added a lot of try/catch statements to contain it.
+
 ## v0.88 (March 20, 2022)
 ### Typo
 - Email settings: TO, FROM field labels corrected.

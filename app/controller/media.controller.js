@@ -51,23 +51,27 @@ var upload = multer({
 
 
 exports.fileUpload = async (req, res) => {
-    upload(req,res,async function(err) {
-        if(err) {
-            res.send(err)
-        }
-        else {
-            var date = moment(new Date()).format('MMDDYYYY');
-            var mediaData = {media:`uploads/${date}/${req.file.filename}`, user:req.user.id};
-
-            var media = await Media.create(mediaData);
-            if(media){
-                media.media = `${process.env.BASE_URL.trim()}${media.media}`
-                res.send({status:true, message:'Media upload!', data:media});
-            }else{
-                res.status(400).json({status:'false',message:'Media not uploaded!'}); 
+    try{
+        upload(req,res,async function(err) {
+            if(err) {
+                res.send(err)
             }
-        }
-    })
+            else {
+                var date = moment(new Date()).format('MMDDYYYY');
+                var mediaData = {media:`uploads/${date}/${req.file.filename}`, user:req.user.id};
+
+                var media = await Media.create(mediaData);
+                if(media){
+                    media.media = `${process.env.BASE_URL.trim()}${media.media}`
+                    res.send({status:true, message:'Media upload!', data:media});
+                }else{
+                    res.status(400).json({status:'false',message:'Media not uploaded!'}); 
+                }
+            }
+        })
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
+    }
 };
 
 var cron = require('node-cron');
@@ -84,12 +88,16 @@ cron.schedule('0 1 * * *', () => {
     }
 });
 exports.deleteMedia = async (req, res) => {
-    var startdate = moment();
-    startdate = startdate.subtract(7, "days");
-    startdate = startdate.format("DDMMYYYY");
-    try {
-        fs.rmdirSync("./uploads/"+startdate, { recursive: true });
-    }catch (e) {
-        console.log('folder not found')
+    try{
+        var startdate = moment();
+        startdate = startdate.subtract(7, "days");
+        startdate = startdate.format("DDMMYYYY");
+        try {
+            fs.rmdirSync("./uploads/"+startdate, { recursive: true });
+        }catch (e) {
+            console.log('folder not found')
+        }
+    }catch(error){
+        res.status(400).json({status:'false',message:'something is wrong'});
     }
 };

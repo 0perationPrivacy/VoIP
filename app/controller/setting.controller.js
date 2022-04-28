@@ -540,6 +540,7 @@ exports.sendSms = async (req, res) => {
             res.status(419).send({status: false, errors:validation.errors, data: []});
         }  
     } catch (error) {
+        console.log(error)
         res.status(400).send({status: false, message:error.message, data: []});
     } 
 };

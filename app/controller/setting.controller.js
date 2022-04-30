@@ -784,7 +784,6 @@ exports.messageDelete = async (req, res) => {
             res.status(400).send({status: false, errors:'Chat not deleted', data: []});
         }
     } catch (error) {
-        console.error(error);
         res.status(400).send({status: false, errors:error.message, data: []});
     }
 };

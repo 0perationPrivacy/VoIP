@@ -1,14 +1,19 @@
 <template>
   <div id="wrapbody" class="wrap">
     <check-dir />
-    <call-view :contacts="contacts" ref="callView" v-if="activeCallTab"></call-view>
-  <div id="loader" v-if="isLoading">
+    <call-view
+      :contacts="contacts"
+      ref="callView"
+      v-if="activeCallTab"
+    ></call-view>
+    <div id="loader" v-if="isLoading">
       <div class="d-flex loader justify-content-center align-items-center">
         <div class="sp sp-circle"></div>
       </div>
-  </div>
+    </div>
     <theme-button id-hide="true"></theme-button>
-    <b-sidebar v-if="vw < 576"
+    <b-sidebar
+      v-if="vw < 576"
       class="d-sm-none"
       id="sidebar-no-header"
       ref="mySidebar2"
@@ -26,11 +31,22 @@
             </b-button>
           </div>
         </div>
-       <number-list ref="numberList" @onaddContact="onaddContact" @activeChat="activeProfileView" @clicked="onClickChild" />
+        <number-list
+          ref="numberList"
+          @onaddContact="onaddContact"
+          @activeChat="activeProfileView"
+          @clicked="onClickChild"
+        />
       </template>
     </b-sidebar>
     <section class="col-auto col-md-4 d-none d-sm-block">
-    <number-list ref="numberList" @onaddContact="onaddContact" @activeChat="activeProfileView" @clicked="onClickChild"  v-if="vw >= 576" />
+      <number-list
+        ref="numberList"
+        @onaddContact="onaddContact"
+        @activeChat="activeProfileView"
+        @clicked="onClickChild"
+        v-if="vw >= 576"
+      />
     </section>
     <section class="col col-md-8 pb-2" id="drop-area1">
       <div class="chat-head">
@@ -49,14 +65,29 @@
         ></b-icon>
         <div class="chat-name">
           <h1 class="font-name" v-if="activeChat">
-            <div class="d-flex align-items-start align-self-center" v-if="activeChat.contact">
-              <div class="mt-2 ml-4" >{{activeChat.contact.first_name}} {{activeChat.contact.last_name}}</div>
+            <div
+              class="d-flex align-items-start align-self-center"
+              v-if="activeChat.contact"
+            >
+              <div class="mt-2 ml-4">
+                {{ activeChat.contact.first_name }}
+                {{ activeChat.contact.last_name }}
+              </div>
             </div>
             <div class="d-flex align-items-start align-self-center">
-              <div class="mt-2 ml-4" >{{ activeChat._id }}</div>
+              <div class="mt-2 ml-4">{{ activeChat._id }}</div>
               &nbsp;&nbsp;&nbsp;
-              <span style="cursor: copy" title="Add Contact" @click="addContact(activeChat._id)" v-if="!activeChat.contact">
-                <b-icon font-scale="1.5" icon="plus-circle" aria-hidden="true"></b-icon>
+              <span
+                style="cursor: copy"
+                title="Add Contact"
+                @click="addContact(activeChat._id)"
+                v-if="!activeChat.contact"
+              >
+                <b-icon
+                  font-scale="1.5"
+                  icon="plus-circle"
+                  aria-hidden="true"
+                ></b-icon>
               </span>
             </div>
           </h1>
@@ -71,33 +102,71 @@
           </span>
         </div>
       </div>
-      <div :class="(!this.activeChat || modelMms) ?'d-none':''">
-        <div id="drop-area" style="z-index: 1;"  :class="uploadedImages.length > 0 ?'activeImageArea':'inactive'">
+      <div :class="!this.activeChat || modelMms ? 'd-none' : ''">
+        <div
+          id="drop-area"
+          style="z-index: 1"
+          :class="uploadedImages.length > 0 ? 'activeImageArea' : 'inactive'"
+        >
           <form class="my-form">
-            <p>Upload multiple files by dragging and dropping images inside this box</p>
+            <p>
+              Upload multiple files by dragging and dropping images inside this
+              box
+            </p>
             <div class="text-center m-auto">
-            <button type="button" class="btn btn-danger px-4" @click="hideImageDrag()">Cancel</button>
+              <button
+                type="button"
+                class="btn btn-danger px-4"
+                @click="hideImageDrag()"
+              >
+                Cancel
+              </button>
             </div>
-            <input type="file" id="fileElem" multiple accept="image/*" @change="handleFiles($event.target.files)">
+            <input
+              type="file"
+              id="fileElem"
+              multiple
+              accept="image/*"
+              @change="handleFiles($event.target.files)"
+            />
             <!-- <label class="button" for="fileElem">Select some files</label> -->
           </form>
           <div class="row" id="gallery">
             <div class="col-lg-4" v-for="image in uploadedImages" :key="image">
-              <img style="width:150px" :src="image" >
+              <img style="width: 150px" :src="image" />
               <a href="javascript:void(0)" @click="removeFromPrevie(image)">
-                <span class="start-100 translate-middle badge border border-light rounded-circle bg-danger">X</span>
+                <span
+                  class="
+                    start-100
+                    translate-middle
+                    badge
+                    border border-light
+                    rounded-circle
+                    bg-danger
+                  "
+                  >X</span
+                >
               </a>
             </div>
           </div>
-          <progress style="display: none" id="progress-bar" max=100 value=0></progress>
+          <progress
+            style="display: none"
+            id="progress-bar"
+            max="100"
+            value="0"
+          ></progress>
         </div>
       </div>
       <div class="wrap-chat" id="chat_body">
-          <div class="loading-bar" v-if="chatListLoader">
-            <div class="blue-bar"></div>
-          </div>
+        <div class="loading-bar" v-if="chatListLoader">
+          <div class="blue-bar"></div>
+        </div>
         <!-- v-chat-scroll="{smooth: true, notSmoothOnInit: true}" -->
-        <div class="chat" id="chat-container" v-bind:class="{ 'opacitynone': chatListLoader }">
+        <div
+          class="chat"
+          id="chat-container"
+          v-bind:class="{ opacitynone: chatListLoader }"
+        >
           <div v-if="activeChatData">
             <div v-for="message in messages" :key="message._id">
               <div
@@ -114,22 +183,38 @@
                   }"
                 ></div>
                 <div class="content">
-                  <span v-if="message.media && JSON.parse(message.media) && JSON.parse(message.media).length > 0">
-                    <span v-for="image in JSON.parse(message.media)" :key="image">
+                  <span
+                    v-if="
+                      message.media &&
+                      JSON.parse(message.media) &&
+                      JSON.parse(message.media).length > 0
+                    "
+                  >
+                    <span
+                      v-for="image in JSON.parse(message.media)"
+                      :key="image"
+                    >
                       <a @click="showImage(image)" href="javascript:void(0)">
-                        <img :src="image" alt="Image">
+                        <img :src="image" alt="Image" />
                       </a>
                     </span>
                   </span>
                   <span v-if="message.datatype === 'call'">
-                    <span v-if="message.type === 'send'"> <b-icon icon="telephone-outbound-fill"></b-icon>&nbsp;&nbsp; Outbound</span>
-                    <span v-else><b-icon icon="telephone-inbound-fill"></b-icon>&nbsp;&nbsp; Inbound</span>
-                    Call( {{getMMSS(message.duration) }} )
+                    <span v-if="message.type === 'send'">
+                      <b-icon icon="telephone-outbound-fill"></b-icon
+                      >&nbsp;&nbsp; Outbound</span
+                    >
+                    <span v-else
+                      ><b-icon icon="telephone-inbound-fill"></b-icon
+                      >&nbsp;&nbsp; Inbound</span
+                    >
+                    Call( {{ getMMSS(message.duration) }} )
                   </span>
                   <span v-else> {{ message.message }} </span>
                 </div>
                 <div class="time">
-                  {{ message.created_at | moment("LLL") }}  <!-- January 1, 2000 10:00 AM -->
+                  {{ message.created_at | moment("LLL") }}
+                  <!-- January 1, 2000 10:00 AM -->
                 </div>
               </div>
             </div>
@@ -156,52 +241,109 @@
               @click="sendSms()"
               style="height: 36px"
             >
-              <b-icon icon="arrow-right-circle-fill" aria-hidden="true"></b-icon>
+              <b-icon
+                icon="arrow-right-circle-fill"
+                aria-hidden="true"
+              ></b-icon>
             </div>
           </div>
         </div>
       </div>
     </section>
     <!-- modal -->
-    <b-modal ref="my-modal2" id="modal-2" size="lg" title="Compose Message" hide-footer>
-      <span class="small text-secondary">Input (+) and country code followed by the 10 digit phone number. If no country code is provided (+1) is assumed. Multiple numbers will be sent as Bulk SMS (individual sms's to recipients). <span class="small text-center">[Telnyx does not support group texting]</span></span>
+    <b-modal
+      ref="my-modal2"
+      id="modal-2"
+      size="lg"
+      title="Compose Message"
+      hide-footer
+    >
+      <span class="small text-secondary"
+        >Input (+) and country code followed by the 10 digit phone number. If no
+        country code is provided (+1) is assumed. Multiple numbers will be sent
+        as Bulk SMS (individual sms's to recipients).
+        <span class="small text-center"
+          >[Telnyx does not support group texting]</span
+        ></span
+      >
       <form @submit.prevent="handleSubmit2" class="ml-2 mr-2">
-        <v-select class="mt-4" v-model="selectedContact" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
+        <v-select
+          class="mt-4"
+          v-model="selectedContact"
+          @option:selected="contactChangeEvent($event)"
+          :options="searchContacts"
+        ></v-select>
         <div class="form-group mt-4">
-          <vue-tags-input class="form-control chat-input"
-               v-model="sms.numbers"
-              :tags="tags"
-              placeholder="Enter phone number"
-              @tags-changed="newTags => tags = newTags"
-            />
+          <vue-tags-input
+            class="form-control chat-input"
+            v-model="sms.numbers"
+            :tags="tags"
+            placeholder="Enter phone number"
+            @tags-changed="(newTags) => (tags = newTags)"
+          />
           <div v-if="tags.length <= 0" class="invalid-feedback">
             <span>Numbers are required</span>
           </div>
         </div>
         <div class="form-group mb-2 mt-4">
-          <textarea rows="8" class="form-control chat-input" v-model="sms.message" placeholder="Type Message here"  :class="{ 'is-invalid': submitted2 && $v.sms.message.$error }">
-            </textarea>
-          <div v-if="submitted2 && $v.sms.message.$error" class="invalid-feedback">
+          <textarea
+            rows="8"
+            class="form-control chat-input"
+            v-model="sms.message"
+            placeholder="Type Message here"
+            :class="{ 'is-invalid': submitted2 && $v.sms.message.$error }"
+          >
+          </textarea>
+          <div
+            v-if="submitted2 && $v.sms.message.$error"
+            class="invalid-feedback"
+          >
             <span v-if="!$v.sms.message.required">Message is required</span>
           </div>
         </div>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text paperClip chat-input" @click="choseFile2()" id="basic-addon1"><b-icon icon="paperclip" ></b-icon></span>
+            <span
+              class="input-group-text paperClip chat-input"
+              @click="choseFile2()"
+              id="basic-addon1"
+              ><b-icon icon="paperclip"></b-icon
+            ></span>
           </div>
-          <input type="text" class="form-control chat-input" @click="choseFile2()" placeholder="Choose file" aria-label="Username" readonly v-model="modelFileValu" aria-describedby="basic-addon1">
+          <input
+            type="text"
+            class="form-control chat-input"
+            @click="choseFile2()"
+            placeholder="Choose file"
+            aria-label="Username"
+            readonly
+            v-model="modelFileValu"
+            aria-describedby="basic-addon1"
+          />
         </div>
         <div class="form-group mb-2 mt-4 d-none">
-         <input type="file" id="model_file_input" class="form-control chat-input" multiple accept="image/*" @change="handleFiles($event.target.files, true)">
+          <input
+            type="file"
+            id="model_file_input"
+            class="form-control chat-input"
+            multiple
+            accept="image/*"
+            @change="handleFiles($event.target.files, true)"
+          />
         </div>
 
         <div class="d-grid d-md-flex">
-          <button class="btn btn-primary" type="submit" id="login-button">Send Message</button>
+          <button class="btn btn-primary" type="submit" id="login-button">
+            Send Message
+          </button>
         </div>
       </form>
     </b-modal>
     <div id="hidden" @click="hiddenImage()">
-      <div class="d-flex justify-content-center align-items-center" style="height:100vh; width:100vw">
+      <div
+        class="d-flex justify-content-center align-items-center"
+        style="height: 100vh; width: 100vw"
+      >
         <img class="img-fluid" alt="Responsive image" :src="zoomImage" />
       </div>
     </div>
@@ -209,25 +351,32 @@
   </div>
 </template>
 <script>
-import { required } from 'vuelidate/lib/validators'
-import NumberList from './inbox/NumberList.vue'
-import VueTagsInput from '@johmun/vue-tags-input'
-import ThemeButton from '@/components/ThemeButton.vue'
-import { post } from '../core/module/common.module'
-import Setting from './setting/Setting.vue'
-import CallView from '@/components/CallView.vue'
-import CheckDir from '@/components/CheckDir.vue'
-import { EventBus } from '@/event-bus'
-const io = require('socket.io-client')
+import { required } from "vuelidate/lib/validators";
+import NumberList from "./inbox/NumberList.vue";
+import VueTagsInput from "@johmun/vue-tags-input";
+import ThemeButton from "@/components/ThemeButton.vue";
+import { post } from "../core/module/common.module";
+import Setting from "./setting/Setting.vue";
+import CallView from "@/components/CallView.vue";
+import CheckDir from "@/components/CheckDir.vue";
+import { EventBus } from "@/event-bus";
+const io = require("socket.io-client");
 export default {
-  name: 'dashboard',
-  components: { NumberList, VueTagsInput, ThemeButton, Setting, CallView, CheckDir },
-  data () {
+  name: "dashboard",
+  components: {
+    NumberList,
+    VueTagsInput,
+    ThemeButton,
+    Setting,
+    CallView,
+    CheckDir,
+  },
+  data() {
     return {
       isLoading: false,
       fullPage: true,
       contacts: [],
-      selectedContact: '',
+      selectedContact: "",
       dropArea: null,
       progressBar: null,
       filesDone: 0,
@@ -236,12 +385,12 @@ export default {
       uploadedImages: [],
       activeChatData: false,
       activeProfile: null,
-      activeChat: '',
-      msg: 'Welcome to dashboard',
+      activeChat: "",
+      msg: "Welcome to dashboard",
       tags: [],
       sms: {
-        numbers: '',
-        message: ''
+        numbers: "",
+        message: "",
       },
       setting: {},
       chatListLoader: false,
@@ -250,486 +399,515 @@ export default {
       access_token: null,
       headers: null,
       messages: [],
-      messageBody: '',
+      messageBody: "",
       socket: null,
-      baseurl: '',
+      baseurl: "",
       vw: 0,
       vh: 0,
       modelMms: false,
-      modelFileValu: '',
-      zoomImage: '',
+      modelFileValu: "",
+      zoomImage: "",
       searchContacts: [],
-      activeCallTab: false
-    }
+      activeCallTab: false,
+    };
   },
-  created () {
-    window.addEventListener('resize', this.updateVw, {passive: true})
+  created() {
+    window.addEventListener("resize", this.updateVw, { passive: true });
   },
-  destroyed () {
-    window.removeEventListener('resize', this.updateVw, {passive: true})
+  destroyed() {
+    window.removeEventListener("resize", this.updateVw, { passive: true });
   },
   mounted: function () {
-    EventBus.$on('toggleLoader', () => {
-      this.toggleLoader()
-    })
-    EventBus.$on('contactAdded', (number) => {
+    EventBus.$on("toggleLoader", () => {
+      this.toggleLoader();
+    });
+    EventBus.$on("contactAdded", (number) => {
       if (this.activeChat._id === number) {
-        this.showChat(this.activeChat)
+        this.showChat(this.activeChat);
       }
-    })
-    EventBus.$on('changeProfile2', () => {
-      this.activeChat = null
-      this.activeCallTab = false
+    });
+    EventBus.$on("changeProfile2", () => {
+      this.activeChat = null;
+      this.activeCallTab = false;
       setTimeout(() => {
-        this.activeCallTab = true
-      }, 1500)
-    })
-    EventBus.$on('changeProfile', () => {
-      this.activeChat = null
-      this.activeCallTab = false
+        this.activeCallTab = true;
+      }, 1500);
+    });
+    EventBus.$on("changeProfile", () => {
+      this.activeChat = null;
+      this.activeCallTab = false;
       setTimeout(() => {
-        this.activeCallTab = true
-      }, 1500)
-    })
+        this.activeCallTab = true;
+      }, 1500);
+    });
 
-    if (!this.$cookie.get('access_token')) {
-      this.$router.push('/')
+    if (!this.$cookie.get("access_token")) {
+      this.$router.push("/");
     }
-    this.updateVw()
-    var baseUrl = window.location.origin
-    if (baseUrl === 'http://localhost:8080') {
-      this.baseurl = 'http://localhost:3000'
+    this.updateVw();
+    var baseUrl = window.location.origin;
+    if (baseUrl === "http://localhost:8080") {
+      this.baseurl = "http://localhost:3000";
     }
-    const socket = io(this.baseurl, {transports: ['websocket']})
-    this.socket = socket
-    var $this = this
-    this.socket.on('new_message', function (data) {
-      $this.getNumberList()
+    const socket = io(this.baseurl, { transports: ["websocket"] });
+    this.socket = socket;
+    var $this = this;
+    this.socket.on("new_message", function (data) {
+      $this.getNumberList();
       if ($this.activeChatData) {
-        $this.showChat($this.activeChat)
+        $this.showChat($this.activeChat);
       }
-    })
+    });
     // this.userdata = JSON.parse(localStorage.getItem('userdata'))
-    this.userdata = JSON.parse(this.$cookie.get('userdata'))
-    this.access_token = this.$cookie.get('access_token')
-    this.socket.emit('join_profile_channel', this.userdata._id.toString())
+    this.userdata = JSON.parse(this.$cookie.get("userdata"));
+    this.access_token = this.$cookie.get("access_token");
+    this.socket.emit("join_profile_channel", this.userdata._id.toString());
 
-    this.socket.on('user_message', function (data) {
+    this.socket.on("user_message", function (data) {
       if ($this.activeChatData) {
-        $this.showChat($this.activeChat)
+        $this.showChat($this.activeChat);
       } else {
-        $this.$refs.numberList.getOneProfile()
-        $this.$refs.numberList.refreshProfile()
+        $this.$refs.numberList.getOneProfile();
+        $this.$refs.numberList.refreshProfile();
       }
-      $this.$refs.numberList.getNumberList()
-      $this.notifyMe(data.number, data.message)
-    })
+      $this.$refs.numberList.getNumberList();
+      $this.notifyMe(data.number, data.message);
+    });
     this.headers = {
       headers: {
-        token: this.access_token
-      }
-    }
-    this.dropArea = document.getElementById('drop-area1')
-    ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      this.dropArea.addEventListener(eventName, this.preventDefaults, false)
-    })
-
-    ;['dragenter', 'dragover'].forEach(eventName => {
-      this.dropArea.addEventListener(eventName, this.highlight, false)
-    })
-
-    ;['dragleave', 'drop'].forEach(eventName => {
-      this.dropArea.addEventListener(eventName, this.unhighlight, false)
-    })
-    this.dropArea.addEventListener('drop', this.handleDrop, false)
-    this.progressBar = document.getElementById('progress-bar')
+        token: this.access_token,
+      },
+    };
+    this.dropArea = document.getElementById("drop-area1");
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+      this.dropArea.addEventListener(eventName, this.preventDefaults, false);
+    });
+    ["dragenter", "dragover"].forEach((eventName) => {
+      this.dropArea.addEventListener(eventName, this.highlight, false);
+    });
+    ["dragleave", "drop"].forEach((eventName) => {
+      this.dropArea.addEventListener(eventName, this.unhighlight, false);
+    });
+    this.dropArea.addEventListener("drop", this.handleDrop, false);
+    this.progressBar = document.getElementById("progress-bar");
   },
   validations: {
     sms: {
-      numbers: {required},
-      message: {required}
-    }
+      numbers: { required },
+      message: { required },
+    },
   },
   methods: {
-    addContact (number) {
-      EventBus.$emit('addContact', number)
+    addContact(number) {
+      EventBus.$emit("addContact", number);
     },
-    toggleLoader () {
+    toggleLoader() {
       if (this.isLoading) {
-        this.isLoading = false
+        this.isLoading = false;
       } else {
-        this.isLoading = true
+        this.isLoading = true;
       }
     },
-    makeCall () {
+    makeCall() {
       if (this.activeChat) {
-        this.$refs.callView.makeCall(this.activeChat._id)
+        this.$refs.callView.makeCall(this.activeChat._id);
       }
     },
-    messageRefresh () {
-      this.messages = []
+    messageRefresh() {
+      this.messages = [];
     },
-    contactChangeEvent (e) {
-      var inputText = {'text': e.code, 'tiClasses': ['ti-valid']}
-      this.tags.push(inputText)
+    contactChangeEvent(e) {
+      var inputText = { text: e.code, tiClasses: ["ti-valid"] };
+      this.tags.push(inputText);
       // this.sms.numbers = e.target.value
 
-      this.selectedContact = ''
+      this.selectedContact = "";
       // console.log(e.target.value)
     },
-    onaddContact (data) {
-      this.contacts = data
-      this.formatecontact(data)
+    onaddContact(data) {
+      this.contacts = data;
+      this.formatecontact(data);
     },
-    formatecontact (contacts) {
-      var arrContact = []
+    formatecontact(contacts) {
+      var arrContact = [];
       for (var i = 0; i < contacts.length; i++) {
-        var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}
-        arrContact.push(contact)
+        var contact = {
+          label: `${contacts[i].first_name} ${contacts[i].last_name}`,
+          code: contacts[i].number,
+        };
+        arrContact.push(contact);
       }
-      this.searchContacts = arrContact
+      this.searchContacts = arrContact;
     },
-    hiddenImage () {
-      this.zoomImage = ''
-      document.getElementById('hidden').style.display = 'none'
+    hiddenImage() {
+      this.zoomImage = "";
+      document.getElementById("hidden").style.display = "none";
     },
-    showImage (image) {
-      this.zoomImage = image
-      document.getElementById('hidden').style.display = 'block'
+    showImage(image) {
+      this.zoomImage = image;
+      document.getElementById("hidden").style.display = "block";
     },
-    choseFile2 () {
-      document.getElementById('model_file_input').click()
+    choseFile2() {
+      document.getElementById("model_file_input").click();
     },
-    file_upload () {
-      document.getElementById('fileElem').click()
+    file_upload() {
+      document.getElementById("fileElem").click();
     },
-    initializeProgress (numfiles) {
-      this.progressBar.value = 0
-      this.uploadProgress = []
+    initializeProgress(numfiles) {
+      this.progressBar.value = 0;
+      this.uploadProgress = [];
       for (let i = this.numFiles; i > 0; i--) {
-        this.uploadProgress.push(0)
+        this.uploadProgress.push(0);
       }
     },
-    updateProgress (fileNumber, percent) {
-      this.uploadProgress[fileNumber] = percent
-      let total = this.uploadProgress.reduce((tot, curr) => tot + curr, 0) / this.uploadProgress.length
-      this.progressBar.value = total
+    updateProgress(fileNumber, percent) {
+      this.uploadProgress[fileNumber] = percent;
+      let total =
+        this.uploadProgress.reduce((tot, curr) => tot + curr, 0) /
+        this.uploadProgress.length;
+      this.progressBar.value = total;
     },
-    progressDone () {
-      this.filesDone++
-      this.progressBar.value = this.filesDone / this.filesToDo * 100
+    progressDone() {
+      this.filesDone++;
+      this.progressBar.value = (this.filesDone / this.filesToDo) * 100;
     },
-    handleDrop (e) {
-      let dt = e.dataTransfer
-      let files = dt.files
+    handleDrop(e) {
+      let dt = e.dataTransfer;
+      let files = dt.files;
 
-      this.handleFiles(files)
+      this.handleFiles(files);
     },
-    handleFiles (files, modelFile = false) {
+    handleFiles(files, modelFile = false) {
       if (modelFile) {
-        this.modelMms = true
-        var filesData = []
+        this.modelMms = true;
+        var filesData = [];
         for (var i = 0; i < files.length; i++) {
-          filesData.push(files[i].name)
+          filesData.push(files[i].name);
         }
-        this.modelFileValu = filesData.join()
+        this.modelFileValu = filesData.join();
       } else {
-        this.modelMms = false
+        this.modelMms = false;
       }
-      files = [...files]
-      this.initializeProgress(files.length)
-      files.forEach(this.uploadFile)
+      files = [...files];
+      this.initializeProgress(files.length);
+      files.forEach(this.uploadFile);
     },
-    previewFile (file) {
-      let reader = new FileReader()
-      reader.readAsDataURL(file)
+    previewFile(file) {
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
       reader.onloadend = function () {
-        let img = document.createElement('img')
-        img.style.width = '150px'
-        img.src = reader.result
-        document.getElementById('gallery').appendChild(img)
-      }
+        let img = document.createElement("img");
+        img.style.width = "150px";
+        img.src = reader.result;
+        document.getElementById("gallery").appendChild(img);
+      };
     },
-    removeFromPrevie (image) {
-      var images = []
+    removeFromPrevie(image) {
+      var images = [];
       for (var i = 0; i < this.uploadedImages.length; i++) {
         if (this.uploadedImages[i] !== image) {
-          images.push(this.uploadedImages[i])
+          images.push(this.uploadedImages[i]);
         }
       }
-      this.uploadedImages = images
+      this.uploadedImages = images;
       if (this.uploadedImages.length <= 0) {
-        document.getElementById('drop-area').style.display = 'none'
+        document.getElementById("drop-area").style.display = "none";
       }
     },
-    uploadFile (file, i) {
-      var url = `${this.baseurl}/api/media/upload-files`
-      var xhr = new XMLHttpRequest()
-      var formData = new FormData()
-      xhr.open('POST', url, true)
-      xhr.setRequestHeader('token', this.access_token)
-      var $this = this
-      xhr.upload.addEventListener('progress', function (e) {
-        $this.updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
-      })
+    uploadFile(file, i) {
+      var url = `${this.baseurl}/api/media/upload-files`;
+      var xhr = new XMLHttpRequest();
+      var formData = new FormData();
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("token", this.access_token);
+      var $this = this;
+      xhr.upload.addEventListener("progress", function (e) {
+        $this.updateProgress(i, (e.loaded * 100.0) / e.total || 100);
+      });
 
-      xhr.addEventListener('readystatechange', function (e) {
+      xhr.addEventListener("readystatechange", function (e) {
         if (xhr.readyState === 4 && xhr.status === 200) {
-          var response = JSON.parse(xhr.responseText)
-          $this.uploadedImages.push(`${response.data.media}`)
+          var response = JSON.parse(xhr.responseText);
+          $this.uploadedImages.push(`${response.data.media}`);
         } else if (xhr.readyState === 4 && xhr.status !== 200) {
         }
-      })
+      });
 
-      formData.append('file', file)
-      xhr.send(formData)
+      formData.append("file", file);
+      xhr.send(formData);
     },
-    highlight (e) {
-      document.getElementById('drop-area').style.display = 'block'
-      this.dropArea.classList.add('highlight')
+    highlight(e) {
+      document.getElementById("drop-area").style.display = "block";
+      this.dropArea.classList.add("highlight");
     },
-    unhighlight (e) {
-      this.dropArea.classList.remove('highlight')
+    unhighlight(e) {
+      this.dropArea.classList.remove("highlight");
     },
-    preventDefaults (e) {
-      e.preventDefault()
-      e.stopPropagation()
+    preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
     },
-    activeProfileView (profile) {
+    activeProfileView(profile) {
       if (profile.refresh !== undefined && profile.refresh) {
-        this.messages = []
+        this.messages = [];
       }
-      this.activeProfile = profile
+      this.activeProfile = profile;
     },
-    onClickChild (value) {
-      this.firstChatShow(value)
+    onClickChild(value) {
+      this.firstChatShow(value);
     },
-    notifyMe (user, message) {
-      let msgIcon = require(`@/assets/img/icon.png`)
-      if (!('Notification' in window)) {
-        alert('This browser does not support desktop notification')
-      } else if (Notification.permission === 'granted') {
+    notifyMe(user, message) {
+      let msgIcon = require(`@/assets/img/icon.png`);
+      if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+      } else if (Notification.permission === "granted") {
         var options = {
           body: message,
-          dir: 'auto',
-          icon: msgIcon
-        }
+          dir: "auto",
+          icon: msgIcon,
+        };
         // eslint-disable-next-line no-new
-        new Notification('Message from ' + user, options)
-      } else if (Notification.permission !== 'denied') {
+        new Notification("Message from " + user, options);
+      } else if (Notification.permission !== "denied") {
         Notification.requestPermission(function (permission) {
-          if (!('permission' in Notification)) {
-            Notification.permission = permission
+          if (!("permission" in Notification)) {
+            Notification.permission = permission;
           }
-          if (permission === 'granted') {
+          if (permission === "granted") {
             var options = {
               body: message,
-              dir: 'auto',
-              icon: msgIcon
-            }
+              dir: "auto",
+              icon: msgIcon,
+            };
             // eslint-disable-next-line no-new
-            new Notification('Message from ' + user, options)
+            new Notification("Message from " + user, options);
           }
-        })
+        });
       }
     },
-    deletechat () {
+    deletechat() {
       // eslint-disable-next-line no-undef
-      this.$swal.fire({
-        icon: 'info',
-        title: 'Do you want to delete this chat?',
-        showDenyButton: true,
-        showCancelButton: false,
-        confirmButtonText: `Yes, Delete`,
-        denyButtonText: `No`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          var messageData = {user: this.userdata._id, number: this.activeChat}
-          var request = {
-            data: messageData,
-            url: 'setting/message-list-delete'
-          }
-          this.$store
-            .dispatch(post, request)
-            .then((response) => {
-              if (this.activeChatData) {
-                this.showChat(this.activeChat)
-              }
-              this.$refs.numberList.getNumberList()
-            })
-            .catch((e) => {
-              console.log(e)
-            })
-        } else if (result.isDenied) {
-          // eslint-disable-next-line no-undef
-          this.$swal.fire('chat not deleted', '', 'info')
-        }
-      })
-    },
-    sendSms () {
-      this.isLoading = true
-      if (this.messageBody.trim() === '' && this.uploadedImages.length === 0) {
-        this.$swal({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Message or file required'
+      this.$swal
+        .fire({
+          icon: "info",
+          title: "Do you want to delete this chat?",
+          showDenyButton: true,
+          showCancelButton: false,
+          confirmButtonText: `Yes, Delete`,
+          denyButtonText: `No`,
         })
-        this.isLoading = false
-        return
+        .then((result) => {
+          if (result.isConfirmed) {
+            var messageData = {
+              user: this.userdata._id,
+              number: this.activeChat,
+            };
+            var request = {
+              data: messageData,
+              url: "setting/message-list-delete",
+            };
+            this.$store
+              .dispatch(post, request)
+              .then((response) => {
+                if (this.activeChatData) {
+                  this.showChat(this.activeChat);
+                }
+                this.$refs.numberList.getNumberList();
+              })
+              .catch((e) => {
+                console.log(e);
+              });
+          } else if (result.isDenied) {
+            // eslint-disable-next-line no-undef
+            this.$swal.fire("chat not deleted", "", "info");
+          }
+        });
+    },
+    sendSms() {
+      this.isLoading = true;
+      if (this.messageBody.trim() === "" && this.uploadedImages.length === 0) {
+        this.$swal({
+          icon: "error",
+          title: "Oops...",
+          text: "Message or file required",
+        });
+        this.isLoading = false;
+        return;
       }
-      var activechat = JSON.parse(localStorage.getItem('activenumber'))
-      var numbers = [ activechat._id ]
-      this.commonSendMessage(numbers, this.messageBody)
+      var activechat = JSON.parse(localStorage.getItem("activenumber"));
+      var numbers = [activechat._id];
+      this.commonSendMessage(numbers, this.messageBody);
     },
-    hideImageDrag () {
-      this.uploadedImages = []
-      document.getElementById('drop-area').style.display = 'none'
+    hideImageDrag() {
+      this.uploadedImages = [];
+      document.getElementById("drop-area").style.display = "none";
     },
-    commonSendMessage (numbers, message) {
-      var messageData = {user: this.userdata._id, numbers: numbers, message: message, profile: this.activeProfile, media: this.uploadedImages}
+    commonSendMessage(numbers, message) {
+      var messageData = {
+        user: this.userdata._id,
+        numbers: numbers,
+        message: message,
+        profile: this.activeProfile,
+        media: this.uploadedImages,
+      };
       var request = {
         data: messageData,
-        url: 'setting/send-sms'
-      }
+        url: "setting/send-sms",
+      };
       this.$store
         .dispatch(post, request)
         .then((response) => {
           if (response) {
-            this.messageBody = ''
-            this.sms.numbers = ''
-            this.sms.message = ''
-            this.uploadedImages = []
-            this.modelFileValu = ''
-            document.getElementById('drop-area').style.display = 'none'
-            this.tags = []
-            this.$refs.numberList.getNumberList()
+            this.messageBody = "";
+            this.sms.numbers = "";
+            this.sms.message = "";
+            this.uploadedImages = [];
+            this.modelFileValu = "";
+            document.getElementById("drop-area").style.display = "none";
+            this.tags = [];
+            this.$refs.numberList.getNumberList();
             // this.showChat(activechat)
             if (this.activeChatData) {
-              this.showChat(this.activeChat)
+              this.showChat(this.activeChat);
             }
-            this.$refs['my-modal2'].hide()
+            this.$refs["my-modal2"].hide();
             if (this.vw < 576) {
-              this.$refs['mySidebar2'].hide()
+              this.$refs["mySidebar2"].hide();
             }
           }
-          this.isLoading = false
+          this.isLoading = false;
         })
         .catch((e) => {
-          console.log(e)
-        })
+          console.log(e);
+        });
     },
-    firstChatShow (activechat) {
-      this.chatListLoader = true
-      var element = document.getElementById(activechat._id)
+    firstChatShow(activechat) {
+      this.chatListLoader = true;
+      var element = document.getElementById(activechat._id);
       if (element) {
-        element.remove()
+        element.remove();
       }
-      this.showChat(activechat)
-      document.getElementById('drop-area').style.display = 'none'
-      this.uploadedImages = []
+      this.showChat(activechat);
+      document.getElementById("drop-area").style.display = "none";
+      this.uploadedImages = [];
       if (this.vw < 576) {
-        this.$refs['mySidebar2'].hide()
+        this.$refs["mySidebar2"].hide();
       }
     },
-    showChat (activechat) {
-      this.activeChat = activechat
-      this.activeChatData = true
+    showChat(activechat) {
+      this.activeChat = activechat;
+      this.activeChatData = true;
+      let { telnyx_number, _id } = activechat;
       var request = {
-        data: {user: this.userdata._id, number: activechat, profile: this.activeProfile},
-        url: 'setting/message-list'
-      }
+        data: {
+          user: this.userdata._id,
+          number: { telnyx_number, _id },
+          profile: this.activeProfile?.id,
+        },
+        url: "setting/message-list",
+      };
       this.$store
         .dispatch(post, request)
         .then((response) => {
           if (response) {
-            this.messages = response
+            this.messages = response;
             // var container = this.$el.querySelector('#chat-container')
             // container.scrollTop = container.scrollHeight
             setTimeout(() => {
-              var scroll = document.getElementById('chat-container')
-              scroll.scrollTop = scroll.scrollHeight
-              scroll.animate({scrollTop: scroll.scrollHeight})
-              this.chatListLoader = false
-            }, 1000)
-            this.$refs.numberList.refreshProfile()
-            this.$refs.numberList.getOneProfile()
+              var scroll = document.getElementById("chat-container");
+              scroll.scrollTop = scroll.scrollHeight;
+              scroll.animate({ scrollTop: scroll.scrollHeight });
+              this.chatListLoader = false;
+            }, 1000);
+            this.$refs.numberList.refreshProfile();
+            this.$refs.numberList.getOneProfile();
           }
         })
         .catch((e) => {
-          console.log(e)
-        })
+          console.log(e);
+        });
     },
-    handleSubmit2 (e) {
-      this.submitted2 = true
-      this.$v.$touch()
-      this.isLoading = true
+    handleSubmit2(e) {
+      this.submitted2 = true;
+      this.$v.$touch();
+      this.isLoading = true;
       if (this.tags.length <= 0) {
         this.$swal({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'please enter number!'
-        })
-        return
+          icon: "error",
+          title: "Oops...",
+          text: "please enter number!",
+        });
+        return;
       }
-      var numbers = []
+      var numbers = [];
       for (var i = 0; i < this.tags.length; i++) {
-        numbers.push(this.tags[i].text)
+        numbers.push(this.tags[i].text);
       }
       // return
       if (!this.$v.sms.message.$error || this.uploadedImages.length > 0) {
-        this.commonSendMessage(numbers, this.sms.message)
+        this.commonSendMessage(numbers, this.sms.message);
       } else {
         this.$swal({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Message or file required!'
-        })
-        this.isLoading = false
+          icon: "error",
+          title: "Oops...",
+          text: "Message or file required!",
+        });
+        this.isLoading = false;
       }
     },
-    updateVw () {
-      this.vw = this.getVw()
-      this.vh = this.getVh()
-      var chatHeight = this.vh - 120
-      document.getElementById('wrapbody').style.height = `${this.vh}px`
-      document.getElementById('chat_body').style.height = `${chatHeight}px`
+    updateVw() {
+      this.vw = this.getVw();
+      this.vh = this.getVh();
+      var chatHeight = this.vh - 120;
+      document.getElementById("wrapbody").style.height = `${this.vh}px`;
+      document.getElementById("chat_body").style.height = `${chatHeight}px`;
     },
-    getVw () {
-      return Math.round(Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0))
+    getVw() {
+      return Math.round(
+        Math.max(
+          document.documentElement.clientWidth || 0,
+          window.innerWidth || 0
+        )
+      );
     },
-    getVh () {
-      return Math.round(Math.max(document.documentElement.innerHeight || 0, window.innerHeight || 0))
+    getVh() {
+      return Math.round(
+        Math.max(
+          document.documentElement.innerHeight || 0,
+          window.innerHeight || 0
+        )
+      );
     },
-    getMMSS (time) {
+    getMMSS(time) {
       // Hours, minutes and seconds
-      var mins = ~~((time % 3600) / 60)
-      var secs = ~~time % 60
+      var mins = ~~((time % 3600) / 60);
+      var secs = ~~time % 60;
 
       // Output like "1:01" or "4:03:59" or "123:03:59"
-      var ret = ''
-      ret += '' + mins + ':' + (secs < 10 ? '0' : '')
-      ret += '' + secs
-      return ret
-    }
-  }
-}
+      var ret = "";
+      ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+      ret += "" + secs;
+      return ret;
+    },
+  },
+};
 </script>
 <style scoped>
-.opacitynone{
+.opacitynone {
   opacity: 0;
 }
-  .activeImageArea{
-    display: block !important;
-  }
-  .icons{
+.activeImageArea {
+  display: block !important;
+}
+.icons {
   font-size: 30px;
-  }
-  .chat_loader{
+}
+.chat_loader {
   width: 100%;
   max-width: 100%;
-  }
+}
 
-  #drop-area {
+#drop-area {
   border: 2px dashed #ccc;
   border-radius: 20px;
   height: 75vh;
@@ -767,7 +945,7 @@ p {
 #fileElem {
   display: none;
 }
-.paperClip{
+.paperClip {
   border-radius: 0% !important;
   border-top-left-radius: 5px !important;
   border-bottom-left-radius: 5px !important;
@@ -775,15 +953,15 @@ p {
   border-right: 1px solid black;
 }
 #hidden {
-    z-index:9999;
-    display:none;
-    /*background-color:#fff;*/
-    position:fixed;
-    height:100%;
-    width:100%;
-    left: 0px;
-    top: 0px;
-    text-align: center;
+  z-index: 9999;
+  display: none;
+  /*background-color:#fff;*/
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  left: 0px;
+  top: 0px;
+  text-align: center;
 }
 /* .wrap-container{
   width: 100%;
@@ -824,7 +1002,7 @@ p {
     transform: rotate(359deg);
   }
 }
-#loader{
+#loader {
   position: absolute;
   background: white;
   height: 100%;
@@ -832,12 +1010,11 @@ p {
   z-index: 2050;
   top: 0;
   left: 0;
-  opacity: .3;
+  opacity: 0.3;
 }
-.loader{
+.loader {
   height: 100%;
-  width:100%;
+  width: 100%;
   z-index: 2100;
 }
-
 </style>

@@ -53,7 +53,7 @@
                  <a href="https://github.com/0perationPrivacy/" target="_blank" rel="noopener noreferrer" aria-label="Github" title="Github">
                   <b-icon font-scale="2" icon="github" variant="secondary" class="mx-2"></b-icon>
                  </a>
-                 <a href="https://www.OperationPrivacy.com/Donate" target="_blank" rel="noopener noreferrer" aria-label="Donate" title="Donate">
+                 <a href="https://www.OperationPrivacy.com/donate" target="_blank" rel="noopener noreferrer" aria-label="Donate" title="Donate">
                   <b-icon font-scale="2" icon="credit-card" variant="secondary" class="mx-2"></b-icon>
                  </a>
               </div>

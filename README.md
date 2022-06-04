@@ -1,3 +1,4 @@
+
 - For instructions, visit [https://inteltechniques.com/voip.suite.html](https://inteltechniques.com/voip.suite.html)
 - Or the [Wiki](https://github.com/0perationPrivacy/voip/wiki) section.
 
@@ -12,3 +13,7 @@
   - **XMR (Monero):** 899MAgiqJpx6p2gKiizokTKY18o1arRddLXmojVt55A1caQZrHW24AiZoZ2zNJJtr7RAct8cXiwNbUcg9HMXtwTsHJCyXUt
 
 ![VoIP-Suite](https://user-images.githubusercontent.com/89225730/134289428-da8bcf88-5145-4ed6-9d6b-70d57b084e8f.png)
+
+
+![GitHub forks](https://img.shields.io/github/forks/0perationPrivacy/voip?style=flat-square)
+![GitHub](https://img.shields.io/github/license/0perationPrivacy/voip?style=flat-square)

@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const algorithm = "aes-256-cbc"; 
+const algorithm = "aes-256-cbc";
 const nodemailer = require("nodemailer")
 const twilio = require('twilio')
 
@@ -11,7 +11,7 @@ const encryptedString = (message) => {
             const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
             let encryptedData = cipher.update(message, "utf-8", "hex");
             resolve(encryptedData);
-        }catch (e){
+        } catch (e) {
             console.log(e);
             resolve(false);
         }
@@ -25,14 +25,14 @@ const decryptedString = (message) => {
             const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
             let encryptedData = cipher.update(message, "utf-8", "hex");
             resolve(encryptedData);
-        }catch (e){
+        } catch (e) {
             console.log(e);
             resolve(false);
         }
     });
 }
 
-const sendEmail = (setting,email) => {
+const sendEmail = (setting, email) => {
     return new Promise(async (resolve) => {
         try {
             let transporter = nodemailer.createTransport({
@@ -40,7 +40,7 @@ const sendEmail = (setting,email) => {
                 port: setting.port, // 587,
                 secure: setting.secure, // true for 465, false for other ports
                 auth: {
-                    user:  setting.email, // process.env.EMAIL, // generated ethereal user
+                    user: setting.email, // process.env.EMAIL, // generated ethereal user
                     pass: setting.password, // process.env.PASSWORD, // generated ethereal password
                 },
             });
@@ -48,11 +48,11 @@ const sendEmail = (setting,email) => {
                 from: setting.sender_email, // sender address
                 to: setting.to_email, // list of receivers
                 subject: email.subject, // Subject line
-                text:  email.email, // plain text body
+                text: email.email, // plain text body
                 html: email.html
             });
             resolve(true);
-        }catch (e){
+        } catch (e) {
             console.log(e);
             resolve(false);
         }
@@ -69,13 +69,23 @@ const creatTwiml = (sid, token) => {
                 friendlyName: 'operationprivacy VoIPSuite '
             })
             resolve(twiml.sid)
-        }catch (e){
+        } catch (e) {
             console.log(e);
             resolve(false);
         }
     });
 }
 
+const cleanUrl = (url, endpoint) => {
+    let clean_url = url.replace(/([^:]\/)\/+/g, "$1");
+    return clean_url + endpoint;
+}
+
+
 module.exports = {
-    encryptedString, decryptedString, sendEmail, creatTwiml
+    encryptedString,
+    decryptedString,
+    sendEmail,
+    creatTwiml,
+    cleanUrl,
 }

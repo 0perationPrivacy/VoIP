@@ -6,8 +6,8 @@ const creatTwiml = (sid, token) => {
             const client = twilio(sid, token);
             var twiml = await client.applications.create({
                 voiceMethod: 'POST',
-                voiceUrl: `${process.env.BASE_URL.trim()}api/call/make-call`,
-                statusCallback: `${process.env.BASE_URL.trim()}api/call/status`,
+                voiceUrl: `${process.env.BASE_URL.trim()}/api/call/make-call`,
+                statusCallback: `${process.env.BASE_URL.trim()}/api/call/status`,
                 statusCallbackMethod: 'POST',
                 friendlyName: 'Operationprivacy VoIPSuite'
             })
@@ -26,8 +26,8 @@ const updateTwiml = (sid, token, twimlsid) => {
             var twiml = await client.applications(twimlsid)
                     .update({
                         voiceMethod: 'POST',
-                        voiceUrl: `${process.env.BASE_URL.trim()}api/call/make-call`,
-                        statusCallback: `${process.env.BASE_URL.trim()}api/call/status`,
+                        voiceUrl: `${process.env.BASE_URL.trim()}/api/call/make-call`,
+                        statusCallback: `${process.env.BASE_URL.trim()}/api/call/status`,
                         statusCallbackMethod: 'POST',
                     })
             resolve(twiml.sid)

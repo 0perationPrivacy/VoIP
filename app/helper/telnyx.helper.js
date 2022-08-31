@@ -38,9 +38,9 @@ const createTexmlApp = (apiKey) => {
           };
         var data = {
             "friendly_name": moment().format('YYYYMMDDHHmm'),
-            "voice_url" : `${process.env.BASE_URL.trim()}api/call/telnyx`,
+            "voice_url" : `${process.env.BASE_URL.trim()}/api/call/telnyx`,
             "voice_method" : 'post',
-            "status_callback" :`${process.env.BASE_URL.trim()}api/call/status/telnyx`,
+            "status_callback" :`${process.env.BASE_URL.trim()}/api/call/status/telnyx`,
             "status_callback_method": 'post'
         }
         var response = await requestCurl('POST',url,headers, data);
@@ -57,9 +57,9 @@ const updateTexmlApp = (apiKey, twimlid) => {
             'Authorization': `Bearer ${apiKey}`
           };
         var data = {
-            "voice_url" : `${process.env.BASE_URL.trim()}api/call/telnyx`,
+            "voice_url" : `${process.env.BASE_URL.trim()}/api/call/telnyx`,
             "voice_method" : 'post',
-            "status_callback" :`${process.env.BASE_URL.trim()}api/call/status/telnyx`,
+            "status_callback" :`${process.env.BASE_URL.trim()}/api/call/status/telnyx`,
             "status_callback_method": 'post'
         }
         var response = await requestCurl('PATCH',url,headers, data);
@@ -91,7 +91,7 @@ const createSIPApp = (apiKey, userid, outboundProfileid) => {
                 connection_name: `sip${moment().format('YYYYMMDDHHmm')}`,
                 user_name: `user${moment().format('YYYYMMDDHHmm')}`,
                 password: password,
-                webhook_event_url: `${process.env.BASE_URL.trim()}api/call/status/telnyx`,
+                webhook_event_url: `${process.env.BASE_URL.trim()}/api/call/status/telnyx`,
                 outbound: { outbound_voice_profile_id:  outboundProfileid},
                 sip_uri_calling_preference: 'unrestricted'
             });
@@ -109,7 +109,7 @@ const updateSIPApp = (apiKey, uuid, outboundProfileid) => {
             const telnyx = Telnyx(apiKey);
             const { data: credentialConnection } = await telnyx.credentialConnections.retrieve(uuid);
             credentialConnection.update({ 
-                webhook_event_url: `${process.env.BASE_URL.trim()}api/call/status/telnyx`,
+                webhook_event_url: `${process.env.BASE_URL.trim()}/api/call/status/telnyx`,
                 outbound: { outbound_voice_profile_id:  outboundProfileid},
                 sip_uri_calling_preference: 'unrestricted'
             });

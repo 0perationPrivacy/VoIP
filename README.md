@@ -15,7 +15,7 @@
 ![VoIP-Suite](https://user-images.githubusercontent.com/89225730/134289428-da8bcf88-5145-4ed6-9d6b-70d57b084e8f.png)
 
 
-![VoIP-Suite-Overview](https://user-images.githubusercontent.com/89225730/204441937-90dff7cb-23fb-4dc3-9078-285964c658cb.png)
+![VoIP-Suite-Overview](https://user-images.githubusercontent.com/89225730/204443981-d89391f3-b832-4f55-840e-32c665d9b4c1.png)
 
 
 ![GitHub forks](https://img.shields.io/github/forks/0perationPrivacy/voip?style=flat-square)

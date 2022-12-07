@@ -393,7 +393,7 @@ exports.getNumber = async (req, res) => {
             let validation = new Validator(req.body, rules);
             if (validation.passes()) {
                 var phoneNumber = await telnyx(req.body.api_key).phoneNumbers.list();
-                res.send({ status: true, message: 'number list!', data: phoneNumber });
+                res.send({ status: true, message: 'Phone number list retrieved.', data: phoneNumber });
             } else {
                 res.status(419).send({ status: false, errors: validation.errors, data: [] });
             }
@@ -406,7 +406,7 @@ exports.getNumber = async (req, res) => {
             if (validation.passes()) {
                 const client = new twilio(req.body.twilio_sid, req.body.twilio_token);
                 const numbers = await client.incomingPhoneNumbers.list()
-                res.send({ status: true, message: 'number list!', data: numbers });
+                res.send({ status: true, message: 'Phone number list retrieved.', data: numbers });
             } else {
                 res.status(419).send({ status: false, errors: validation.errors, data: [] });
             }

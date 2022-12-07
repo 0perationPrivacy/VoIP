@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
                         status = 'hardwarekey';
                         // harwarekey = false
                         harwarekey = await Hardwarekey.find({ user:user._id, registrationComplete: true });
-                        // res.send({status:'hardwarekey', message:'user data!', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
+                        // res.send({status:'hardwarekey', message:'Successfully logged in.', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
                     } else
                     if(user.mfa && user.mfa === 'true'){
                         status = 'mfa';
@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
                         harwarekey = false;
                         mfa = false;
                     }   
-                    res.send({status:status, message:'user data!', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
+                    res.send({status:status, message:'Successfully logged in.', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
                     return;
                 }else{
                     res.status(401).json({status:'false',message:'Unauthorized Access!'});

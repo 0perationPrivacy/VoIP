@@ -397,6 +397,7 @@ exports.getNumber = async (req, res) => {
             } else {
                 res.status(419).send({ status: false, errors: validation.errors, data: [] });
             }
+            
         } else if (req.body.type == 'twilio') {
             let rules = {
                 twilio_sid: 'required',

@@ -648,7 +648,7 @@ exports.receiveSms = async (req, res) => {
                     messageData2.contact = contact2._id
                 }
             }
-            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber, toNumber: toNumber });
+            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber, toNumber: toNumber, toUser: settingCheck.user });
             if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
                 var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
                 if (emailSetting) {

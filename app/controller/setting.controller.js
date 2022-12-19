@@ -397,7 +397,7 @@ exports.getNumber = async (req, res) => {
             } else {
                 res.status(419).send({ status: false, errors: validation.errors, data: [] });
             }
-            
+
         } else if (req.body.type == 'twilio') {
             let rules = {
                 twilio_sid: 'required',
@@ -648,7 +648,7 @@ exports.receiveSms = async (req, res) => {
                     messageData2.contact = contact2._id
                 }
             }
-            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber });
+            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber, toNumber: toNumber });
             if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
                 var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
                 if (emailSetting) {

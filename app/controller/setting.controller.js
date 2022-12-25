@@ -636,19 +636,20 @@ exports.receiveSms = async (req, res) => {
                 setting: settingCheck._id,
                 media: JSON.stringify(media)
             };
+
             var contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
+
             if (contact) {
                 messageData2.contact = contact._id
             } else {
-                var fromnumber2 = fromnumber.slice(-10)
-                // console.log(fromnumber2)
-                var contact2 = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber2 } });
-                // console.log(contact2)
-                if (contact2) {
-                    messageData2.contact = contact2._id
+                fromnumber = fromnumber.slice(-10)
+                contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
+                if (contact) {
+                    messageData2.contact = contact._id
                 }
             }
-            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber, toNumber: toNumber, toUser: settingCheck.user });
+
+            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber, toNumber: toNumber, toUser: settingCheck.user, contact });
             if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
                 var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
                 if (emailSetting) {

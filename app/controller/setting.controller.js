@@ -651,11 +651,13 @@ exports.receiveSms = async (req, res) => {
 
             global.io.to(settingCheck.user.toString()).emit('user_message', {
                 message: messageText,
-                _id: fromnumber,
-                toNumber: toNumber,
+                number: fromnumber,
+                telnyx_number: toNumber,
                 toUser: settingCheck.user,
                 contact,
-                ...messageData2,
+                type: 'receive',
+                status: 'received',
+                isview: false,
             });
             if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
                 var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })

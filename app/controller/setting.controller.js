@@ -649,7 +649,14 @@ exports.receiveSms = async (req, res) => {
                 }
             }
 
-            global.io.to(settingCheck.user.toString()).emit('user_message', { message: messageText, number: fromnumber, toNumber: toNumber, toUser: settingCheck.user, contact });
+            global.io.to(settingCheck.user.toString()).emit('user_message', {
+                message: messageText,
+                _id: fromnumber,
+                toNumber: toNumber,
+                toUser: settingCheck.user,
+                contact,
+                ...messageData2,
+            });
             if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
                 var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
                 if (emailSetting) {
@@ -667,7 +674,8 @@ exports.receiveSms = async (req, res) => {
 
             }
             // global.io.to(settingCheck.number).emit('new_message',{message: messageText, number:fromnumber});
-            Message.create(messageData2);
+            let messageSavedResponse = await Message.create(messageData2);
+            console.log('messageSavedResponse ===:', messageSavedResponse)
         }
         const VoiceResponse = twilio.twiml.VoiceResponse;
         const response = new VoiceResponse();

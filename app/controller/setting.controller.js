@@ -642,7 +642,6 @@ exports.receiveSms = async (req, res) => {
             if (contact) {
                 messageData2.contact = contact._id
             } else {
-                fromnumber = fromnumber.slice(-10)
                 contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
                 if (contact) {
                     messageData2.contact = contact._id
@@ -664,9 +663,9 @@ exports.receiveSms = async (req, res) => {
                 if (emailSetting) {
                     try {
                         var emailData = {
-                            subject: 'Message received from ' + fromnumber,
+                            subject: `Message received from ${fromnumber}`,
                             text: 'Message received',
-                            html: `Received Message: <br><p>${messageText}</p>`,
+                            html: `Received Message on ${toNumber}: <br><p>${messageText}</p>`,
                         };
                         commonHelper.sendEmail(emailSetting, emailData);
                     } catch (error) {

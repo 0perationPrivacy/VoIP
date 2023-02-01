@@ -665,7 +665,7 @@ exports.receiveSms = async (req, res) => {
                         var emailData = {
                             subject: `Message from ${fromnumber}`,
                             text: 'Message received',
-                            html: `Received Message on ${toNumber}: <br>-----------<br><p>${messageText}</p><br>-----------<br>`,
+                            html: `Received Message on ${toNumber}:<br><hr><br><p>${messageText}</p><br><hr><br>`,
                         };
                         commonHelper.sendEmail(emailSetting, emailData);
                     } catch (error) {

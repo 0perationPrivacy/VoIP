@@ -66,7 +66,7 @@ const creatTwiml = (sid, token) => {
             var twiml = await client.applications.create({
                 voiceMethod: 'POST',
                 voiceUrl: '',
-                friendlyName: 'operationprivacy VoIPSuite '
+                friendlyName: 'Operation Privacy VoIPSuite'
             })
             resolve(twiml.sid)
         }catch (e){

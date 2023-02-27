@@ -657,7 +657,9 @@ exports.receiveSms = async (req, res) => {
                 type: 'receive',
                 status: 'received',
                 isview: false,
+                profile:settingCheck?.profile
             });
+            console.log('profile ===>',settingCheck?.profile);
             if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
                 var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
                 if (emailSetting) {

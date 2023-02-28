@@ -758,42 +758,6 @@ exports.receiveSms = async (req, res) => {
                     savedName = `${process.env.BASE_URL.trim()}${name}`
                     fackMedia.push(savedName)*/
         }
-<<<<<<< HEAD
-        media = fackMedia;
-      }
-    } else {
-      var messageData = req.body.data.payload;
-      var toNumber = messageData.to[0].phone_number;
-      var fromnumber = messageData.from.phone_number;
-      var sid = messageData.id;
-      var messageText = messageData.text;
-      if (messageData.media.length > 0) {
-        var fackMedia = [];
-        for (var i = 0; i < messageData.media.length; i++) {
-          const url = messageData.media[i].url; // link to file you want to download
-          // var name = `uploads/${Date.now()}${sid}.png`;
-          if (messageData.media[i].content_type == "image/gif") {
-            var name = `${crypto.randomBytes(24).toString("hex")}.gif`;
-          } else if (messageData.media[i].content_type == "image/jpeg") {
-            var name = `${crypto.randomBytes(24).toString("hex")}.jpg`;
-          } else {
-            var name = `${crypto.randomBytes(24).toString("hex")}.png`;
-          }
-
-          var date = moment(new Date()).format("MMDDYYYY");
-          try {
-            await fs.promises.access("./uploads/" + date);
-          } catch (e) {
-            await fs.promises.mkdir("./uploads/" + date);
-          }
-
-          request(url)
-            .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
-            .on("close", () => console.log("Image downloaded."));
-          savedName = `${process.env.BASE_URL.trim()}uploads/${date}/${name}`;
-          fackMedia.push(savedName);
-          // fackMedia.push(messageData.media[i].url)
-=======
         var settingCheck = await Setting.findOne({ number: { $eq: toNumber } })
         if (settingCheck) {
             var messageData2 = {
@@ -851,7 +815,6 @@ exports.receiveSms = async (req, res) => {
             // global.io.to(settingCheck.number).emit('new_message',{message: messageText, number:fromnumber});
             let messageSavedResponse = await Message.create(messageData2);
             console.log('messageSavedResponse ===:', messageSavedResponse)
->>>>>>> cff57e92bd25abff5a1fbd9706bd2e986aee94fd
         }
         media = fackMedia;
       }

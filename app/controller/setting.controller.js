@@ -758,6 +758,7 @@ exports.receiveSms = async (req, res) => {
                     savedName = `${process.env.BASE_URL.trim()}${name}`
                     fackMedia.push(savedName)*/
         }
+<<<<<<< HEAD
         media = fackMedia;
       }
     } else {
@@ -792,6 +793,65 @@ exports.receiveSms = async (req, res) => {
           savedName = `${process.env.BASE_URL.trim()}uploads/${date}/${name}`;
           fackMedia.push(savedName);
           // fackMedia.push(messageData.media[i].url)
+=======
+        var settingCheck = await Setting.findOne({ number: { $eq: toNumber } })
+        if (settingCheck) {
+            var messageData2 = {
+                sid: sid,
+                user: settingCheck.user,
+                number: fromnumber,
+                telnyx_number: toNumber,
+                type: 'receive',
+                status: 'received',
+                isview: 'false',
+                message: messageText,
+                setting: settingCheck._id,
+                media: JSON.stringify(media)
+            };
+
+            var contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
+
+            if (contact) {
+                messageData2.contact = contact._id
+            } else {
+                contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
+                if (contact) {
+                    messageData2.contact = contact._id
+                }
+            }
+
+            global.io.to(settingCheck.user.toString()).emit('user_message', {
+                message: messageText,
+                number: fromnumber,
+                telnyx_number: toNumber,
+                toUser: settingCheck.user,
+                contact,
+                type: 'receive',
+                status: 'received',
+                isview: false,
+                profile:settingCheck?.profile
+            });
+            console.log('profile ===>',settingCheck?.profile);
+            if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
+                var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
+                if (emailSetting) {
+                    try {
+                        var emailData = {
+                            subject: `Message from ${fromnumber}`,
+                            text: 'Message received',
+                            html: `Received Message on ${toNumber}:<br><hr><br><p>${messageText}</p><br><hr><br>`,
+                        };
+                        commonHelper.sendEmail(emailSetting, emailData);
+                    } catch (error) {
+                        // console.log(error)
+                    }
+                }
+
+            }
+            // global.io.to(settingCheck.number).emit('new_message',{message: messageText, number:fromnumber});
+            let messageSavedResponse = await Message.create(messageData2);
+            console.log('messageSavedResponse ===:', messageSavedResponse)
+>>>>>>> cff57e92bd25abff5a1fbd9706bd2e986aee94fd
         }
         media = fackMedia;
       }

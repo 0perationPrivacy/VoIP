@@ -758,63 +758,40 @@ exports.receiveSms = async (req, res) => {
                     savedName = `${process.env.BASE_URL.trim()}${name}`
                     fackMedia.push(savedName)*/
         }
-        var settingCheck = await Setting.findOne({ number: { $eq: toNumber } })
-        if (settingCheck) {
-            var messageData2 = {
-                sid: sid,
-                user: settingCheck.user,
-                number: fromnumber,
-                telnyx_number: toNumber,
-                type: 'receive',
-                status: 'received',
-                isview: 'false',
-                message: messageText,
-                setting: settingCheck._id,
-                media: JSON.stringify(media)
-            };
+        media = fackMedia;
+      }
+    } else {
+      var messageData = req.body.data.payload;
+      var toNumber = messageData.to[0].phone_number;
+      var fromnumber = messageData.from.phone_number;
+      var sid = messageData.id;
+      var messageText = messageData.text;
+      if (messageData.media.length > 0) {
+        var fackMedia = [];
+        for (var i = 0; i < messageData.media.length; i++) {
+          const url = messageData.media[i].url; // link to file you want to download
+          // var name = `uploads/${Date.now()}${sid}.png`;
+          if (messageData.media[i].content_type == "image/gif") {
+            var name = `${crypto.randomBytes(24).toString("hex")}.gif`;
+          } else if (messageData.media[i].content_type == "image/jpeg") {
+            var name = `${crypto.randomBytes(24).toString("hex")}.jpg`;
+          } else {
+            var name = `${crypto.randomBytes(24).toString("hex")}.png`;
+          }
 
-            var contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
+          var date = moment(new Date()).format("MMDDYYYY");
+          try {
+            await fs.promises.access("./uploads/" + date);
+          } catch (e) {
+            await fs.promises.mkdir("./uploads/" + date);
+          }
 
-            if (contact) {
-                messageData2.contact = contact._id
-            } else {
-                contact = await Contact.findOne({ user: { $eq: settingCheck.user }, number: { $eq: fromnumber } });
-                if (contact) {
-                    messageData2.contact = contact._id
-                }
-            }
-
-            global.io.to(settingCheck.user.toString()).emit('user_message', {
-                message: messageText,
-                number: fromnumber,
-                telnyx_number: toNumber,
-                toUser: settingCheck.user,
-                contact,
-                type: 'receive',
-                status: 'received',
-                isview: false,
-                profile:settingCheck
-            });
-            console.log('profile ===>',settingCheck);
-            if (settingCheck.emailnotification !== undefined && settingCheck.emailnotification == 'true') {
-                var emailSetting = await Email.findOne({ user: { $eq: settingCheck.user } })
-                if (emailSetting) {
-                    try {
-                        var emailData = {
-                            subject: `Message from ${fromnumber}`,
-                            text: 'Message received',
-                            html: `Received Message on ${toNumber}:<br><hr><br><p>${messageText}</p><br><hr><br>`,
-                        };
-                        commonHelper.sendEmail(emailSetting, emailData);
-                    } catch (error) {
-                        // console.log(error)
-                    }
-                }
-
-            }
-            // global.io.to(settingCheck.number).emit('new_message',{message: messageText, number:fromnumber});
-            let messageSavedResponse = await Message.create(messageData2);
-            console.log('messageSavedResponse ===:', messageSavedResponse)
+          request(url)
+            .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
+            .on("close", () => console.log("Image downloaded."));
+          savedName = `${process.env.BASE_URL.trim()}uploads/${date}/${name}`;
+          fackMedia.push(savedName);
+          // fackMedia.push(messageData.media[i].url)
         }
         media = fackMedia;
       }
@@ -873,9 +850,9 @@ exports.receiveSms = async (req, res) => {
         if (emailSetting) {
           try {
             var emailData = {
-              subject: `Message received from ${fromnumber}`,
+              subject: `Message from ${fromnumber}`,
               text: "Message received",
-              html: `Received Message on ${toNumber}: <br><p>${messageText}</p>`,
+              html: `Received Message on ${toNumber}:<br><hr><br><p>${messageText}</p><br><hr><br>`,
             };
             commonHelper.sendEmail(emailSetting, emailData);
           } catch (error) {

@@ -1,0 +1,8 @@
+docker-compose.yaml
+Dockerfile
+*.md
+!version.md
+LICENSE
+robots.txt
+.github
+mongodb

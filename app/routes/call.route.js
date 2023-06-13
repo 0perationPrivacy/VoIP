@@ -11,7 +11,7 @@ module.exports = app => {
     //calling route
     router.post("/make-call", call.makeCall);
     router.post("/status", call.status);
-    router.post("/incomming", call.incomming);
+    router.post("/incoming", call.incoming);
     router.post("/telnyx", call.telnyx);
     router.post("/status/telnyx", call.statusTelnyx);
     

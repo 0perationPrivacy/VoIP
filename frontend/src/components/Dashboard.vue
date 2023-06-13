@@ -33,7 +33,7 @@
         </div>
         <number-list
           ref="numberList"
-          @onaddContact="onaddContact"
+          @onAddContact="onAddContact"
           @activeChat="activeProfileView"
           @clicked="onClickChild"
         />
@@ -42,7 +42,7 @@
     <section class="col-auto col-md-4 d-none d-sm-block">
       <number-list
         ref="numberList"
-        @onaddContact="onaddContact"
+        @onAddContact="onAddContact"
         @activeChat="activeProfileView"
         @clicked="onClickChild"
         v-if="vw >= 576"
@@ -97,7 +97,7 @@
             <b-icon font-scale="2" icon="telephone" aria-hidden="true"></b-icon>
           </span>
           &nbsp;&nbsp;&nbsp;
-          <span style="cursor: pointer" @click="deletechat()" title="Delete">
+          <span style="cursor: pointer" @click="deleteChat()" title="Delete">
             <b-icon font-scale="2" icon="trash" aria-hidden="true"></b-icon>
           </span>
         </div>
@@ -232,7 +232,7 @@
                 v-model="messageBody"
                 v-on:keyup.enter="sendSms"
               />
-              <a class="m-2" @click="file_upload()" href="javascript:void(0)">
+              <a class="m-2" @click="fileUpload()" href="javascript:void(0)">
                 <b-icon icon="paperclip" scale="2"></b-icon>
               </a>
             </div>
@@ -524,11 +524,11 @@ export default {
       this.selectedContact = "";
       // console.log(e.target.value)
     },
-    onaddContact(data) {
+    onAddContact(data) {
       this.contacts = data;
-      this.formatecontact(data);
+      this.formatContact(data);
     },
-    formatecontact(contacts) {
+    formatContact(contacts) {
       var arrContact = [];
       for (var i = 0; i < contacts.length; i++) {
         var contact = {
@@ -550,7 +550,7 @@ export default {
     choseFile2() {
       document.getElementById("model_file_input").click();
     },
-    file_upload() {
+    fileUpload() {
       document.getElementById("fileElem").click();
     },
     initializeProgress(numfiles) {
@@ -685,7 +685,7 @@ export default {
         });
       }
     },
-    deletechat() {
+    deleteChat() {
       // eslint-disable-next-line no-undef
       this.$swal
         .fire({
@@ -802,7 +802,7 @@ export default {
         data: {
           user: this.userdata._id,
           number: { telnyx_number, _id },
-          profile: this.activeProfile?.id,
+          profile: this.activeProfile.id,
         },
         url: "setting/message-list",
       };

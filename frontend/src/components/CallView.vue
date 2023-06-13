@@ -14,7 +14,7 @@
                     <div v-if="!connection">
                       <v-select class="mb-2" v-model="selectedContact" @option:selected="contactChangeEvent($event)" :options="searchContacts"></v-select>
                       <b-form-group id="input-group-1" style="margin-bottom: 0;">
-                        <b-form-input class="chat-input" id="dailer_number" v-model="number" type="number" required style="" ></b-form-input>
+                        <b-form-input class="chat-input" id="dialer_number" v-model="number" type="number" required style="" ></b-form-input>
                       </b-form-group>
                     </div>
                     <div v-else>
@@ -39,19 +39,19 @@
                     <div>
                       <div class="d-flex justify-content-between mt-4">
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(1)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(1)">
                             <p class="number font-weight-bolder mb-0">1</p>
                             <p class="alpha hide"></p>
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(2)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(2)">
                             <p class="number font-weight-bolder mb-0">2</p>
                             <p class="alpha">abc</p>
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(3)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(3)">
                             <p class="number font-weight-bolder">3</p>
                             <p class="alpha">def</p>
                           </a>
@@ -60,19 +60,19 @@
 
                       <div class="d-flex justify-content-between">
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(4)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(4)">
                             <p class="number font-weight-bolder">4</p>
                             <p class="alpha">ghi</p>
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(5)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(5)">
                             <p class="number font-weight-bolder">5</p>
                             <p class="alpha">jkl</p>
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(6)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(6)">
                             <p class="number font-weight-bolder">6</p>
                             <p class="alpha">mno</p>
                           </a>
@@ -80,19 +80,19 @@
                       </div>
                       <div class="d-flex justify-content-between">
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(7)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(7)">
                             <p class="number font-weight-bolder">7</p>
                             <p class="alpha">pqrs</p>
                           </a>
                         </div>
                           <div>
-                            <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(8)">
+                            <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(8)">
                               <p class="number font-weight-bolder">8</p>
                               <p class="alpha">tuv</p>
                             </a>
                           </div>
                           <div>
-                            <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(9)">
+                            <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(9)">
                               <p class="number font-weight-bolder">9</p>
                               <p class="alpha">wxyz</p>
                             </a>
@@ -102,16 +102,16 @@
                       <div class="d-flex justify-content-between">
                         <div>
                           <a class="btn btn-light-primary dialer-btn2">
-                              <p class="number font-weight-bolder" @click="clickDailer('*')">*</p>
+                              <p class="number font-weight-bolder" @click="clickDialer('*')">*</p>
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer(0)">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer(0)">
                               <p class="number font-weight-bolder">0</p>
                           </a>
                         </div>
                         <div>
-                          <a class="btn btn-light-primary dialer-btn2" @click="clickDailer('#')">
+                          <a class="btn btn-light-primary dialer-btn2" @click="clickDialer('#')">
                               <p class="number font-weight-bolder">#</p>
                           </a>
                         </div>
@@ -187,7 +187,7 @@ export default {
     }
   },
   async mounted () {
-    this.formatecontact(this.contacts)
+    this.formatContact(this.contacts)
     // console.log(this.contacts)
     EventBus.$on('clicked', () => {
       // this.clickHandler()
@@ -223,10 +223,10 @@ export default {
           Device.disconnect((connection) => {
             console.log('Awaiting incoming call...')
             this.call_text = 'Awaiting incoming call...'
-            callPannel.dissconnected()
+            callPannel.disconnected()
           })
           Device.cancel((device) => {
-            callPannel.dissconnected()
+            callPannel.disconnected()
             // callPannel.$refs['my-modal'].hide()
           })
           Device.error((error) => {
@@ -378,7 +378,7 @@ export default {
         Device.disconnectAll()
       } else {
         // this.connection.hangup()
-        this.dissconnected()
+        this.disconnected()
       }
       this.connection = null
       this.incoming = false
@@ -418,7 +418,7 @@ export default {
       this.ss = '00'
       clearInterval(this.userDuration)
     },
-    dissconnected () {
+    disconnected () {
       this.stopTimer()
       if (this.callType === 'twilio') {
         Device.disconnectAll()
@@ -430,9 +430,9 @@ export default {
       this.connection = null
     },
     callHangup () {
-      this.dissconnected()
+      this.disconnected()
     },
-    clickDailer (number) {
+    clickDialer (number) {
       if (this.connection) {
         console.log(number)
         if (this.callType === 'twilio') {
@@ -471,7 +471,7 @@ export default {
 
       }
     },
-    formatecontact (contacts) {
+    formatContact (contacts) {
       var arrContact = []
       for (var i = 0; i < contacts.length; i++) {
         var contact = {label: `${contacts[i].first_name} ${contacts[i].last_name}`, code: contacts[i].number}
@@ -482,7 +482,7 @@ export default {
   },
   watch: {
     contacts: function (newVal, oldVal) {
-      this.formatecontact(newVal)
+      this.formatContact(newVal)
     }
   },
   beforeDestroy: function () {

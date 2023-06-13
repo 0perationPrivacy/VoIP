@@ -6,3 +6,4 @@ LICENSE
 robots.txt
 .github
 mongodb
+node_modules

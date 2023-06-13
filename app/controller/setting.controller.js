@@ -407,7 +407,7 @@ exports.create = async (req, res) => {
                   process.env.BASE_URL.trim() +
                   "api/setting/receive-sms/" +
                   req.body.type,
-                voiceUrl: process.env.BASE_URL.trim() + "api/call/incomming",
+                voiceUrl: process.env.BASE_URL.trim() + "api/call/incoming",
                 statusCallback: process.env.BASE_URL.trim() + "api/call/status",
                 voiceApplicationSid: "",
               };

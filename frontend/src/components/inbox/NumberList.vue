@@ -11,7 +11,7 @@
           <div class="d-flex flex-row bd-highlight">
             <setting></setting>
             <div class="bd-highlight">
-              <contact :contacts="contacts" @onaddContact="onaddContact"></contact>
+              <contact :contacts="contacts" @onAddContact="onAddContact"></contact>
             </div>
             <div class="bd-highlight">
               <b-icon font-scale="1" icon="telephone" aria-hidden="true" class="m-2" title="Call" @click="$bvModal.show('modal-tall')"  style="cursor:pointer;"></b-icon>
@@ -413,7 +413,7 @@ export default {
         token: this.access_token
       }
     }
-    this.onaddContact()
+    this.onAddContact()
     var $this = this
     PullToRefresh.init({
       mainElement: '.contact-list',
@@ -470,7 +470,7 @@ export default {
         }
       })
     },
-    onaddContact () {
+    onAddContact () {
       var request = {
         url: 'contact/get-all'
       }
@@ -480,7 +480,7 @@ export default {
         .then((data) => {
           if (data) {
             this.contacts = data.data
-            this.$emit('onaddContact', data.data)
+            this.$emit('onAddContact', data.data)
           }
         })
         .catch((e) => {

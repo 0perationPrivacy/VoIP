@@ -57,7 +57,7 @@
                       </div>
                       <div>
                         <b-icon icon="pencil-square" title="Update" style="cursor: pointer;" @click="updateContact(contact)"></b-icon>
-                        <b-icon icon="trash-fill" title="Delete" style="cursor: pointer;" @click="deletechat(contact._id)"></b-icon>
+                        <b-icon icon="trash-fill" title="Delete" style="cursor: pointer;" @click="deleteChat(contact._id)"></b-icon>
                       </div>
                     </li>
                   </ul>
@@ -306,7 +306,7 @@ export default {
           if (data) {
             this.$refs['modal-contact'].hide()
             // this.getContacts()
-            this.$emit('onaddContact', true)
+            this.$emit('onAddContact', true)
             EventBus.$emit('contactAdded', this.form.number)
             this.emptyContact()
             this.submitted = false
@@ -330,7 +330,7 @@ export default {
           .dispatch(post, request)
           .then((data) => {
             this.$refs['modal-contact'].hide()
-            this.$emit('onaddContact', true)
+            this.$emit('onAddContact', true)
             this.modelFileValu = ''
           })
           .catch((e) => {
@@ -344,7 +344,7 @@ export default {
         })
       }
     },
-    deletechat (id) {
+    deleteChat (id) {
       // eslint-disable-next-line no-undef
       this.$swal.fire({
         icon: 'info',
@@ -367,7 +367,7 @@ export default {
                 title: 'Success',
                 text: 'Contact Deleted successfully!'
               })
-              this.$emit('onaddContact', true)
+              this.$emit('onAddContact', true)
               EventBus.$emit('contactAdded', 'delete')
               // this.getContacts()
               // this.$refs['modal-contact'].hide()
@@ -416,7 +416,7 @@ export default {
                 title: 'Success',
                 text: 'All contacts deleted successfully'
               })
-              this.$emit('onaddContact', true)
+              this.$emit('onAddContact', true)
               // this.getContacts()
               // this.$refs['modal-contact'].hide()
             })

@@ -236,7 +236,7 @@ exports.statusTelnyx = async (req, res) => {
     res.send(callXml);
 };
 
-exports.incomming = async (req, res) => {
+exports.incoming = async (req, res) => {
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const response = new VoiceResponse();
     try{

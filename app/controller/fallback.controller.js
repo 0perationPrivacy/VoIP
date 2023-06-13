@@ -27,7 +27,7 @@ exports.twilioTwimlFallback = async (req, res) => {
                     sid: checkSetting.twilio_sid,
                     token: checkSetting.twilio_token,
                     numbersid: checkSetting.sid,
-                    voice_url: req.body.url+'/api/call/incomming',
+                    voice_url: req.body.url+'/api/call/incoming',
                     sms_url: req.body.url+'/api/setting/receive-sms/twilio'
                 }
                 await twilioHelper.numberFallbackUpdate(updateData2);

@@ -1,0 +1,30 @@
+---
+version: "3.1"
+
+services:
+  mongo:
+    container_name: voip-suite-db
+    image: mongo:4.4.6 #this does not require AVX
+    # https://github.com/turnkeylinux/tracker/issues/1724
+    #image: mongo:latest # v5+ requires AVX
+    restart: always
+    volumes:
+      - "./mongodb/db:/data/db"
+      - "./mongodb/configdb:/data/configdb"
+    logging:
+      options:
+        max-size: 1g
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  voip:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    container_name: voip-suite-app
+    links:
+      - mongo
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

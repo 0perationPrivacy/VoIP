@@ -1,6 +1,13 @@
 const Validator = require('validatorjs');
+const openpgp = require('openpgp');
 var Email = require('../model/email.model');
 var Setting = require('../model/setting.model');
+
+const _validPgpKey = async (keyString) => {
+    return new Promise(async (resolve, reject) => {
+        await openpgp.readKey({ armoredKey: keyString }).then(resolve).catch(reject);
+    });
+}
 
 exports.create = async (req, res) => {
     try{
@@ -18,6 +25,14 @@ exports.create = async (req, res) => {
         if(validation.passes()){
             var storeData = {user: req.user.id};
             var checkemail = await Email.findOne(storeData)
+            if (req.body.pgpEncryptEnabled === true) {
+                try {
+                    await _validPgpKey(req.body.pgpPublicKey);
+                } catch (error) {
+                    res.status(400).json({status:false, message:'Email settings not saved! Invalid PGP Key.'});
+                    return;
+                }
+            }
             if(checkemail){
                 checkemail.email = req.body.email
                 checkemail.password = req.body.password
@@ -26,6 +41,8 @@ exports.create = async (req, res) => {
                 checkemail.port = req.body.port
                 checkemail.secure = req.body.secure
                 checkemail.sender_email = req.body.sender_email
+                checkemail.pgpPublicKey = req.body.pgpPublicKey
+                checkemail.pgpEncryptEnabled = req.body.pgpEncryptEnabled
                 var saveData = await checkemail.save()
                 if(saveData){
                     res.send({status:true, message:'Email settings updated!', data:checkemail});

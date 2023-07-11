@@ -46,6 +46,18 @@
                 Secure
               </b-form-checkbox>
             </div>
+            <div class="form-group mt-2">
+              <textarea class="form-control" name="pgpPublicKey" v-model="form.pgpPublicKey" placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----..." :class="{ 'is-invalid': submitted3 && form.pgpEncryptEnabled && !form.pgpPublicKey }">
+              </textarea>
+              <div v-if="form.pgpEncryptEnabled && !form.pgpPublicKey" class="invalid-feedback">
+                    <span v-if="form.pgpEncryptEnabled && !form.pgpPublicKey">Public PGP Key Required</span>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+              <b-form-checkbox v-model="form.pgpEncryptEnabled"  name="pgpEncryptEnabled" :value="true" plain v-b-tooltip.hover.bottomright="'for PGP encrypted emails'" variant="primary">
+                Encrypt with PGP
+              </b-form-checkbox>
+            </div>
             <div class="form-group">
                 <button class="btn btn-success mt-2" type="submit">Save</button>
             </div>
@@ -81,7 +93,9 @@ export default {
         to_email: '',
         host: '',
         port: '',
-        secure: false
+        secure: false,
+        pgpEncryptEnabled: false,
+        pgpPublicKey: ''
       },
       submitted3: false,
       showProfile: false,
@@ -167,6 +181,8 @@ export default {
             this.form.port = ''
             this.form.secure = false
             this.form.sender_email = ''
+            this.form.pgpEncryptEnabled = false
+            this.form.pgpPublicKey = ''
           }
         })
         .catch((e) => {

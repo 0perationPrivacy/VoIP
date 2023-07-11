@@ -63,7 +63,10 @@ exports.fileUpload = async (req, res) => {
 
                 var media = await Media.create(mediaData);
                 if (media) {
-                    media.media = `${process.env.BASE_URL.trim()}${media.media}`
+                    media.media = path.join(
+                      process.env.BASE_URL.trim(),
+                      media.media
+                    );
                     res.send({ status: true, message: 'Media upload!', data: media });
                 } else {
                     res.status(400).json({ status: 'false', message: 'Media not uploaded!' });

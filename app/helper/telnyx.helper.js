@@ -2,6 +2,7 @@ const Telnyx = require('telnyx');
 var axios = require('axios');
 const moment = require('moment');
 const crypto = require('crypto')
+const path = require('path');
 //Inside lib file declare functions
 const requestCurl = (method,url,headers,data=null) => {
     return new Promise((resolve) => {
@@ -37,12 +38,15 @@ const createTexmlApp = (apiKey) => {
             'Authorization': `Bearer ${apiKey}`
           };
         var data = {
-            "friendly_name": moment().format('YYYYMMDDHHmm'),
-            "voice_url" : `${process.env.BASE_URL.trim()}api/call/telnyx`,
-            "voice_method" : 'post',
-            "status_callback" :`${process.env.BASE_URL.trim()}api/call/status/telnyx`,
-            "status_callback_method": 'post'
-        }
+          friendly_name: moment().format("YYYYMMDDHHmm"),
+          voice_url: path.join(process.env.BASE_URL.trim(), "api/call/telnyx"),
+          voice_method: "post",
+          status_callback: path.join(
+            process.env.BASE_URL.trim(),
+            "api/call/status/telnyx"
+          ),
+          status_callback_method: "post",
+        };
         var response = await requestCurl('POST',url,headers, data);
         resolve(response);
     });
@@ -57,11 +61,14 @@ const updateTexmlApp = (apiKey, twimlid) => {
             'Authorization': `Bearer ${apiKey}`
           };
         var data = {
-            "voice_url" : `${process.env.BASE_URL.trim()}api/call/telnyx`,
-            "voice_method" : 'post',
-            "status_callback" :`${process.env.BASE_URL.trim()}api/call/status/telnyx`,
-            "status_callback_method": 'post'
-        }
+          voice_url: path.join(process.env.BASE_URL.trim(), "api/call/telnyx"),
+          voice_method: "post",
+          status_callback: path.join(
+            process.env.BASE_URL.trim(),
+            "api/call/status/telnyx"
+          ),
+          status_callback_method: "post",
+        };
         var response = await requestCurl('PATCH',url,headers, data);
         resolve(response);
     });
@@ -87,14 +94,18 @@ const createSIPApp = (apiKey, userid, outboundProfileid) => {
             const telnyx = Telnyx(apiKey);
             // In Node 10
             var password = crypto.randomBytes(16).toString('hex');
-            const credentialConnection = await telnyx.credentialConnections.create({
-                connection_name: `sip${moment().format('YYYYMMDDHHmm')}`,
-                user_name: `user${moment().format('YYYYMMDDHHmm')}`,
+            const credentialConnection =
+              await telnyx.credentialConnections.create({
+                connection_name: `sip${moment().format("YYYYMMDDHHmm")}`,
+                user_name: `user${moment().format("YYYYMMDDHHmm")}`,
                 password: password,
-                webhook_event_url: `${process.env.BASE_URL.trim()}api/call/status/telnyx`,
-                outbound: { outbound_voice_profile_id:  outboundProfileid},
-                sip_uri_calling_preference: 'unrestricted'
-            });
+                webhook_event_url: path.join(
+                  process.env.BASE_URL.trim(),
+                  "api/call/status/telnyx"
+                ),
+                outbound: { outbound_voice_profile_id: outboundProfileid },
+                sip_uri_calling_preference: "unrestricted",
+              });
             resolve(credentialConnection);
         }catch(error){
             console.log(error)
@@ -108,10 +119,13 @@ const updateSIPApp = (apiKey, uuid, outboundProfileid) => {
         try{
             const telnyx = Telnyx(apiKey);
             const { data: credentialConnection } = await telnyx.credentialConnections.retrieve(uuid);
-            credentialConnection.update({ 
-                webhook_event_url: `${process.env.BASE_URL.trim()}api/call/status/telnyx`,
-                outbound: { outbound_voice_profile_id:  outboundProfileid},
-                sip_uri_calling_preference: 'unrestricted'
+            credentialConnection.update({
+              webhook_event_url: path.join(
+                process.env.BASE_URL.trim(),
+                "api/call/status/telnyx"
+              ),
+              outbound: { outbound_voice_profile_id: outboundProfileid },
+              sip_uri_calling_preference: "unrestricted",
             });
             resolve(true);
         }catch(error){

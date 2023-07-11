@@ -1,9 +1,17 @@
 
 # Changelog
 
-> Note: Every update deletes the MMS media files/folder that's stored locally and not in the database.
+> Note: Every update deletes the MMS media files and folder which is stored locally in your ephemeral cloud hosted service and not stored in the database.
 
 ---
+## v0.91 (Jul 11, 2022)
+### Feature
+- Ability to send PGP Encrypted email notifications of smses received
+### Bug Fixes
+- fixed a few leading slash issues
+- fixed hitting enter on OTP
+- fixed path url 404 not found on new registrations
+- added example in .env for custom application path for url obscurity purposes
 
 ## v0.90 (Jan 2, 2022)
 ### Feature

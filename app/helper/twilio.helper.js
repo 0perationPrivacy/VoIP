@@ -1,16 +1,23 @@
 const twilio = require('twilio')
+const path = require('path');
 
 const creatTwiml = (sid, token) => {
     return new Promise(async (resolve) => {
         try {
             const client = twilio(sid, token);
             var twiml = await client.applications.create({
-                voiceMethod: 'POST',
-                voiceUrl: `${process.env.BASE_URL.trim()}api/call/make-call`,
-                statusCallback: `${process.env.BASE_URL.trim()}api/call/status`,
-                statusCallbackMethod: 'POST',
-                friendlyName: 'Operationprivacy VoIPSuite'
-            })
+              voiceMethod: "POST",
+              voiceUrl: path.join(
+                process.env.BASE_URL.trim(),
+                "api/call/make-call"
+              ),
+              statusCallback: path.join(
+                process.env.BASE_URL.trim(),
+                "api/call/status"
+              ),
+              statusCallbackMethod: "POST",
+              friendlyName: "Operationprivacy VoIPSuite",
+            });
             resolve(twiml.sid)
         }catch (e){
             console.log(e);
@@ -23,13 +30,18 @@ const updateTwiml = (sid, token, twimlsid) => {
     return new Promise(async (resolve) => {
         try {
             const client = twilio(sid, token);
-            var twiml = await client.applications(twimlsid)
-                    .update({
-                        voiceMethod: 'POST',
-                        voiceUrl: `${process.env.BASE_URL.trim()}api/call/make-call`,
-                        statusCallback: `${process.env.BASE_URL.trim()}api/call/status`,
-                        statusCallbackMethod: 'POST',
-                    })
+            var twiml = await client.applications(twimlsid).update({
+              voiceMethod: "POST",
+              voiceUrl: path.join(
+                process.env.BASE_URL.trim(),
+                "api/call/make-call"
+              ),
+              statusCallback: path.join(
+                process.env.BASE_URL.trim(),
+                "api/call/status"
+              ),
+              statusCallbackMethod: "POST",
+            });
             resolve(twiml.sid)
         }catch (e){
             console.log(e);

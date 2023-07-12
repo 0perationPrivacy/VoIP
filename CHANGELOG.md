@@ -4,7 +4,7 @@
 > Note: Every update deletes the MMS media files and folder which is stored locally in your ephemeral cloud hosted service and not stored in the database.
 
 ---
-## v0.91 (Jul 11, 2022)
+## v0.91 (Jul 11, 2023)
 ### Feature
 - Ability to send PGP Encrypted email notifications of smses received
 ### Bug Fixes

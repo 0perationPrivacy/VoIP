@@ -128,7 +128,8 @@ export default {
     },
     getsignup () {
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/auth/get-signup`, {})
+      const url = path.join(`${this.baseurl}`, `/api/auth/get-signup`)
+      axios.post(url, {})
         .then(response => {
           if (response.data.data === 'on') {
             this.signUpOption = true

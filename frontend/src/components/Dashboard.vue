@@ -361,6 +361,7 @@ import CallView from "@/components/CallView.vue";
 import CheckDir from "@/components/CheckDir.vue";
 import { EventBus } from "@/event-bus";
 const io = require("socket.io-client");
+const path = require("path");
 export default {
   name: "dashboard",
   components: {
@@ -615,7 +616,7 @@ export default {
       }
     },
     uploadFile(file, i) {
-      var url = `${this.baseurl}/api/media/upload-files`;
+      var url = path.join(`${this.baseurl}`, `/api/media/upload-files`);
       var xhr = new XMLHttpRequest();
       var formData = new FormData();
       xhr.open("POST", url, true);

@@ -360,7 +360,8 @@ import Setting from "./setting/Setting.vue";
 import CallView from "@/components/CallView.vue";
 import CheckDir from "@/components/CheckDir.vue";
 import { EventBus } from "@/event-bus";
-const io = require("socket.io-client");
+// const io = require("socket.io-client");
+import { io } from "socket.io-client";
 export default {
   name: "dashboard",
   components: {

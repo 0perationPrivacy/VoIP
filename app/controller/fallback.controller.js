@@ -3,6 +3,7 @@ var Setting = require('../model/setting.model');
 
 const telnyxHelper = require('../helper/telnyx.helper')
 const twilioHelper = require('../helper/twilio.helper');
+const { combineURLs } = require('../helper/common.helper')
 
 exports.twilioTwimlFallback = async (req, res) => {
     try{
@@ -19,7 +20,7 @@ exports.twilioTwimlFallback = async (req, res) => {
                     sid: checkSetting.twilio_sid,
                     token: checkSetting.twilio_token,
                     twimlsid: checkSetting.twiml_app,
-                    url: req.body.url+'/api/call/make-call'
+                    url: combineURLs(req.body.url, '/api/call/make-call')
                 }
                 await twilioHelper.twimlFallbackUpdate(updateData);
 
@@ -27,8 +28,8 @@ exports.twilioTwimlFallback = async (req, res) => {
                     sid: checkSetting.twilio_sid,
                     token: checkSetting.twilio_token,
                     numbersid: checkSetting.sid,
-                    voice_url: req.body.url+'/api/call/incomming',
-                    sms_url: req.body.url+'/api/setting/receive-sms/twilio'
+                    voice_url: combineURLs(req.body.url, '/api/call/incomming'),
+                    sms_url: combineURLs(req.body.url, '/api/setting/receive-sms/twilio)')
                 }
                 await twilioHelper.numberFallbackUpdate(updateData2);
 
@@ -146,21 +147,21 @@ exports.telnyxMessageFallback = async (req, res) => {
                 var updateData = {
                     apiKey: checkSetting.api_key,
                     setting: checkSetting.setting,
-                    url: req.body.url+'/api/setting/receive-sms/telnyx'
+                    url: combineURLs(req.body.url, '/api/setting/receive-sms/telnyx')
                 }
                 await telnyxHelper.messageProfileFallback(updateData);
 
                 var updateData2 = {
                     apiKey: checkSetting.api_key,
                     twimlid: checkSetting.telnyx_twiml,
-                    url: req.body.url+'/api/call/telnyx'
+                    url: combineURLs(req.body.url, '/api/call/telnyx')
                 }
                 await telnyxHelper.texmlAppFalback(updateData2);
 
                 var updateData3 = {
                     apiKey: checkSetting.api_key,
                     uuid: checkSetting.sip_id,
-                    url: req.body.url+'/api/call/status/telnyx'
+                    url: combineURLs(req.body.url, '/api/call/status/telnyx')
                 }
                 await telnyxHelper.sIPAppFallback(updateData3);
 

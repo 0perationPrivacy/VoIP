@@ -360,8 +360,9 @@ import Setting from "./setting/Setting.vue";
 import CallView from "@/components/CallView.vue";
 import CheckDir from "@/components/CheckDir.vue";
 import { EventBus } from "@/event-bus";
-// const io = require("socket.io-client");
 import { io } from "socket.io-client";
+import { combineURLs } from '@/helper';
+
 export default {
   name: "dashboard",
   components: {
@@ -616,10 +617,10 @@ export default {
       }
     },
     uploadFile(file, i) {
-      var url = `${this.baseurl}/api/media/upload-files`;
+      const fileUploadURL = combineURLs(this.baseurl, '/api/media/upload-files');
       var xhr = new XMLHttpRequest();
       var formData = new FormData();
-      xhr.open("POST", url, true);
+      xhr.open("POST", fileUploadURL, true);
       xhr.setRequestHeader("token", this.access_token);
       var $this = this;
       xhr.upload.addEventListener("progress", function (e) {

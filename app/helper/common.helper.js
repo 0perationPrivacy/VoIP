@@ -86,6 +86,14 @@ const creatTwiml = (sid, token) => {
     });
 }
 
+const combineURLs = (...urls)  => {
+    let output = urls[0];
+    for (let i = 1; i < urls.length; i++) {
+        output = output.replace(/\/+$/, '') + '/' + urls[i].replace(/^\/+/, '');
+    }
+    return output;
+}
+
 module.exports = {
-    encryptedString, decryptedString, sendEmail, creatTwiml
+    encryptedString, decryptedString, sendEmail, creatTwiml, combineURLs
 }

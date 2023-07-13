@@ -802,7 +802,7 @@ export default {
         data: {
           user: this.userdata._id,
           number: { telnyx_number, _id },
-          profile: this.activeProfile?.id,
+          profile: this.activeProfile.id,
         },
         url: "setting/message-list",
       };

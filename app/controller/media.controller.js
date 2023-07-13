@@ -4,6 +4,7 @@ const path = require("path")
 const crypto = require('crypto')
 const moment = require('moment')
 const fs = require("fs")
+const { combineURLs } = require("../helper/common.helper")
 
 var storage = multer.diskStorage({
     destination: async function (req, file, cb) {
@@ -15,7 +16,7 @@ var storage = multer.diskStorage({
         }
         // Uploads is the Upload_folder_name
         cb(null, `./uploads/${date}/`)
-        // cb(null, path.join(__dirname, '../../../uploads/'));
+        // cb(null, combineURLs(__dirname, '../../../uploads/'));
     },
     filename: function (req, file, cb) {
         let ext = path.extname(file.originalname).toLowerCase();
@@ -63,7 +64,7 @@ exports.fileUpload = async (req, res) => {
 
                 var media = await Media.create(mediaData);
                 if (media) {
-                    media.media = path.join(
+                    media.media = combineURLs(
                       process.env.BASE_URL.trim(),
                       media.media
                     );

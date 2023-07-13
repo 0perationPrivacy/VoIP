@@ -4,6 +4,12 @@
 > Note: Every update deletes the MMS media files and folder which is stored locally in your ephemeral cloud hosted service and not stored in the database.
 
 ---
+## v0.92 (Jul 13, 2023)
+### Bug Fixes
+- fixed a few leading slash issues with a helper function
+- fixed socket.io-client import from throwing errors
+- fixed build errors
+
 ## v0.91 (Jul 11, 2023)
 ### Feature
 - Ability to send PGP Encrypted email notifications of smses received

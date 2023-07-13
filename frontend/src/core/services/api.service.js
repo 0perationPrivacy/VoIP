@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import { combineURLs } from '../../helper'
 
 /**
  * Service to call HTTP request via Axios
@@ -15,7 +16,7 @@ const ApiService = {
     }
     console.log(baseurl2)
     Vue.use(VueAxios, axios)
-    Vue.axios.defaults.baseURL = baseurl2 + '/api'
+    Vue.axios.defaults.baseURL = combineURLs(baseurl2, '/api')
   },
 
   /**

@@ -16,7 +16,7 @@ const Numbers = require("twilio/lib/rest/Numbers");
 var Contact = require("../model/contact.model");
 var Email = require("../model/email.model");
 const { exists } = require("../model/setting.model");
-const commonHelper = require("../helper/common.helper");
+const {sendEmail, combineURLs } = require("../helper/common.helper");
 const telnyxHelper = require("../helper/telnyx.helper");
 const twilioHelper = require("../helper/twilio.helper");
 
@@ -237,7 +237,7 @@ exports.create = async (req, res) => {
                 ).messagingProfiles.create({
                   name: "VoIP sms Web Application",
                   enabled: true,
-                  webhook_url: path.join(
+                  webhook_url: combineURLs(
                     process.env.BASE_URL.trim(),
                     "api/setting/receive-sms/",
                     req.body.type
@@ -248,7 +248,7 @@ exports.create = async (req, res) => {
                 await telnyx(req.body.api_key).messagingProfiles.update(
                   settingCheck.setting,
                   {
-                    webhook_url: path.join(
+                    webhook_url: combineURLs(
                       process.env.BASE_URL.trim(),
                       "api/setting/receive-sms/",
                       req.body.type
@@ -405,16 +405,16 @@ exports.create = async (req, res) => {
             );
             if (req.body.override === "true") {
               var twilioUpdatedata = {
-                smsUrl: path.join(
+                smsUrl: combineURLs(
                   process.env.BASE_URL.trim(),
                   "api/setting/receive-sms/",
                   req.body.type
                 ),
-                voiceUrl: path.join(
+                voiceUrl: combineURLs(
                   process.env.BASE_URL.trim(),
                   "api/call/incoming"
                 ),
-                statusCallback: path.join(
+                statusCallback: combineURLs(
                   process.env.BASE_URL.trim(),
                   "api/call/status"
                 ),
@@ -599,7 +599,7 @@ exports.sendSms = async (req, res) => {
               body: req.body.message,
               from: settingCheck.number,
               to: toNumber,
-              statusCallback: path.join(
+              statusCallback: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/setting/sms-status/twilio"
               ),
@@ -662,7 +662,7 @@ exports.sendSms = async (req, res) => {
               from: settingCheck.number, // Your Telnyx number
               to: toNumber,
               text: req.body.message,
-              webhook_url: path.join(
+              webhook_url: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/setting/sms-status/telnyx"
               ),
@@ -766,7 +766,7 @@ exports.receiveSms = async (req, res) => {
           request(url)
             .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
             .on("close", () => console.log("Image downloaded."));
-          savedName = path.join(
+          savedName = combineURLs(
             process.env.BASE_URL.trim(),
             "uploads",
             date,
@@ -775,7 +775,7 @@ exports.receiveSms = async (req, res) => {
           fackMedia.push(savedName);
           /*request(url).pipe(fs.createWriteStream(name))
                     .on('close', () => console.log('Image downloaded.'));
-                    savedName = path.join(
+                    savedName = combineURLs(
                       process.env.BASE_URL.trim(),
                       "uploads",
                       date,
@@ -814,7 +814,7 @@ exports.receiveSms = async (req, res) => {
           request(url)
             .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
             .on("close", () => console.log("Image downloaded."));
-            savedName = path.join(
+            savedName = combineURLs(
               process.env.BASE_URL.trim(),
               "uploads",
               date,
@@ -884,7 +884,7 @@ exports.receiveSms = async (req, res) => {
               text: "Message received",
               html: `Received Message on ${toNumber}:<br><hr><br><p>${messageText}</p><br><hr><br>`,
             };
-            commonHelper.sendEmail(emailSetting, emailData);
+            sendEmail(emailSetting, emailData);
           } catch (error) {
             // console.log(error)
           }

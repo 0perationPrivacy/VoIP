@@ -2,7 +2,8 @@ const Telnyx = require('telnyx');
 var axios = require('axios');
 const moment = require('moment');
 const crypto = require('crypto')
-const path = require('path');
+const { combineURLs } = require("./common.helper")
+
 //Inside lib file declare functions
 const requestCurl = (method,url,headers,data=null) => {
     return new Promise((resolve) => {
@@ -39,9 +40,9 @@ const createTexmlApp = (apiKey) => {
           };
         var data = {
           friendly_name: moment().format("YYYYMMDDHHmm"),
-          voice_url: path.join(process.env.BASE_URL.trim(), "api/call/telnyx"),
+          voice_url: combineURLs(process.env.BASE_URL.trim(), "api/call/telnyx"),
           voice_method: "post",
-          status_callback: path.join(
+          status_callback: combineURLs(
             process.env.BASE_URL.trim(),
             "api/call/status/telnyx"
           ),
@@ -61,9 +62,9 @@ const updateTexmlApp = (apiKey, twimlid) => {
             'Authorization': `Bearer ${apiKey}`
           };
         var data = {
-          voice_url: path.join(process.env.BASE_URL.trim(), "api/call/telnyx"),
+          voice_url: combineURLs(process.env.BASE_URL.trim(), "api/call/telnyx"),
           voice_method: "post",
-          status_callback: path.join(
+          status_callback: combineURLs(
             process.env.BASE_URL.trim(),
             "api/call/status/telnyx"
           ),
@@ -99,7 +100,7 @@ const createSIPApp = (apiKey, userid, outboundProfileid) => {
                 connection_name: `sip${moment().format("YYYYMMDDHHmm")}`,
                 user_name: `user${moment().format("YYYYMMDDHHmm")}`,
                 password: password,
-                webhook_event_url: path.join(
+                webhook_event_url: combineURLs(
                   process.env.BASE_URL.trim(),
                   "api/call/status/telnyx"
                 ),
@@ -120,7 +121,7 @@ const updateSIPApp = (apiKey, uuid, outboundProfileid) => {
             const telnyx = Telnyx(apiKey);
             const { data: credentialConnection } = await telnyx.credentialConnections.retrieve(uuid);
             credentialConnection.update({
-              webhook_event_url: path.join(
+              webhook_event_url: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/call/status/telnyx"
               ),

@@ -65,6 +65,8 @@
 <script>
 
 import { required, minLength, sameAs } from 'vuelidate/lib/validators'
+import { combineURLs } from '@/helper'
+
 export default {
   name: 'Signup',
   data () {
@@ -128,7 +130,8 @@ export default {
     },
     getsignup () {
       // eslint-disable-next-line no-undef
-      axios.post(`${this.baseurl}/api/auth/get-signup`, {})
+      const signUpURL = combineURLs(this.baseurl, '/api/auth/get-signup');
+      axios.post(signUpURL, {})
         .then(response => {
           if (response.data.data === 'on') {
             this.signUpOption = true

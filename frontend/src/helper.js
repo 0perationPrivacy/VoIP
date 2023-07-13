@@ -127,4 +127,12 @@ var preformatGetAssertReq = (getAssert) => {
     return getAssert
 }
 
-export {parseAuthData, bufToHex}
+const combineURLs = (...urls)  => {
+    let output = urls[0];
+    for (let i = 1; i < urls.length; i++) {
+        output = output.replace(/\/+$/, '') + '/' + urls[i].replace(/^\/+/, '');
+    }
+    return output;
+}
+
+export {parseAuthData, bufToHex, combineURLs}

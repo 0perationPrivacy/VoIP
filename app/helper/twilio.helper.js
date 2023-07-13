@@ -1,5 +1,5 @@
 const twilio = require('twilio')
-const path = require('path');
+const { combineURLs } = require("./common.helper")
 
 const creatTwiml = (sid, token) => {
     return new Promise(async (resolve) => {
@@ -7,11 +7,11 @@ const creatTwiml = (sid, token) => {
             const client = twilio(sid, token);
             var twiml = await client.applications.create({
               voiceMethod: "POST",
-              voiceUrl: path.join(
+              voiceUrl: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/call/make-call"
               ),
-              statusCallback: path.join(
+              statusCallback: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/call/status"
               ),
@@ -32,11 +32,11 @@ const updateTwiml = (sid, token, twimlsid) => {
             const client = twilio(sid, token);
             var twiml = await client.applications(twimlsid).update({
               voiceMethod: "POST",
-              voiceUrl: path.join(
+              voiceUrl: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/call/make-call"
               ),
-              statusCallback: path.join(
+              statusCallback: combineURLs(
                 process.env.BASE_URL.trim(),
                 "api/call/status"
               ),

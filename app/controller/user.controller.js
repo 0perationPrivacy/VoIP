@@ -23,6 +23,11 @@ var jwt = require('jsonwebtoken');
 const Speakeasy = require("speakeasy");
 const QRCode = require("qrcode");
 
+const userDataResponseGen = (userDataObj) => {
+  const { _id, name, email, token } = userDataObj;
+  return { _id, name, email, token };
+};
+
 exports.login = async (req, res) => {
     try{
         let rules = {
@@ -61,8 +66,9 @@ exports.login = async (req, res) => {
                     }else{
                         harwarekey = false;
                         mfa = false;
-                    }   
-                    res.send({status:status, message:'Successfully logged in.', data:user, token:token, harwarekey:harwarekey, mfa:mfa});
+                    }
+                    const userDataResponse = userDataResponseGen(user);
+                    res.send({status:status, message:'Successfully logged in.', data:userDataResponse, token:token, harwarekey:harwarekey, mfa:mfa});
                     return;
                 }else{
                     res.status(401).json({status:'false',message:'Unauthorized Access!'});
@@ -116,7 +122,9 @@ exports.register = async (req, res) => {
                 const hash = bcrypt.hashSync(req.body.password, saltRounds);
                 var userData = {name:email, email:email,password:hash};
                 var saveUser = await User.create(userData);
-                res.send({status:true, message:'User created successfully!', data:saveUser});
+
+                const userDataResponse = userDataResponseGen(saveUser);
+                res.send({status:true, message:'User created successfully!', data:userDataResponse});
             }
         }else{
             res.status(419).send({status: false, errors:validation.errors, data: []});
@@ -134,7 +142,6 @@ exports.getSignUpOption = async (req, res) => {
         }else{
             res.status(400).send({status: false, errors:'signup not avilables', data: []}); 
         }
-        // res.send({status:true, message:'user created successfully!', data:saveUser});
     }catch(error){
         res.status(400).json({status:'false',message:'something is wrong'});
     }
@@ -262,7 +269,8 @@ exports.updateUserName = async (req, res) => {
                     checkUser.email = req.body.email
                     checkUser.name = req.body.email
                     var saveEmail = await checkUser.save()
-                    res.send({status:true, message:'username updated successfully!', data:checkUser});
+                    const userDataResponse = userDataResponseGen(checkUser);
+                    res.send({status:true, message:'username updated successfully!', data:userDataResponse});
                 }else{
                     res.status(400).json({status:'false',message:'User not found!'});
                 }
@@ -279,7 +287,8 @@ exports.getUser = async (req, res) => {
     try{
         var user = await User.findOne({ _id: { $eq: req.user.id } });
         if(user){
-            res.status(200).json({status:'true',data:user,message:'user get!'});
+            const userDataResponse = userDataResponseGen(user);
+            res.status(200).json({ status: "true", data: userDataResponse, message: "user get!" });
         }else{
             res.status(400).json({status:'false',message:'User not found!'});
         }
@@ -319,7 +328,9 @@ exports.saveMfa = async (req, res) => {
                         if(verifyData){
                             user.mfa = 'true'
                             await user.save()
-                            res.status(200).json({status:'true',data:user,message:'verified successfully!'});
+
+                        const userDataResponse = userDataResponseGen(user);
+                        res.status(200).json({status: "true", data: userDataResponse, message: "verified successfully!" });
                         }else{
                             res.status(400).json({status:'false',message:'Please enter valid verification code!'});
                         }
@@ -327,7 +338,9 @@ exports.saveMfa = async (req, res) => {
                 }else{
                     user.mfa = req.body.status
                     await user.save()
-                    res.status(200).json({status:'true',data:user,message:'status saved successfully!'});
+
+                    const userDataResponse = userDataResponseGen(user);
+                    res.status(200).json({status:'true',data:userDataResponse,message:'status saved successfully!'});
                 }
             }else{
                 // var checkUser = await User.findById(req.user.id);
@@ -336,7 +349,9 @@ exports.saveMfa = async (req, res) => {
                     checkUser.email = req.body.email
                     checkUser.name = req.body.email
                     var saveEmail = await checkUser.save()
-                    res.send({status:true, message:'username updated successfully!', data:checkUser});
+
+                    const userDataResponse = userDataResponseGen(checkUser);
+                    res.send({status:true, message:'username updated successfully!', data:userDataResponse});
                 }else{
                     res.status(400).json({status:'false',message:'User not found!'});
                 }
@@ -366,7 +381,9 @@ exports.updatePassword = async (req, res) => {
                     const hash = bcrypt.hashSync(req.body.password, saltRounds);
                     checkUser.password = hash
                     var saveEmail = await checkUser.save()
-                    res.send({status:true, message:'Password updated successfully!', data:checkUser});
+
+                    const userDataResponse = userDataResponseGen(checkUser);
+                    res.send({status:true, message:'Password updated successfully!', data:userDataResponse});
                 }else{
                     res.status(400).json({status:'false',message:'Please enter a valid old password!'});
                 }
@@ -391,7 +408,8 @@ exports.passwordVerify = async(req, res) => {
             if(checkUser){
                 var checkpassword = bcrypt.compareSync(req.body.password, checkUser.password);
                 if(checkpassword){
-                    res.send({status:'true', message:'Password checked!', data:checkUser});
+                    const userDataResponse = userDataResponseGen(checkUser);
+                    res.send({status:'true', message:'Password checked!', data:userDataResponse});
                 }else{
                     res.status(400).json({status:'false',message:'please enter valid password!'});
                 }
@@ -419,7 +437,6 @@ exports.checkPassword = async (req, res) => {
                 if(checkpassword){
                     var response = await deleteAllAccountData(req.user.id)
                     res.send(response)
-                    // res.send({status:'true', message:'Password checked!', data:checkUser});
                 }else{
                     res.status(400).json({status:'false',message:'Please enter a valid password!'});
                 }

@@ -4,6 +4,13 @@
 > Note: Every update deletes the MMS media files and folder which is stored locally in your ephemeral cloud hosted service and not stored in the database.
 
 ---
+## v0.93 (Jul 14, 2023)
+### Security
+- stop sending MFA secret to client upon login
+  - doing so would allow anyone to generate the TOTP after logging in with user/pass
+### Bug Fixes
+- fixed chat conversations not appearing (Issue #204)
+
 ## v0.92 (Jul 13, 2023)
 ### Bug Fixes
 - fixed a few leading slash issues with a helper function

@@ -1037,7 +1037,7 @@ exports.messageList = async (req, res) => {
       user: { $eq: req.body.user },
       telnyx_number: { $eq: req.body.number.telnyx_number },
       number: { $eq: req.body.number._id },
-      setting: { $eq: req.body.profile.id },
+      setting: { $eq: req.body.profile },
     };
 
     await Message.updateMany(

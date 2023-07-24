@@ -3,7 +3,7 @@
     <div class="selected-option">
       {{ selectedOption[labelProp] }}
     </div>
-    <div class="dropdown" v-if="showDropdown">
+    <div class="dropdown">
       <input
         v-model="searchTerm"
         @input="filterOptions"
@@ -139,6 +139,7 @@ export default {
 .custom-select {
   position: relative;
   display: inline-block;
+  width: 100%;
 }
 
 .selected-option {

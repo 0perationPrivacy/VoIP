@@ -231,7 +231,7 @@
             </div>
           </div>
         </div>
-        <div class="card form-group mt-4" v-if="selected == 'telnyx'">
+        <div class="card form-group mt-4 overflow-visible-card" v-if="selected == 'telnyx'">
           <div class="card-body">
             <div class="row mb-2">
               <div class="col-auto m-auto">
@@ -329,7 +329,7 @@
             </div>
           </div>
         </div>
-        <div class="card form-group mt-4" v-if="selected == 'twilio'">
+        <div class="card form-group mt-4 overflow-visible-card" v-if="selected == 'twilio'">
           <div class="card-body">
             <div class="row mb-2">
               <div class="col-auto col-lg-3 m-auto">
@@ -1102,5 +1102,8 @@ export default {
   height: 100%;
   width: 100%;
   z-index: 2100;
+}
+.overflow-visible-card{
+  overflow: visible;
 }
 </style>

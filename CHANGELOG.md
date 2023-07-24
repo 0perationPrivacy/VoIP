@@ -1,9 +1,12 @@
-
 # Changelog
 
 > Note: Every update deletes the MMS media files and folder which is stored locally in your ephemeral cloud hosted service and not stored in the database.
 
 ---
+## v0.94 (Jul 24, 2023)
+### Feature
+- added autocomplete/search in dropdown under `Profile Settings` > `Get Number` to search through a long list of numbers
+
 ## v0.93 (Jul 14, 2023)
 ### Security
 - stop sending MFA secret to client upon login

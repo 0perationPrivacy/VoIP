@@ -3,7 +3,7 @@
     <div class="selected-option">
       {{ selectedOption[labelProp] }}
     </div>
-    <div class="dropdown">
+    <div class="dropdown" v-if="showDropdown">
       <input
         v-model="searchTerm"
         @input="filterOptions"

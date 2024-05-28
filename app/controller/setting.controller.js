@@ -242,6 +242,7 @@ exports.create = async (req, res) => {
                     "api/setting/receive-sms/",
                     req.body.type
                   ),
+                  whitelisted_destinations: ["*"]
                 });
                 var telnyxSetting = saveTelnyxSetting.data.id;
               } else {

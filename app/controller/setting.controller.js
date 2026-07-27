@@ -19,6 +19,7 @@ const { exists } = require("../model/setting.model");
 const {sendEmail, combineURLs } = require("../helper/common.helper");
 const telnyxHelper = require("../helper/telnyx.helper");
 const twilioHelper = require("../helper/twilio.helper");
+const webhookVerify = require("../helper/webhook-verify.helper");
 
 exports.deleteKey = async (req, res) => {
   try {
@@ -86,6 +87,25 @@ exports.deleteKey = async (req, res) => {
             );
           } catch (error) {}
         }
+        if (settingCheck.sip_domain_sid && settingCheck.sip_id) {
+          try {
+            await twilioHelper.deleteSipCredential(
+              settingCheck.twilio_sid,
+              settingCheck.twilio_token,
+              settingCheck.sip_domain_sid,
+              settingCheck.sip_id
+            );
+          } catch (error) {}
+        }
+        if (settingCheck.sip_domain_sid) {
+          try {
+            await twilioHelper.deleteSipDomain(
+              settingCheck.twilio_sid,
+              settingCheck.twilio_token,
+              settingCheck.sip_domain_sid
+            );
+          } catch (error) {}
+        }
         const client = twilio(
           settingCheck.twilio_sid,
           settingCheck.twilio_token
@@ -110,6 +130,8 @@ exports.deleteKey = async (req, res) => {
     settingCheck.sip_id = null;
     settingCheck.sip_username = null;
     settingCheck.sip_password = null;
+    settingCheck.sip_registrar = null;
+    settingCheck.sip_domain_sid = null;
     settingCheck.telnyx_twiml = null;
     settingCheck.telnyx_outbound = null;
 
@@ -165,6 +187,7 @@ exports.create = async (req, res) => {
               settingCheck.sid = req.body.sid;
               settingCheck.profile = req.body.profile;
               settingCheck.type = "telnyx";
+              settingCheck.telnyx_public_key = req.body.telnyx_public_key;
 
               if (req.body.override === "true") {
                 if (settingCheck.telnyx_twiml) {
@@ -176,6 +199,12 @@ exports.create = async (req, res) => {
                   var twimlTel = await telnyxHelper.createTexmlApp(
                     req.body.api_key
                   );
+                  if (!twimlTel || !twimlTel.data) {
+                    return res.status(400).json({
+                      status: "false",
+                      message: "Failed to create the Telnyx TeXML application — check that your API key is valid and check the backend log for the specific Telnyx error.",
+                    });
+                  }
                   settingCheck.telnyx_twiml = twimlTel.data.id;
                 }
                 if (settingCheck.telnyx_outbound) {
@@ -184,6 +213,12 @@ exports.create = async (req, res) => {
                   var outboundTel = await telnyxHelper.createOutboundVoice(
                     req.body.api_key
                   );
+                  if (!outboundTel || !outboundTel.data) {
+                    return res.status(400).json({
+                      status: "false",
+                      message: "Failed to create the Telnyx outbound voice profile — check that your API key is valid and check the backend log for the specific Telnyx error.",
+                    });
+                  }
                   settingCheck.telnyx_outbound = outboundTel.data.id;
                 }
 
@@ -191,26 +226,30 @@ exports.create = async (req, res) => {
                   await telnyxHelper.updateSIPApp(
                     req.body.api_key,
                     settingCheck.sip_id,
-                    settingCheck.telnyx_outbound
+                    settingCheck.telnyx_outbound,
+                    settingCheck.number
                   );
                 } else {
-                  // console.log('==================================================================')
-                  // console.log(settingCheck.telnyx_outbound)
                   var sipTel = await telnyxHelper.createSIPApp(
                     req.body.api_key,
                     req.user.id,
-                    settingCheck.telnyx_outbound
+                    settingCheck.telnyx_outbound,
+                    settingCheck.number
                   );
-                  //console.log('==================================================================')
-                  // console.log(sipTel.data.id)
+                  if (!sipTel || !sipTel.data) {
+                    return res.status(400).json({
+                      status: "false",
+                      message: "Failed to create the Telnyx SIP credential connection — check that your API key is valid and check the backend log for the specific Telnyx error.",
+                    });
+                  }
                   settingCheck.sip_id = sipTel.data.id;
                   settingCheck.sip_username = sipTel.data.user_name;
                   settingCheck.sip_password = sipTel.data.password;
+                  settingCheck.sip_registrar = 'sip.telnyx.com';
                 }
               }
 
-              settingCheck.save();
-              var save = settingCheck;
+              var save = await settingCheck.save();
               if (!settingCheck.setting) {
                 settingStore = true;
               }
@@ -222,6 +261,7 @@ exports.create = async (req, res) => {
                 user: req.body.user,
                 profile: req.body.profile,
                 type: "telnyx",
+                telnyx_public_key: req.body.telnyx_public_key,
               };
               var save = await Setting.create(telynxData);
               settingStore = true;
@@ -242,7 +282,12 @@ exports.create = async (req, res) => {
                     "api/setting/receive-sms/",
                     req.body.type
                   ),
-                  whitelisted_destinations: ["*"]
+                  // "*" is not a valid value — Telnyx expects real alpha-2
+                  // country codes here (same as the Outbound Voice Profile's
+                  // whitelisted_destinations), and rejects the whole request
+                  // otherwise. Pre-existing bug, unrelated to the voice-calling
+                  // whitelist fix elsewhere in this file.
+                  whitelisted_destinations: ["US", "CA"]
                 });
                 var telnyxSetting = saveTelnyxSetting.data.id;
               } else {
@@ -254,6 +299,15 @@ exports.create = async (req, res) => {
                       "api/setting/receive-sms/",
                       req.body.type
                     ),
+                    // This profile was originally created with the invalid
+                    // "*" wildcard (see the create branch above) — Telnyx
+                    // apparently validates whitelisted_destinations on
+                    // update even when this call doesn't otherwise touch it,
+                    // and rejects the whole request while that invalid value
+                    // is still stored. Set it explicitly here too so this
+                    // gets corrected regardless of which branch a given
+                    // profile happens to hit.
+                    whitelisted_destinations: ["US", "CA"],
                   }
                 );
                 var telnyxSetting = settingCheck.setting;
@@ -362,30 +416,35 @@ exports.create = async (req, res) => {
               settingCheck.profile = req.body.profile;
               settingCheck.type = "twilio";
               if (req.body.override === "true") {
-                if (settingCheck.twiml_app) {
-                  await twilioHelper.updateTwiml(
+                // SIP Domain + Credential List — the generic-SIP replacement for
+                // the old TwiML Application + API Key flow below it (which only
+                // a Twilio-proprietary Voice SDK could consume). Kept alongside
+                // rather than deleting yet: the old fields still back the
+                // now-retired getToken() branch until any remaining callers move over.
+                if (!settingCheck.sip_domain_sid) {
+                  var sipDomain = await twilioHelper.createSipDomain(
+                    req.body.twilio_sid,
+                    req.body.twilio_token
+                  );
+                  if (sipDomain) {
+                    settingCheck.sip_domain_sid = sipDomain.sid;
+                    settingCheck.sip_registrar = sipDomain.domainName;
+                  }
+                }
+                if (settingCheck.sip_domain_sid && !settingCheck.sip_username) {
+                  var sipCredential = await twilioHelper.createSipCredential(
                     req.body.twilio_sid,
                     req.body.twilio_token,
-                    settingCheck.twiml_app
+                    settingCheck.sip_domain_sid
                   );
-                } else {
-                  var twiml_app = await twilioHelper.creatTwiml(
-                    req.body.twilio_sid,
-                    req.body.twilio_token
-                  );
-                  settingCheck.twiml_app = twiml_app;
-                }
-                if (settingCheck.app_key) {
-                } else {
-                  var appData = await twilioHelper.creatAPIKey(
-                    req.body.twilio_sid,
-                    req.body.twilio_token
-                  );
-                  settingCheck.app_key = appData.sid;
-                  settingCheck.app_secret = appData.secret;
+                  if (sipCredential) {
+                    settingCheck.sip_id = sipCredential.credentialListSid;
+                    settingCheck.sip_username = sipCredential.username;
+                    settingCheck.sip_password = sipCredential.password;
+                  }
                 }
               }
-              var save = settingCheck.save();
+              var save = await settingCheck.save();
             } else {
               var twilioData = {
                 number: req.body.twilio_number,
@@ -413,7 +472,7 @@ exports.create = async (req, res) => {
                 ),
                 voiceUrl: combineURLs(
                   process.env.BASE_URL.trim(),
-                  "api/call/incoming"
+                  "api/call/twilio-sip-inbound"
                 ),
                 statusCallback: combineURLs(
                   process.env.BASE_URL.trim(),
@@ -485,7 +544,7 @@ exports.create = async (req, res) => {
       }
     }
   } catch (error) {
-    // console.log(error)
+    console.log('setting.create failed:', error.response?.data || error.message);
     res.status(400).send({ status: false, message: error.message, data: [] });
   }
 };
@@ -734,57 +793,46 @@ exports.sendSms = async (req, res) => {
   }
 };
 
+async function downloadInboundMedia(mediaDescriptors) {
+  var media = [];
+  for (var i = 0; i < mediaDescriptors.length; i++) {
+    const {url, contentType} = mediaDescriptors[i];
+    if (contentType == "image/gif") {
+      var name = `${crypto.randomBytes(24).toString("hex")}.gif`;
+    } else if (contentType == "image/jpeg") {
+      var name = `${crypto.randomBytes(24).toString("hex")}.jpg`;
+    } else {
+      var name = `${crypto.randomBytes(24).toString("hex")}.png`;
+    }
+    var date = moment(new Date()).format("MMDDYYYY");
+    try {
+      await fs.promises.access("./uploads/" + date);
+    } catch (e) {
+      await fs.promises.mkdir("./uploads/" + date);
+    }
+
+    request(url)
+      .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
+      .on("close", () => console.log("Image downloaded."));
+    var savedName = combineURLs(process.env.BASE_URL.trim(), "uploads", date, name);
+    media.push(savedName);
+  }
+  return media;
+}
+
 exports.receiveSms = async (req, res) => {
   try {
-    var media = [];
+    var mediaDescriptors = [];
     if (req.params.type !== undefined && req.params.type == "twilio") {
       var messageText = req.body.Body;
       var toNumber = req.body.To;
       var fromnumber = req.body.From;
       var sid = req.body.SmsSid;
-      if (req.body.NumMedia > 0) {
-        var fackMedia = [];
-        for (var i = 0; i < req.body.NumMedia; i++) {
-          var tMedia = `MediaUrl${i}`;
-          var tMediaType = `MediaContentType${i}`;
-          const url = req.body[tMedia]; // link to file you want to download
-          //var name = `uploads/${Date.now()}${req.body.SmsSid}.png`;
-          // var name = crypto.randomBytes(24).toString('hex');
-          if (tMediaType == "image/gif") {
-            var name = `${crypto.randomBytes(24).toString("hex")}.gif`;
-          } else if (tMediaType == "image/jpeg") {
-            var name = `${crypto.randomBytes(24).toString("hex")}.jpg`;
-          } else {
-            var name = `${crypto.randomBytes(24).toString("hex")}.png`;
-          }
-          var date = moment(new Date()).format("MMDDYYYY");
-          try {
-            await fs.promises.access("./uploads/" + date);
-          } catch (e) {
-            await fs.promises.mkdir("./uploads/" + date);
-          }
-
-          request(url)
-            .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
-            .on("close", () => console.log("Image downloaded."));
-          savedName = combineURLs(
-            process.env.BASE_URL.trim(),
-            "uploads",
-            date,
-            name
-          );
-          fackMedia.push(savedName);
-          /*request(url).pipe(fs.createWriteStream(name))
-                    .on('close', () => console.log('Image downloaded.'));
-                    savedName = combineURLs(
-                      process.env.BASE_URL.trim(),
-                      "uploads",
-                      date,
-                      name
-                    );
-                    fackMedia.push(savedName)*/
-        }
-        media = fackMedia;
+      for (var i = 0; i < (req.body.NumMedia || 0); i++) {
+        mediaDescriptors.push({
+          url: req.body[`MediaUrl${i}`],
+          contentType: req.body[`MediaContentType${i}`],
+        });
       }
     } else {
       var messageData = req.body.data.payload;
@@ -792,42 +840,33 @@ exports.receiveSms = async (req, res) => {
       var fromnumber = messageData.from.phone_number;
       var sid = messageData.id;
       var messageText = messageData.text;
-      if (messageData.media.length > 0) {
-        var fackMedia = [];
-        for (var i = 0; i < messageData.media.length; i++) {
-          const url = messageData.media[i].url; // link to file you want to download
-          // var name = `uploads/${Date.now()}${sid}.png`;
-          if (messageData.media[i].content_type == "image/gif") {
-            var name = `${crypto.randomBytes(24).toString("hex")}.gif`;
-          } else if (messageData.media[i].content_type == "image/jpeg") {
-            var name = `${crypto.randomBytes(24).toString("hex")}.jpg`;
-          } else {
-            var name = `${crypto.randomBytes(24).toString("hex")}.png`;
-          }
-
-          var date = moment(new Date()).format("MMDDYYYY");
-          try {
-            await fs.promises.access("./uploads/" + date);
-          } catch (e) {
-            await fs.promises.mkdir("./uploads/" + date);
-          }
-
-          request(url)
-            .pipe(fs.createWriteStream(`./uploads/${date}/${name}`))
-            .on("close", () => console.log("Image downloaded."));
-            savedName = combineURLs(
-              process.env.BASE_URL.trim(),
-              "uploads",
-              date,
-              name
-            );
-          fackMedia.push(savedName);
-          // fackMedia.push(messageData.media[i].url)
-        }
-        media = fackMedia;
+      for (var i = 0; i < messageData.media.length; i++) {
+        mediaDescriptors.push({
+          url: messageData.media[i].url,
+          contentType: messageData.media[i].content_type,
+        });
       }
     }
+
     var settingCheck = await Setting.findOne({ number: { $eq: toNumber } });
+
+    // Without this, any inbound-message endpoint accepted whatever payload was
+    // POSTed to it — the destination number alone was treated as proof it came
+    // from the real carrier, so anyone could forge a "received" text into a
+    // user's inbox. Reject anything that doesn't carry a valid provider signature.
+    if (settingCheck) {
+      var isVerified =
+        req.params.type === "twilio"
+          ? webhookVerify.verifyTwilioSignature(req, settingCheck.twilio_token)
+          : webhookVerify.verifyTelnyxSignature(req, settingCheck.telnyx_public_key);
+
+      if (!isVerified) {
+        return res.status(401).json({ status: "false", message: "invalid webhook signature" });
+      }
+    }
+
+    var media = mediaDescriptors.length > 0 ? await downloadInboundMedia(mediaDescriptors) : [];
+
     if (settingCheck) {
       var messageData2 = {
         sid: sid,
@@ -933,35 +972,45 @@ exports.smsStatus = async (req, res) => {
     if (req.params.type !== undefined && req.params.type === "twilio") {
       var status = req.body.MessageStatus;
       var sid = req.body.MessageSid;
+
+      var settingCheck = await Setting.findOne({
+        number: { $eq: req.body.From },
+      });
+      if (settingCheck && !webhookVerify.verifyTwilioSignature(req, settingCheck.twilio_token)) {
+        return res.status(401).json({ status: "false", message: "invalid webhook signature" });
+      }
+
       if (
-        req.body.MessageStatus === "delivered" ||
-        req.body.MessageStatus === "undelivered" ||
-        req.body.MessageStatus === "failed"
+        settingCheck &&
+        settingCheck.type === "twilio" &&
+        (req.body.MessageStatus === "delivered" ||
+          req.body.MessageStatus === "undelivered" ||
+          req.body.MessageStatus === "failed")
       ) {
-        var settingCheck = await Setting.findOne({
-          number: { $eq: req.body.From },
-        });
-        if (settingCheck) {
-          if (settingCheck.type === "twilio") {
-            const client = twilio(
-              settingCheck.twilio_sid,
-              settingCheck.twilio_token
-            );
-            for (var i = 0; i < 5; i++) {
-              try {
-                var isDelete = await client.messages(sid).remove();
-                if (isDelete) {
-                  break;
-                }
-              } catch (error) {}
-            } //remove Twilio sms from server right after sent with any status reply state
-          }
-        }
+        const client = twilio(
+          settingCheck.twilio_sid,
+          settingCheck.twilio_token
+        );
+        for (var i = 0; i < 5; i++) {
+          try {
+            var isDelete = await client.messages(sid).remove();
+            if (isDelete) {
+              break;
+            }
+          } catch (error) {}
+        } //remove Twilio sms from server right after sent with any status reply state
       }
     } else {
       var data = req.body.data.payload;
       var status = data.to[0].status;
       var sid = data.id;
+
+      var settingCheck = await Setting.findOne({
+        number: { $eq: data.to[0].phone_number },
+      });
+      if (settingCheck && !webhookVerify.verifyTelnyxSignature(req, settingCheck.telnyx_public_key)) {
+        return res.status(401).json({ status: "false", message: "invalid webhook signature" });
+      }
     }
     var message = await Message.findOne({ sid: { $eq: sid } });
     if (message) {

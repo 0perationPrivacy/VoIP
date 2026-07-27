@@ -10,6 +10,28 @@ var session = require('cookie-session')
 var compression = require('compression')
 app.use(compression())
 
+// Refuse to boot on the placeholder secrets checked into .env — those values
+// are public (visible to anyone who has cloned this repo), so running with
+// them means forgeable sessions and/or unreadable stored credentials.
+;['COOKIE_KEY', 'COOKIE_KEY2', 'CREDENTIALS_ENCRYPTION_KEY'].forEach((name) => {
+  const value = (process.env[name] || '').trim();
+  if (!value || value.startsWith('CHANGE_ME')) {
+    console.error(
+      `Refusing to start: ${name} is unset or still the placeholder from .env. ` +
+      `Generate one (e.g. \`openssl rand -hex 32\`) and set it before running the server.`
+    );
+    process.exit(1);
+  }
+});
+
+// TEMP diagnostic: log every incoming request before any routing/auth, so
+// nothing can go unlogged while tracking down a request that isn't reaching
+// any of the normal route handlers.
+app.use((req, res, next) => {
+  console.log(`>>> INCOMING ${req.method} ${req.originalUrl} from ${req.ip}`);
+  next();
+});
+
 var expiryDate = new Date(Date.now() + 60 * 60 * (1000 * 12 * 30)) // 30 day
 app.use(session({
   name: 'session',
@@ -125,23 +147,34 @@ if( process.env.HTTPS.trim() === 'true'){
   }) */
 }
 // parse requests of content-type - application/json
-app.use(bodyParser.json({limit: '500mb',parameterLimit: 10000000})); 
+// The `verify` callback stashes the raw bytes on the request — Telnyx webhook
+// signatures are computed over the exact bytes sent, so the re-serialized
+// req.body wouldn't reliably match.
+app.use(bodyParser.json({
+  limit: '500mb',
+  parameterLimit: 10000000,
+  verify: (req, res, buf) => { req.rawBody = buf; },
+}));
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true, limit: '500mb',parameterLimit: 10000000 }));
+// Same rawBody capture as above — Telnyx's TeXML voice webhooks (call.telnyx,
+// call.statusTelnyx) arrive form-encoded, matching Twilio's format for
+// drop-in compatibility, but Telnyx still signs them Ed25519-over-raw-bytes
+// the same as its JSON Call Control webhooks.
+app.use(bodyParser.urlencoded({
+  extended: true,
+  limit: '500mb',
+  parameterLimit: 10000000,
+  verify: (req, res, buf) => { req.rawBody = buf; },
+}));
 app.use('/uploads', express.static('uploads'));
-app.use('/src', express.static('src'));
-app.use('/frontend', express.static('frontend'));
-// app.use('/frontend', express.static('frontend'));
+// Removed: `/src` (empty, unused) and a blanket `/frontend` mount that served
+// the entire uncompiled source tree (frontend/config, frontend/src, frontend/test)
+// alongside the build output. Only the built `frontend/dist` needs to be public,
+// and it already is via the mounts below.
 app.use('/frontend/dist/static/', express.static('frontend/dist/static'));
 app.get(`/error`, function (req, res) {
   res.sendFile(path.join(__dirname, './error/index.html'));
-})
-app.get(`/:id`, function (req, res) {
-  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
-})
-app.get(`/:id/:name`, function (req, res) {
-  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
 })
 app.use(express.static(path.join(__dirname, './frontend/dist')));
 
@@ -162,4 +195,16 @@ app.get('/api/users/', function (req, res) {
 app.get('/get-base-url', function(req, res) {
   res.status(200).json({url: process.env.BASE_URL.trim()});
 });
+
+// These SPA catch-alls must be registered last: Express matches routes in
+// registration order, and `/:id` / `/:id/:name` would otherwise swallow any
+// two-segment API path (confirmed live: GET /api/users/ returned the SPA's
+// index.html, not JSON, before this reordering).
+app.get(`/:id`, function (req, res) {
+  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
+})
+app.get(`/:id/:name`, function (req, res) {
+  res.sendFile(path.join(__dirname, './frontend/dist/index.html'));
+})
+
 server.listen(process.env.PORT)

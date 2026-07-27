@@ -2,7 +2,7 @@
   <div>
       <b-icon font-scale="1" icon="gear-fill" aria-hidden="true" class="m-2" title="Settings" style="cursor:pointer;" v-b-toggle.sidebar-email-setting></b-icon>
       <b-sidebar id="sidebar-email-setting" title="Settings" shadow backdrop>
-          <div class="px-3 py-2" v-if="activeMenu == 'setting'">
+          <div v-if="activeMenu == 'setting'">
             <ul class="list-group">
               <li class="list-group-item" @click="enableMenu('email')" style="cursor: pointer">
                 <b-icon icon="envelope" font-scale="1" aria-hidden="true" class="mx-2"></b-icon>Email Settings</li>

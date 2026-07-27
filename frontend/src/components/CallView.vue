@@ -28,7 +28,7 @@
                                 <span class='multiCallData_name'> {{number}}</span>
                                 </div>
                                 <div class="d-flex justify-content-center" style="width:100%">
-                                <span class='timerContainer font-weight-bold mx-auto float-right mt-2' style='font-size: 45px;color:#4d64bc'><span class='multiCallData_minute' id='data.call.sid'>{{mm}}</span>:<span class='multiCallData_second' id=' data.call.sid'>{{ss}}</span></span>
+                                <span class='timerContainer font-weight-bold mx-auto float-right mt-2' style='font-size: 45px;color:var(--accent)'><span class='multiCallData_minute' id='data.call.sid'>{{mm}}</span>:<span class='multiCallData_second' id=' data.call.sid'>{{ss}}</span></span>
                                 </div>
                             </div>
                             <div class='p-1 mt-1'><button @click="callHangup()" class='btn btn-danger multiCallData_hangup w-100' data-id=' number + "' data-sid='data.call.sid+"' data-type='callType+"' style='width: 100%;font-size: 30px;'>Hangup</button>
@@ -136,10 +136,10 @@
                         <button type="button" class="btn btn-success m-1">
                             <b-icon icon="person-fill" aria-hidden="true"></b-icon>
                         </button>
-                        <p class="font-weight-bold mt-2" style="font-size: 30px;color: #787878;margin-bottom:0;">
+                        <p class="font-weight-bold mt-2" style="font-size: 30px;color: var(--text-secondary);margin-bottom:0;">
                             {{name}}
                         </p>
-                        <p class="font-weight-bold" style="font-size: 30px;color: #787878;">
+                        <p class="font-weight-bold" style="font-size: 30px;color: var(--text-secondary);">
                             {{number}}
                         </p>
                     </div>
@@ -499,6 +499,13 @@ export default {
 }
 </script>
 <style scoped>
+  /* Call/accept actions keep the conventional green (phone-app universal
+     for "answer"/"place call") rather than the app's general accent color —
+     overrides the global .btn-success -> accent rule in main.css. */
+  .btn-success {
+    background-color: var(--success) !important;
+    color: #fff !important;
+  }
   .number{
     margin-bottom: 0px;
     font-size: 40px;

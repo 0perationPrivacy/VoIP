@@ -56,9 +56,11 @@ exports.create = async (req, res) => {
                     password: req.body.password, 
                     to_email:req.body.to_email,
                     host:req.body.host,
-                    port: req.body.port, 
+                    port: req.body.port,
                     secure:req.body.secure,
-                    sender_email: req.body.sender_email
+                    sender_email: req.body.sender_email,
+                    pgpPublicKey: req.body.pgpPublicKey,
+                    pgpEncryptEnabled: req.body.pgpEncryptEnabled
                 };
                 var isSave = await Email.create(createData);
                 if(isSave){
@@ -107,8 +109,9 @@ exports.getEmail  = async (req, res) => {
 
 exports.saveSetting = async (req, res) => {
     try{
-        // var checkemail = await Setting.findById(req.body.setting_id)
-        var checkemail = await Setting.findOne({_id: { $eq: req.body.setting_id}})
+        // Scope the lookup to the authenticated user, otherwise any logged-in user
+        // could toggle another user's per-profile forwarding by passing its id.
+        var checkemail = await Setting.findOne({_id: { $eq: req.body.setting_id}, user: { $eq: req.user.id }})
         if(checkemail){
             checkemail.emailnotification = req.body.status
             var updateData = await checkemail.save()

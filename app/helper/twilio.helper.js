@@ -1,5 +1,7 @@
 const twilio = require('twilio')
+const crypto = require('crypto')
 const { combineURLs } = require("./common.helper")
+const { generateStrongPassword } = require("./crypto.helper")
 
 const creatTwiml = (sid, token) => {
     return new Promise(async (resolve) => {
@@ -171,6 +173,103 @@ const numberGet = (data) => {
     });
 }
 
+// --- SIP Domain + Credential List provisioning (Phase 3) ---
+// Twilio's analog to Telnyx's Credential Connection (see telnyx.helper.js's
+// createSIPApp): a generic SIP REGISTER target that any SIP client — Linphone
+// included — can authenticate against, replacing the old Voice-SDK access-token
+// flow (twilio.jwt.AccessToken + VoiceGrant) that required Twilio's proprietary
+// client SDK and would have disqualified the app from F-Droid.
+
+const createSipDomain = (sid, token) => {
+    return new Promise(async (resolve) => {
+        try {
+            const client = twilio(sid, token);
+            // Domain names are unique across ALL of Twilio, not just this
+            // account, so this needs real entropy rather than a timestamp.
+            const domainName = `voipsuite${crypto.randomBytes(8).toString('hex')}.sip.twilio.com`;
+            const domain = await client.sip.domains.create({
+                domainName,
+                friendlyName: 'Operation Privacy VoIP Suite',
+                sipRegistration: true,
+                voiceMethod: 'POST',
+            });
+            resolve(domain);
+        } catch (e) {
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
+const deleteSipDomain = (sid, token, domainSid) => {
+    return new Promise(async (resolve) => {
+        try {
+            const client = twilio(sid, token);
+            await client.sip.domains(domainSid).remove();
+            resolve(true);
+        } catch (e) {
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
+const updateSipDomainVoiceUrl = (sid, token, domainSid, voiceUrl) => {
+    return new Promise(async (resolve) => {
+        try {
+            const client = twilio(sid, token);
+            await client.sip.domains(domainSid).update({voiceUrl, voiceMethod: 'POST'});
+            resolve(true);
+        } catch (e) {
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
+// One credential list holding one username/password pair, mapped to the
+// domain for both REGISTER auth and (via sipRegistration above) outbound
+// INVITE auth from the registered client.
+const createSipCredential = (sid, token, domainSid) => {
+    return new Promise(async (resolve) => {
+        try {
+            const client = twilio(sid, token);
+            const username = `sip${crypto.randomBytes(6).toString('hex')}`;
+            const password = generateStrongPassword();
+
+            const credentialList = await client.sip.credentialLists.create({
+                friendlyName: `voip-suite-${username}`,
+            });
+            await client.sip.credentialLists(credentialList.sid).credentials.create({username, password});
+            await client.sip.domains(domainSid).credentialListMappings.create({
+                credentialListSid: credentialList.sid,
+            });
+
+            resolve({credentialListSid: credentialList.sid, username, password});
+        } catch (e) {
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
+const deleteSipCredential = (sid, token, domainSid, credentialListSid) => {
+    return new Promise(async (resolve) => {
+        try {
+            const client = twilio(sid, token);
+            try {
+                await client.sip.domains(domainSid).credentialListMappings(credentialListSid).remove();
+            } catch (e) {}
+            await client.sip.credentialLists(credentialListSid).remove();
+            resolve(true);
+        } catch (e) {
+            console.log(e);
+            resolve(false);
+        }
+    });
+}
+
 module.exports = {
-    creatTwiml, updateTwiml, deleteTwiml, creatAPIKey, removeAPIKey, unlinkNumber, twimlFallbackUpdate, numberFallbackUpdate, twimlGet, numberGet 
+    creatTwiml, updateTwiml, deleteTwiml, creatAPIKey, removeAPIKey, unlinkNumber, twimlFallbackUpdate, numberFallbackUpdate, twimlGet, numberGet,
+    createSipDomain, deleteSipDomain, updateSipDomainVoiceUrl, createSipCredential, deleteSipCredential
 }

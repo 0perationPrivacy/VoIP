@@ -109,11 +109,13 @@ exports.getAllContact = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try{
-        var deleteContact = await Contact.deleteOne({_id: { $eq: req.body.contact_id} })
-        if(deleteContact){
+        // Scope the delete to the authenticated user, otherwise any logged-in
+        // user could delete another user's contact by passing its id.
+        var deleteContact = await Contact.deleteOne({_id: { $eq: req.body.contact_id}, user: { $eq: req.user.id } })
+        if(deleteContact.deletedCount){
             res.send({status:true, message:'Contact deleted successfully!', data:deleteContact});
         }else{
-            res.status(400).json({status:'false',message:'Contact not deleted!'});
+            res.status(404).json({status:'false',message:'Contact not found!'});
         }
     }catch(error){
         res.status(400).json({status:'false',message:'something is wrong'});
@@ -131,8 +133,12 @@ exports.update = async (req, res) => {
         };
         let validation = new Validator(req.body, rules);
         if(validation.passes()){
-            // var contact = await Contact.findById(req.body.contact_id)
-            var contact = await Contact.findOne({_id: { $eq: req.body.contact_id}})
+            // Scope the lookup to the authenticated user, otherwise any logged-in
+            // user could overwrite another user's contact by passing its id.
+            var contact = await Contact.findOne({_id: { $eq: req.body.contact_id}, user: { $eq: req.user.id }})
+            if(!contact){
+                return res.status(404).json({status:'false',message:'Contact not found!'});
+            }
             var phoneNumber = req.body.number.trim().replace("+", "")
             var stringLen = phoneNumber.length
             if(stringLen > 10){
@@ -144,12 +150,12 @@ exports.update = async (req, res) => {
             contact.last_name = req.body.last_name;
             contact.number = phoneNumber;
             contact.note = req.body.note;
-            var save = contact.save();
+            var save = await contact.save();
             if(save){
                 res.send({status:true, message:'Contact update successfully!', data:contact});
             }else{
                 res.status(400).json({status:'false',message:'Contact not updated!'});
-            }    
+            }
         }else{
             res.status(419).send({status: false, errors:validation.errors, data: []});       
         }

@@ -3,7 +3,7 @@ module.exports = app => {
     var router = require("express").Router();
     const auth = require('../middleware/auth.middleware');
     //router.post("/register",auth, user.login);
-    router.post("/create",auth, profileController.crateProfile);
+    router.post("/create",auth, profileController.createProfile);
     router.post("/getdata",auth, profileController.getProfile);
     router.post("/delete-profile",auth, profileController.deleteProfile);
     router.post("/update-profile",auth, profileController.updateProfile);

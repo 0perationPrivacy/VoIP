@@ -5,7 +5,7 @@ const twilio = require('twilio');
 const telnyx = require('telnyx');
 const telnyxHelper = require('../helper/telnyx.helper')
 const twilioHelper = require('../helper/twilio.helper')
-exports.crateProfile = async (req, res) => {
+exports.createProfile = async (req, res) => {
     try{
         let rules = {
             profile: 'required'

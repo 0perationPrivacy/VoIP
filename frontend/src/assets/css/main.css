@@ -5,44 +5,125 @@
     src: url('../fonts/skia.woff') format('woff');
   }
 
-:root {
-    --background-color-primary: #ffffff;
-    --background-color-secondary: rgb(246, 246, 246);
-    --background-color-info: #dcd4cc;
-    --accent-color: #cacaca;
-    --text-primary-color: #222;
-    --element-size: 4rem;
-    --buttun-color: #73a839;
-    --chat-you: rgb(233,233,233);
-    --chat-me: rgb(50, 105, 230);
-    --theme-orange: #ff5821;
-    --chat-background: white;
-    --contact-list: rgb(246, 246, 246);
-    --contact-highlighted: rgb(222, 222, 222);
-    --contact-hover: rgb(233, 233, 233);
-    --background-image-opacity: 0.8;
-    --text-button: #1c282f;
+/* Poppins — same font the mobile app uses (see helpers/Metrics.ts there),
+   self-hosted rather than pulled from a font CDN, consistent with this
+   project's no-third-party-tracking values. */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Poppins-Regular.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/Poppins-Medium.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/Poppins-SemiBold.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Poppins-Bold.otf') format('opentype');
+}
 
+/* Design tokens — mirrors theme/colors.ts, theme/spacing.ts in the mobile
+   app (VoIP-Suite-Mobile) so the web dashboard and the app read as the same
+   product rather than two unrelated skins. Brand accent (#FBB03B) is taken
+   from the Operation Privacy logo. Existing variable names (--background-
+   color-primary etc.) are kept so untouched component CSS elsewhere still
+   resolves correctly; new tokens are additive. */
+:root {
+    --background-color-primary: #FFFFFF;
+    --background-color-secondary: #F5F5F7;
+    --background-color-info: #F5F5F7;
+    --accent-color: #E5E5EA;
+    --text-primary-color: #0B0B0C;
+    --element-size: 4rem;
+    --buttun-color: #FBB03B;
+    --chat-you: #F0F0F2;
+    --chat-me: #FBB03B;
+    --theme-orange: #FBB03B;
+    --chat-background: #FFFFFF;
+    --contact-list: #F5F5F7;
+    --contact-highlighted: rgba(251,176,59,0.16);
+    --contact-hover: #EDEDF0;
+    --background-image-opacity: 0.8;
+    --text-button: #1A1400;
+
+    --surface: #FFFFFF;
+    --border: #E5E5EA;
+    --separator: #EDEDF0;
+    --text-secondary: #6B6B70;
+    --text-tertiary: #A0A0A5;
+    --text-on-accent: #1A1400;
+    --accent: #FBB03B;
+    --accent-pressed: #E09A2C;
+    --accent-soft: rgba(251,176,59,0.16);
+    --link-text: #C9860A;
+    --destructive: #E5484D;
+    --success: #2FA36B;
+    --warning: #E0A100;
+    --overlay: rgba(0,0,0,0.4);
+
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-xxl: 24px;
+    --space-xxxl: 32px;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-bubble: 18px;
+    --radius-pill: 999px;
+
+    --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   :root.dark-theme {
-    --background-color-primary: rgb(18, 18, 18);
-    --background-color-secondary: rgb(46, 46, 46);
-    --background-color-info: #0b1419;
-    --accent-color: #3f3f3f;
-    --text-primary-color: #ddd;
-    --buttun-color: #1c282f;
-    --chat-you: rgb(59,59,59);
-    --chat-me: rgb(50, 105, 230);
-    --chat-background: rgb(18, 18, 18);
-    --contact-list: rgb(46, 46, 46);
-    --contact-highlighted: rgb(74, 74, 74);
-    --contact-hover: rgb(59, 59, 59);
+    --background-color-primary: #0B0B0D;
+    --background-color-secondary: #151517;
+    --background-color-info: #151517;
+    --accent-color: #2C2C2E;
+    --text-primary-color: #F5F5F7;
+    --buttun-color: #FBB03B;
+    --chat-you: #2C2C2E;
+    --chat-me: #FBB03B;
+    --chat-background: #0B0B0D;
+    --contact-list: #151517;
+    --contact-highlighted: rgba(251,176,59,0.22);
+    --contact-hover: #242426;
     --background-image-opacity: 0.4;
-    --text-button: #cacaca;
+    --text-button: #1A1400;
+
+    --surface: #1C1C1E;
+    --border: #2C2C2E;
+    --separator: #242426;
+    --text-secondary: #9B9BA1;
+    --text-tertiary: #6B6B70;
+    --text-on-accent: #1A1400;
+    --accent: #FBB03B;
+    --accent-pressed: #FFC257;
+    --accent-soft: rgba(251,176,59,0.22);
+    --link-text: #FBB03B;
+    --destructive: #FF6961;
+    --success: #32D74B;
+    --warning: #FFC940;
+    --overlay: rgba(0,0,0,0.6);
   }
   body{
       background: var(--background-color-secondary);
       color: var(--text-primary-color);
+      font-family: var(--font-family);
   }
  /* html, body {
     min-height: 100%;
@@ -66,16 +147,16 @@
       float: right !important;
   }
 .login-box {
-    background: var(--background-color-primary);
+    background: var(--surface);
     width: 50%;
     max-width: 400px;
     margin: auto;
     margin-top: 50px;
-    padding-top: 10px;
-    padding-bottom: 30px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    padding: var(--space-xxxl);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     transition: 0.5s;
-    border-radius: 10px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
   }
   
   @media only screen and (max-width: 768px) {
@@ -98,7 +179,11 @@
   .login-box h1 {
     text-align: center;
     transition: 0.5s;
-    font-family: "Skia", sans-serif;
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--text-primary-color);
+    letter-spacing: -0.3px;
   }
   .vue-tags-input{
     border: none !important; 
@@ -131,9 +216,9 @@
     border: none;
     background-color: var(--background-color-secondary);
     color: var(--text-primary-color);
-    border-radius: 10px;
-    /* padding: 10px; */
-    font-size: 14px;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 15px;
     transition: 0.5s;
     display: inline-flex;
   }
@@ -154,19 +239,22 @@
     color: var(--text-primary-color);
   }
   
-  #login-button {
-    /* background-color: var(--buttun-color); */
-    border: none;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    transition: 0.5s;
+  #login-button, #login-button2, .btn-accent, .btn-primary, .btn-success {
+    background-color: var(--accent) !important;
+    border: none !important;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-on-accent) !important;
+    transition: 0.2s;
+  }
+  #login-button:hover, #login-button2:hover, .btn-accent:hover, .btn-primary:hover, .btn-success:hover {
+    background-color: var(--accent-pressed) !important;
   }
 
 * {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-family);
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
@@ -210,7 +298,7 @@
     width: 100%;
     height: 60px;
     background: var(--background-color-secondary);
-    border-right: 1px solid #444444;
+    border-right: 1px solid var(--border);
     display: flex;
     justify-content: end;
     padding-left: 20px;
@@ -224,7 +312,7 @@
 }
 
 .icons {
-    color: white;
+    color: var(--text-primary-color);
     display: flex;
 }
 
@@ -249,7 +337,7 @@
 }
 
 .search i, .wrap-message i {
-    color: #aaaaaa;
+    color: var(--text-tertiary);
     text-align: center;
 }
 
@@ -273,8 +361,9 @@
 
 .contact, .active-contact, .new-message-contact {
     height: 70px;
-    background-color: var(--contact-highlighted);
+    background-color: transparent;
     display: flex;
+    transition: background-color 0.15s;
 }
 
 .contact img, .active-contact img, .new-message-contact img {
@@ -285,7 +374,7 @@
 }
 
 .active-contact {
-    background-color: #ebebeb;
+    background-color: var(--contact-hover);
 }
 
 .contact:hover, .new-message-contact:hover {
@@ -297,11 +386,11 @@
 }
 .new-message-contact {
     font-weight: bold;
-}	
+}
 .contact-preview {
     width: 100%;
     height: 70px;
-    border-bottom: 1px solid #444444;
+    border-bottom: 1px solid var(--separator);
     display: flex;
     overflow: hidden;
 }
@@ -351,7 +440,7 @@
 }
 
 .chat-head i {
-    color: #aaaaaa;
+    color: var(--text-secondary);
     width: 60px;
     margin: auto;
     text-align: center;
@@ -428,9 +517,9 @@
 
 /* ------ CHAT ------ */
 .chat-bubble {
-    border-radius: 7px;
-    box-shadow: 2px 2px 10px rgba(70,70,70,0.5);
-    padding: 5px 7px;
+    border-radius: var(--radius-bubble, 18px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    padding: 8px 12px;
     width: 350px;
     max-width: 100%;
     position: relative;
@@ -438,6 +527,7 @@
 
 .you {
     background: var(--chat-you);
+    color: var(--text-primary-color);
     margin: 0px auto 10px 0px;
     text-align: left;
     width: max-content;
@@ -448,7 +538,7 @@
     margin: 0px 0px 10px auto;
     text-align: right;
     width: max-content;
-    color: whitesmoke;
+    color: var(--text-on-accent);
 }
 
 .your-mouth {
@@ -538,6 +628,7 @@ body::-webkit-scrollbar-thumb, .contact-list::-webkit-scrollbar-thumb, .chat::-w
 }
 a {
     text-decoration: none !important;
+    color: var(--link-text);
 }
 .modal-content{
     background-color: var(--background-color-primary);
@@ -612,6 +703,9 @@ a {
 .b-sidebar-header, .b-sidebar-body{
     background-color: var(--contact-list);
     color: var(--text-primary-color);
+}
+.b-sidebar-body {
+    padding: var(--space-xl);
 }
 
 .box, .box-placeholder {
@@ -691,6 +785,34 @@ a {
 .bi {
     outline: none;
 }
+
+/* SweetAlert2 — used app-wide for confirmations/errors via vue-sweetalert2,
+   overridden here once rather than passing custom styling to every .fire()
+   call site individually. */
+.swal2-popup {
+    background: var(--surface) !important;
+    color: var(--text-primary-color) !important;
+    font-family: var(--font-family) !important;
+    border-radius: var(--radius-xl) !important;
+}
+.swal2-title, .swal2-html-container {
+    color: var(--text-primary-color) !important;
+    font-family: var(--font-family) !important;
+}
+.swal2-confirm {
+    background-color: var(--accent) !important;
+    color: var(--text-on-accent) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+}
+.swal2-cancel, .swal2-deny {
+    background-color: var(--background-color-secondary) !important;
+    color: var(--text-primary-color) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+}
 #btn-radios-2 > label > input {
     margin-right: 0.6rem;
 }
@@ -704,15 +826,18 @@ a {
 }
 .input-group-text {
     border: none;
-    background-color: var(--accent-color);
-    color: var(--background-color-primary);
+    background-color: var(--background-color-secondary);
+    color: var(--text-secondary);
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+.input-group .chat-input {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 .version {
     font-size: 0.8em;
     margin-top: 1.5rem;
-    margin-top: 1.5rem;
     text-align: center;
-    color: var(--accent-color);
+    color: var(--text-tertiary);
 }
 .dropDown .dropdown-toggle::after{
     display: none !important;
@@ -744,11 +869,29 @@ a {
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
     max-height: 100vh;
     overflow-y: auto;
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+}
+.dropdown-item {
+    color: var(--text-primary-color) !important;
+}
+.dropdown-divider {
+    border-color: var(--separator) !important;
 }
 
 .list-group-item {
     color: var(--text-primary-color) !important;
     background-color: transparent !important;
+    padding: var(--space-lg) var(--space-lg) !important;
+    font-size: 17px;
+    border-color: var(--separator) !important;
+    transition: background-color 0.15s;
+}
+.list-group-item:hover {
+    background-color: var(--contact-hover) !important;
+}
+.list-group-item .b-icon {
+    font-size: 1.15em;
 }
 
 /* dailer css */

@@ -492,6 +492,12 @@ const deleteAllAccountData = (userid) => {
                         if(settings[i].app_key){
                             await twilioHelper.unlinkNumber(settings[i].twilio_sid, settings[i].twilio_token, settings[i].sid)
                         }
+                        if(settings[i].sip_domain_sid && settings[i].sip_id){
+                            await twilioHelper.deleteSipCredential(settings[i].twilio_sid, settings[i].twilio_token, settings[i].sip_domain_sid, settings[i].sip_id)
+                        }
+                        if(settings[i].sip_domain_sid){
+                            await twilioHelper.deleteSipDomain(settings[i].twilio_sid, settings[i].twilio_token, settings[i].sip_domain_sid)
+                        }
                     }
                 }catch(error){
 

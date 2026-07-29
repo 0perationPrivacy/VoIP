@@ -1,7 +1,7 @@
 <template>
-  <div class="custom-select" @click="toggleDropdown">
-    <div class="selected-option">
-      {{ selectedOption[labelProp] }}
+  <div class="custom-select" :class="{ 'is-empty': options.length === 0 }" @click="toggleDropdown">
+    <div class="selected-option" :class="{ placeholder: !selectedOption[labelProp] }">
+      {{ selectedOption[labelProp] || (options.length ? 'Select a number' : 'Numbers will populate here') }}
     </div>
     <div class="dropdown" v-if="showDropdown">
       <input
@@ -138,15 +138,32 @@ export default {
 <style scoped>
 .custom-select {
   position: relative;
-  display: inline-block;
+  display: block;
   width: 100%;
 }
 
+.custom-select.is-empty {
+  cursor: not-allowed;
+}
+
 .selected-option {
-  padding: 8px 20px;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  min-height: 20px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--background-color-secondary);
+  color: var(--text-primary-color);
   cursor: pointer;
+}
+
+.custom-select.is-empty .selected-option {
+  background-color: var(--background-color-secondary);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.selected-option.placeholder {
+  color: var(--text-tertiary);
 }
 
 .dropdown {
@@ -154,15 +171,24 @@ export default {
   top: 100%;
   left: 0;
   width: 100%;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  z-index: 20;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
 }
 
 input {
   width: 100%;
-  padding: 8px;
+  padding: 10px 14px;
   border: none;
+  background-color: var(--surface);
+  color: var(--text-primary-color);
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
 }
 
 ul {
@@ -175,10 +201,10 @@ ul {
 
 li {
   cursor: pointer;
-  padding: 5px;
+  padding: 8px 14px;
 }
 
-li:hover {
-  background-color: #f2f2f2;
+li:hover, li.highlighted {
+  background-color: var(--contact-hover);
 }
 </style>

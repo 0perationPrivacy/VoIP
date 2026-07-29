@@ -22,15 +22,12 @@
       shadow
       backdrop
       visible
+      width="94%"
     >
       <template #default="{ hide }">
-        <div class="d-flex flex-row-reverse bd-highlight">
-          <div class="bd-highlight dropDown">
-            <b-button class="float-right d-flex" size="sm" variant="primary">
-              <b-icon @click="hide" icon="x" scale="1"></b-icon>
-            </b-button>
-          </div>
-        </div>
+        <b-button class="icon-btn-sm icon-btn-close mobile-sidebar-close" size="sm" variant="primary">
+          <b-icon @click="hide" icon="x" scale="1"></b-icon>
+        </b-button>
         <number-list
           ref="numberList"
           @onaddContact="onaddContact"

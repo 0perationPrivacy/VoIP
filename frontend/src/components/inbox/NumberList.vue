@@ -20,7 +20,7 @@
             </div>
             <div class="bd-highlight">
               <b-icon
-                font-scale="1"
+                font-scale="1.5"
                 icon="telephone"
                 aria-hidden="true"
                 class="m-2"
@@ -32,7 +32,7 @@
             <div class="bd-highlight">
               <b-icon
                 v-b-modal.modal-2
-                font-scale="1"
+                font-scale="1.5"
                 icon="pencil-square"
                 aria-hidden="true"
                 class="m-2"
@@ -63,7 +63,7 @@
                 </div>
                 <div>
                   <b-icon
-                    font-scale="1"
+                    font-scale="1.3"
                     icon="person-badge"
                     aria-hidden="true"
                     class="mx-2 my-auto"
@@ -104,6 +104,24 @@
         />
       </div>
     </div>
+    <div class="wrap-filters">
+      <button
+        type="button"
+        class="filter-chip"
+        :class="{ active: listFilter === 'all' }"
+        @click="listFilter = 'all'"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="filter-chip"
+        :class="{ active: listFilter === 'unread' }"
+        @click="listFilter = 'unread'"
+      >
+        Unread
+      </button>
+    </div>
     <div class="contact-list">
       <div class="box-placeholder" v-if="messageListLoader">
         <div class="p-4">
@@ -129,7 +147,7 @@
         </div>
       </div>
       <div
-        v-for="item in search_numbers"
+        v-for="item in filteredNumbers"
         :key="item._id"
         class="contact"
         :id="`phone${item._id}`"
@@ -149,8 +167,8 @@
                 {{ item.contact.first_name }} {{ item.contact.last_name }}
               </h1>
               <h1 v-else class="font-name">{{ item._id }}</h1>
-              <p class="font-preview" v-if="item.message">
-                {{ getValidString(item.message) }}
+              <p class="font-preview" v-if="item.message" :title="item.message">
+                {{ item.message }}
               </p>
               <p class="font-preview" v-else>
                 <span v-if="item.message_type == 'call'">
@@ -508,6 +526,7 @@ export default {
         profile: ""
       },
       query: "",
+      listFilter: "all",
       isLoading: false,
       contacts: [],
       activeChat: "",
@@ -530,6 +549,14 @@ export default {
       selected: "telnyx",
       showDelete: false
     };
+  },
+  computed: {
+    filteredNumbers() {
+      if (this.listFilter === "unread") {
+        return this.search_numbers.filter(item => item.isview > 0);
+      }
+      return this.search_numbers;
+    }
   },
   validations: {
     user: {
@@ -626,15 +653,6 @@ export default {
         .catch(e => {
           console.log(e);
         });
-    },
-    getValidString(str) {
-      if (str.length > 10) {
-        var newStr2 = str.substring(0, str.length - (str.length - 10)) + "..";
-      } else {
-        // eslint-disable-next-line no-redeclare
-        var newStr2 = str;
-      }
-      return newStr2;
     },
     getOneProfile() {
       if (this.activeProfile._id !== undefined) {
@@ -1038,11 +1056,16 @@ export default {
   cursor: pointer;
 }
 .contact-list {
-  min-height: calc(100vh - 105px);
+  min-height: calc(100vh - 173px);
 }
 
 .icons {
-  font-size: 30px;
+  font-size: 38px;
+}
+@media (max-width: 576px) {
+  .icons {
+    font-size: 24px;
+  }
 }
 .chat_loader {
   width: 100%;

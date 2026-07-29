@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-icon font-scale="1" icon="gear-fill" aria-hidden="true" class="m-2" title="Settings" style="cursor:pointer;" v-b-toggle.sidebar-email-setting></b-icon>
+      <b-icon font-scale="1.5" icon="gear-fill" aria-hidden="true" class="m-2" title="Settings" style="cursor:pointer;" v-b-toggle.sidebar-email-setting></b-icon>
       <b-sidebar id="sidebar-email-setting" title="Settings" shadow backdrop>
           <div v-if="activeMenu == 'setting'">
             <ul class="list-group">

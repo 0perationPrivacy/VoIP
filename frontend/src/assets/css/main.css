@@ -133,9 +133,6 @@
     box-sizing: border-box;
     position: fixed;
 }*/
-#sidebar-email-setting .close{
-    color: var(--text-primary-color) !important;
-}
   section {
     background-color: var(--background-color-primary);
   }
@@ -269,9 +266,14 @@
 }
 
 .font-preview {
-    font-size: 0.8em;
+    font-size: 0.85em;
     line-height: 1.2rem;
     font-weight: inherit;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
 }
 
 .font-online {
@@ -283,13 +285,10 @@
 .wrap {
     display: flex;
     flex-grow: 1;
-    /* height: 100%; */
-    /*height: 100vh;*/
-    max-width: 1200px;
-    border-radius: 10px;
+    width: 100%;
+    height: 100vh;
     overflow: hidden;
-    margin: auto;
-    box-shadow: 0px 0px 2px 0px #aaa;
+    margin: 0;
 }
 
 /* ------ LEFT SIDE ------ */
@@ -302,6 +301,8 @@
     display: flex;
     justify-content: end;
     padding-left: 20px;
+    padding-right: 16px;
+    box-sizing: border-box;
 }
 
 .profile img {
@@ -318,22 +319,25 @@
 
 .wrap-search {
     width: 100%;
-    height: 45px;
+    height: 68px;
     background: var(--background-color-primary);
     display: flex;
+    padding: 0 16px;
+    box-sizing: border-box;
 }
 
 .search {
-    width: calc(100% - 20px);
-    height: 30px;
+    width: 100%;
+    height: 44px;
     background-color: var(--background-color-secondary);
     margin: auto;
-    border-radius: 15px;
+    border-radius: var(--radius-pill);
     display: flex;
+    overflow: hidden;
 }
 
 .search i {
-    width: 60px;
+    width: 48px;
 }
 
 .search i, .wrap-message i {
@@ -346,16 +350,42 @@
     border: none;
     background-color: var(--background-color-secondary);
     color: var(--text-primary-color);
-    border-radius: unset; /* fixes Chromium cursor size on message search bar */
+    border-radius: var(--radius-pill);
 }
 
 .input-search:focus {
     outline: none;
 }
+.wrap-filters {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 12px 16px;
+    background: var(--background-color-primary);
+    box-sizing: border-box;
+}
+
+.filter-chip {
+    border: 1px solid var(--border) !important;
+    background-color: var(--background-color-secondary) !important;
+    color: var(--text-primary-color) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 4px 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+.filter-chip.active,
+.btn-group-toggle .btn-outline-primary.active {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--text-on-accent) !important;
+}
+
 .contact-list {
     background-color: var(--contact-list);
     width: 100%;
-    height: calc(100vh - 105px);
+    height: calc(100vh - 173px);
     overflow-y: auto;
 }
 
@@ -389,6 +419,7 @@
 }
 .contact-preview {
     width: 100%;
+    min-width: 0;
     height: 70px;
     border-bottom: 1px solid var(--separator);
     display: flex;
@@ -396,6 +427,8 @@
 }
 
 .contact-text {
+    width: 100%;
+    min-width: 0;
     height: 40px;
     margin: auto 0;
 }
@@ -581,15 +614,17 @@
 
 .wrap-message {
     width: auto;
-    height: 60px;
+    height: 68px;
     background: var(--chat-background);
     display: flex;
+    padding: 8px 16px;
+    box-sizing: border-box;
 }
 
 .message {
     width: 100%;
     background: var(--background-color-primary);
-    margin: 5px;
+    margin: 0 5px;
     border:none;
     border-radius: 25px;
     display: flex;
@@ -621,10 +656,27 @@ body::-webkit-scrollbar-thumb, .contact-list::-webkit-scrollbar-thumb, .chat::-w
     background-color: rgba(0,0,0,0.2);
 }
 
-.dropDown, .dropDown > button, .dropDown > .dropdown-menu, .dropdown-item {
-    background-color: var(--background-color-secondary) !important;
-    border-color: var(--background-color-secondary) !important;
+.dropDown > .dropdown-menu, .dropdown-item {
+    background-color: var(--surface) !important;
+    border-color: var(--border) !important;
     color: var(--text-primary-color) !important;
+}
+.dropDown > button {
+    background-color: var(--accent-soft) !important;
+    border: 1px solid var(--accent) !important;
+    color: var(--text-primary-color) !important;
+}
+.dropDown > button:hover, .dropDown > button:focus, .dropDown > button:active {
+    background-color: var(--accent) !important;
+    color: var(--text-on-accent) !important;
+}
+.dropDown > button:hover .profileNum,
+.dropDown > button:focus .profileNum,
+.dropDown > button:active .profileNum,
+.dropDown > button:hover .profileName,
+.dropDown > button:focus .profileName,
+.dropDown > button:active .profileName {
+    color: var(--text-on-accent) !important;
 }
 a {
     text-decoration: none !important;
@@ -633,12 +685,26 @@ a {
 .modal-content{
     background-color: var(--background-color-primary);
 }
-.close{
-    padding: 1rem;
-    margin: -1rem -1rem -1rem auto;
-    background-color: transparent;
-    border: 0;
-    color: var(--text-primary-color);
+.close, #sidebar-email-setting .b-sidebar-header .close {
+    width: 34px;
+    height: 34px;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-soft) !important;
+    border: 1px solid var(--accent) !important;
+    border-radius: var(--radius-md);
+    color: var(--text-primary-color) !important;
+    font-size: 20px;
+    line-height: 1;
+    opacity: 1 !important;
+    transition: 0.2s;
+}
+.close:hover {
+    background-color: var(--accent) !important;
+    color: var(--text-on-accent) !important;
 }
 
 .card-body {
@@ -704,8 +770,42 @@ a {
     background-color: var(--contact-list);
     color: var(--text-primary-color);
 }
+.b-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 .b-sidebar-body {
     padding: var(--space-xl);
+}
+#sidebar-no-header .b-sidebar-body {
+    padding: 0;
+    position: relative;
+}
+.sidebar-header-row {
+    row-gap: 4px;
+}
+.sidebar-header-title {
+    white-space: nowrap;
+    margin-left: 4px;
+}
+.icon-btn-sm {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md) !important;
+}
+.icon-btn-close {
+    background-color: var(--accent-soft) !important;
+    border: 1px solid var(--accent) !important;
+    color: var(--text-primary-color) !important;
+}
+.icon-btn-close:hover {
+    background-color: var(--accent) !important;
+    color: var(--text-on-accent) !important;
 }
 
 .box, .box-placeholder {
@@ -824,11 +924,19 @@ a {
     text-align: center;
     float: left;
 }
+.input-group-prepend {
+    display: flex;
+}
 .input-group-text {
     border: none;
     background-color: var(--background-color-secondary);
     color: var(--text-secondary);
     border-radius: var(--radius-md) 0 0 var(--radius-md);
+    padding: 10px 14px;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
 .input-group .chat-input {
     border-radius: 0 var(--radius-md) var(--radius-md) 0;
@@ -843,11 +951,13 @@ a {
     display: none !important;
 }
 .dropDown .btn{
-    padding: 0 0.75rem !important;
+    padding: 6px 14px !important;
     font-size: 15px !important;
+    border-radius: var(--radius-pill) !important;
 }
 .profileNum {
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--theme-orange);
 }
 .dropdown-item {
@@ -860,10 +970,11 @@ a {
     max-width: 250px;
 }
 .profileName {
-    max-width: 100px;
+    max-width: 140px;
+    font-size: 13px;
 }
 .dropdown-item:hover {
-    background-color: var(--contact-hover)!important;
+    background-color: var(--accent-soft)!important;
 }
 .dropdown-menu {
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
@@ -1004,3 +1115,19 @@ a {
     border-color: var(--accent-color);
     background: var(--contact-hover);
   }
+
+@media (max-width: 576px) {
+  .profile {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  #sidebar-no-header .profile {
+    padding-right: 46px;
+  }
+  #sidebar-no-header .mobile-sidebar-close {
+    position: absolute;
+    top: 17px;
+    right: 8px;
+    z-index: 10;
+  }
+}

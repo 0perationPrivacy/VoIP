@@ -1,50 +1,30 @@
 <template>
     <div>
-        <b-icon class="pointer-icon m-2" font-scale="1" icon="person-lines-fill" aria-hidden="true" title="Contacts" v-b-toggle.sidebar-right></b-icon>
-        <b-sidebar id="sidebar-right" right shadow no-header backdrop>
+        <b-icon class="pointer-icon m-2" font-scale="1.5" icon="person-lines-fill" aria-hidden="true" title="Contacts" v-b-toggle.sidebar-right></b-icon>
+        <b-sidebar id="sidebar-right" right shadow no-header backdrop width="380px">
             <template #default="{ hide }">
-                <div class="d-flex flex-row mt-2 justify-content-between bd-highlight">
-                    <div class="bd-highlight dropDown">
-                        <b-button class="float-left d-flex m-1" size="sm" variant="primary">
-                          <b-icon @click="hide" icon="x" scale="1"></b-icon>
-                        </b-button>
-                    </div>
-                    <div >
-                        <div class="d-flex justify-content-start">
-                            <div class="ml-1">
-                                <b-button v-b-tooltip.hover title="Add Contact" @click="openContactModel()" class="float-left d-flex m-1" size="sm" variant="primary">
-                                    <b-icon icon="plus-circle" scale="1"></b-icon>
-                                </b-button>
-                            </div>
-                            <div class="ml-2">
-                              <b-button v-b-tooltip.hover title="Export Contact" @click="exportContact()" class="float-left d-flex m-1" size="sm" variant="primary">
-                                    <b-icon icon="cloud-download" scale="1"></b-icon>
-                                </b-button>
-                            </div>
-                            <div class="ml-2">
-                              <b-button v-b-tooltip.hover title="Delete All Contact" @click="deleteAll()" class="float-left d-flex m-1" size="sm" variant="danger">
-                                    <b-icon icon="trash-fill" scale="1"></b-icon>
-                                </b-button>
-                            </div>
-                            <div>
-                                <h4 class="pr-3 m-1">
-                                    Contacts
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
+                <div class="d-flex flex-row align-items-center flex-wrap mt-2 bd-highlight sidebar-header-row">
+                    <b-button class="icon-btn-sm icon-btn-close m-1" size="sm" variant="primary">
+                      <b-icon @click="hide" icon="x" scale="1"></b-icon>
+                    </b-button>
+                    <b-button v-b-tooltip.hover title="Add Contact" @click="openContactModel()" class="icon-btn-sm m-1" size="sm" variant="primary">
+                        <b-icon icon="plus-circle" scale="1"></b-icon>
+                    </b-button>
+                    <b-button v-b-tooltip.hover title="Export Contact" @click="exportContact()" class="icon-btn-sm m-1" size="sm" variant="primary">
+                        <b-icon icon="cloud-download" scale="1"></b-icon>
+                    </b-button>
+                    <b-button v-b-tooltip.hover title="Delete All Contact" @click="deleteAll()" class="icon-btn-sm m-1" size="sm" variant="danger">
+                        <b-icon icon="trash-fill" scale="1"></b-icon>
+                    </b-button>
+                    <h4 class="m-1 sidebar-header-title">
+                        Contacts
+                    </h4>
                 </div>
                 <div>
                   <div class="wrap-search">
                     <div class="search">
-                      <div class="d-flex flex-row bd-highlight">
-                        <div class="bd-highlight">
-                          &nbsp;&nbsp;<b-icon icon="search"></b-icon>&nbsp;&nbsp;
-                        </div>
-                        <div class="bd-highlight">
-                          <input type="text" class="input-search" v-model="query" @keyup="searchContact()" placeholder="Search" />
-                        </div>
-                      </div>
+                      <i class="fa fa-search fa" aria-hidden="true"></i>
+                      <input type="text" class="input-search" v-model="query" @keyup="searchContact()" placeholder="Search" />
                     </div>
                   </div>
                   <ul class="list-group">
